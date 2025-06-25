@@ -1,6 +1,24 @@
 # Audit d'Accessibilité RGAA/WCAG
 
-Une application web moderne pour effectuer des audits d'accessibilité automatisés selon les standards RGAA (Référentiel Général d'Amélioration de l'Accessibilité) et WCAG (Web Content Accessibility Guidelines) en utilisant l'intelligence artificielle de ChatGPT.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Beloic/rgaa-audit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-15.3.3-blue.svg)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+
+Une application web moderne pour effectuer des audits d'accessibilité automatisés avec trois moteurs d'analyse : **RGAA Engine personnalisé**, **WAVE**, et **Axe Core**. Support de l'analyse comparative et de l'intelligence artificielle via OpenAI.
+
+## 🎯 Demo Live
+
+🚀 **[Démo en ligne sur Vercel](https://rgaa-audit.vercel.app)** 
+
+## ✨ Nouveautés
+
+- **🔥 3 Moteurs d'analyse** : RGAA Engine, WAVE, Axe Core
+- **📊 Analyse comparative** : Comparaison des résultats entre moteurs
+- **🤖 IA intégrée** : Résumés et conseils via OpenAI
+- **📝 Blog intégré** : Articles sur l'accessibilité
+- **🎯 Quiz RGAA** : Quiz interactif pour tester ses connaissances
+- **📖 Guide d'audit manuel** : Guide étape par étape avec progression
 
 ## 🚀 Fonctionnalités
 
