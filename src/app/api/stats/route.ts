@@ -138,11 +138,14 @@ export async function POST(request: NextRequest) {
 // GET - Récupérer les statistiques (protégé par mot de passe admin)
 export async function GET(request: NextRequest) {
   try {
-    // Vérifier le mot de passe admin dans les headers
-    const adminPassword = request.headers.get('x-admin-password');
+    // Vérifier le mot de passe admin dans les headers (support des deux formats)
+    const adminPasswordHeader = request.headers.get('x-admin-password');
+    const authorizationHeader = request.headers.get('authorization');
     const expectedPassword = process.env.ADMIN_STATS_PASSWORD || 'RGAAAudit2025Admin!Stats';
     
-    if (adminPassword !== expectedPassword) {
+    const providedPassword = adminPasswordHeader || authorizationHeader;
+    
+    if (providedPassword !== expectedPassword) {
       return NextResponse.json(
         { error: 'Accès non autorisé' },
         { status: 401 }
