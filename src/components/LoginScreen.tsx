@@ -2,25 +2,19 @@
 
 import { useState } from 'react';
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface LoginScreenProps {
-  onLogin: (password: string) => void;
-  error?: string;
-}
-
-export default function LoginScreen({ onLogin, error }: LoginScreenProps) {
+export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, error, isLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!password.trim()) return;
     
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
-    onLogin(password);
-    setIsLoading(false);
+    await login(password);
+    // Le contexte gère maintenant l'état de chargement et les erreurs
   };
 
   return (

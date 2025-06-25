@@ -9,10 +9,10 @@ interface AuthWrapperProps {
 }
 
 export default function AuthWrapper({ children }: AuthWrapperProps) {
-  const { isAuthenticated, login, error } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
-    return <LoginScreen onLogin={login} error={error || undefined} />;
+    return <LoginScreen />;
   }
 
   return <>{children}</>;
