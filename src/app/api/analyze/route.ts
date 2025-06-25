@@ -355,7 +355,54 @@ export async function OPTIONS(request: NextRequest) {
 async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
   console.log(`🌊 Lancement de WAVE via le site web avec l'URL: ${url}`);
 
+  // Détecter l'environnement Vercel/production
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+  
+  if (isProduction) {
+    console.log('🔧 Environnement de production détecté - utilisation de l\'API WAVE alternative');
+    
+    // En production, utiliser l'API publique de WAVE ou un fallback
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      
+      const response = await fetch(`https://wave.webaim.org/api/request?key=${process.env.WAVE_API_KEY}&url=${encodeURIComponent(url)}&format=json`, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; RGAA-Audit-Tool/1.0)',
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const waveData = await response.text();
+        return parseWaveResults(waveData);
+      } else {
+        console.log('⚠️ API WAVE non disponible, utilisation du fallback');
+        throw new Error('API WAVE non disponible');
+      }
+    } catch (error) {
+      console.log('⚠️ Erreur API WAVE, utilisation du fallback minimal');
+      
+      // Fallback : analyse basique sans WAVE
+      return [{
+        ruleId: 'wave-fallback',
+        criterion: 'N/A',
+        level: 'AA',
+        impact: 'medium',
+        description: 'Analyse WAVE non disponible en production',
+        element: 'body',
+        recommendation: 'Veuillez utiliser l\'outil WAVE directement sur https://wave.webaim.org/ pour une analyse complète.',
+        context: 'Production environment fallback',
+        htmlSnippet: '<body>Production environment - WAVE analysis requires manual verification</body>'
+      }];
+    }
+  }
+
   try {
+    // Code existant pour l'environnement local...
     // Import dynamique de Puppeteer standard avec anti-détection manuel
     const puppeteer = await import('puppeteer');
     
@@ -377,7 +424,8 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
       console.log(`🔗 Tentative de connexion à une instance Chrome existante...`);
       browser = await puppeteer.default.connect({
         browserURL: 'http://localhost:9222',
-        defaultViewport: null
+        defaultViewport: null,
+        protocolTimeout: 180000 // 3 minutes
       });
       isConnectedToExisting = true;
       console.log(`✅ Connecté à l'instance Chrome existante!`);
@@ -386,6 +434,7 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
       console.log(`📱 Aucune instance Chrome trouvée, lancement d'une nouvelle instance...`);
       browser = await puppeteer.default.launch({
         headless: false, // Mode visible pour permettre à l'utilisateur de voir le rapport WAVE
+        protocolTimeout: 180000, // 3 minutes
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -976,6 +1025,7 @@ async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
     console.log(`🚀 Lancement d'une instance Chrome headless pour Axe Core...`);
     const browser = await puppeteer.default.launch({
       headless: true, // Mode headless pour Axe Core
+      protocolTimeout: 180000, // 3 minutes
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -1493,6 +1543,7 @@ async function launchRGAAAnalysis(url: string): Promise<RGAAViolation[]> {
     console.log(`🚀 Lancement d'une instance Chrome headless pour le moteur RGAA...`);
     const browser = await puppeteer.default.launch({
       headless: true, // Mode headless strict
+      protocolTimeout: 180000, // 3 minutes
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
