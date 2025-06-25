@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 // Types pour les statistiques
 interface VisitorStat {
@@ -20,49 +18,15 @@ interface StatsData {
   visitors: VisitorStat[];
 }
 
-// Chemin vers le fichier de statistiques
-const STATS_FILE = path.join(process.cwd(), 'data', 'visitor-stats.json');
-
-// Fonction pour s'assurer que le répertoire existe
-function ensureDataDirectory() {
-  const dataDir = path.dirname(STATS_FILE);
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-}
-
-// Fonction pour lire les statistiques
-function readStats(): StatsData {
-  try {
-    ensureDataDirectory();
-    if (fs.existsSync(STATS_FILE)) {
-      const data = fs.readFileSync(STATS_FILE, 'utf8');
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error('Erreur lors de la lecture des stats:', error);
-  }
-  
-  // Retourner des données par défaut
-  return {
-    totalAttempts: 0,
-    successfulLogins: 0,
-    failedAttempts: 0,
-    uniqueVisitors: 0,
-    lastActivity: new Date().toISOString(),
-    visitors: []
-  };
-}
-
-// Fonction pour écrire les statistiques
-function writeStats(stats: StatsData) {
-  try {
-    ensureDataDirectory();
-    fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2));
-  } catch (error) {
-    console.error('Erreur lors de l\'écriture des stats:', error);
-  }
-}
+// Stockage en mémoire temporaire pour Vercel
+let memoryStats: StatsData = {
+  totalAttempts: 0,
+  successfulLogins: 0,
+  failedAttempts: 0,
+  uniqueVisitors: 0,
+  lastActivity: new Date().toISOString(),
+  visitors: []
+};
 
 // Fonction pour obtenir l'IP du client
 function getClientIP(request: NextRequest): string {
@@ -88,8 +52,6 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || 'unknown';
     const timestamp = new Date().toISOString();
     
-    const stats = readStats();
-    
     // Créer une nouvelle entrée visiteur
     const newVisitor: VisitorStat = {
       timestamp,
@@ -99,27 +61,25 @@ export async function POST(request: NextRequest) {
       failureReason
     };
     
-    // Mettre à jour les statistiques
-    stats.visitors.push(newVisitor);
-    stats.totalAttempts++;
-    stats.lastActivity = timestamp;
+    // Mettre à jour les statistiques en mémoire
+    memoryStats.visitors.push(newVisitor);
+    memoryStats.totalAttempts++;
+    memoryStats.lastActivity = timestamp;
     
     if (success) {
-      stats.successfulLogins++;
+      memoryStats.successfulLogins++;
     } else {
-      stats.failedAttempts++;
+      memoryStats.failedAttempts++;
     }
     
     // Calculer les visiteurs uniques (basé sur IP)
-    const uniqueIPs = new Set(stats.visitors.map(v => v.ip));
-    stats.uniqueVisitors = uniqueIPs.size;
+    const uniqueIPs = new Set(memoryStats.visitors.map(v => v.ip));
+    memoryStats.uniqueVisitors = uniqueIPs.size;
     
-    // Garder seulement les 1000 dernières entrées pour éviter que le fichier devienne trop gros
-    if (stats.visitors.length > 1000) {
-      stats.visitors = stats.visitors.slice(-1000);
+    // Garder seulement les 1000 dernières entrées pour éviter une surcharge mémoire
+    if (memoryStats.visitors.length > 1000) {
+      memoryStats.visitors = memoryStats.visitors.slice(-1000);
     }
-    
-    writeStats(stats);
     
     return NextResponse.json({ 
       success: true, 
@@ -152,16 +112,14 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    const stats = readStats();
-    
     // Calculer des statistiques supplémentaires
     const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const recentVisitors = stats.visitors.filter(
+    const recentVisitors = memoryStats.visitors.filter(
       v => new Date(v.timestamp) > last24h
     );
     
     const last7days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const weeklyVisitors = stats.visitors.filter(
+    const weeklyVisitors = memoryStats.visitors.filter(
       v => new Date(v.timestamp) > last7days
     );
     
@@ -171,7 +129,7 @@ export async function GET(request: NextRequest) {
       const dayStart = new Date(date.setHours(0, 0, 0, 0));
       const dayEnd = new Date(date.setHours(23, 59, 59, 999));
       
-      const dayVisitors = stats.visitors.filter(v => {
+      const dayVisitors = memoryStats.visitors.filter(v => {
         const vDate = new Date(v.timestamp);
         return vDate >= dayStart && vDate <= dayEnd;
       });
@@ -185,14 +143,14 @@ export async function GET(request: NextRequest) {
     }).reverse();
     
     const enhancedStats = {
-      ...stats,
+      ...memoryStats,
       analytics: {
         last24hAttempts: recentVisitors.length,
         last24hSuccessful: recentVisitors.filter(v => v.success).length,
         last7daysAttempts: weeklyVisitors.length,
         last7daysSuccessful: weeklyVisitors.filter(v => v.success).length,
-        successRate: stats.totalAttempts > 0 
-          ? Math.round((stats.successfulLogins / stats.totalAttempts) * 100) 
+        successRate: memoryStats.totalAttempts > 0 
+          ? Math.round((memoryStats.successfulLogins / memoryStats.totalAttempts) * 100) 
           : 0,
         dailyStats
       }
