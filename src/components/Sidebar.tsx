@@ -1,0 +1,91 @@
+'use client';
+
+import { Monitor, FileCheck, BookOpen, Plus } from 'lucide-react';
+
+interface SidebarProps {
+  activeSection: 'analyze' | 'manual-audit' | 'rgaa-reference';
+  onSectionChange: (section: 'analyze' | 'manual-audit' | 'rgaa-reference') => void;
+  onNewAnalysis?: () => void;
+  hasAnalysis?: boolean;
+}
+
+export default function Sidebar({ activeSection, onSectionChange, onNewAnalysis, hasAnalysis = false }: SidebarProps) {
+  const getButtonClasses = (section: string) => {
+    const baseClasses = "w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500";
+    if (activeSection === section) {
+      return `${baseClasses} bg-blue-50 text-blue-700 border border-blue-200`;
+    }
+    return `${baseClasses} text-gray-700 hover:bg-gray-50 hover:text-gray-900`;
+  };
+
+  return (
+    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 flex flex-col">
+      <nav className="p-4 space-y-2 flex-1" aria-label="Navigation secondaire">
+        {/* Bouton Nouvelle analyse */}
+        {onNewAnalysis && (
+          <button
+            onClick={() => {
+              onSectionChange('analyze'); // Changer vers la section analyze
+              onNewAnalysis(); // Déclencher la nouvelle analyse
+            }}
+            className={getButtonClasses('new-analysis')}
+            aria-label="Nouvelle analyse"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Nouvelle analyse</span>
+          </button>
+        )}
+        
+        {hasAnalysis && (
+          <button
+            onClick={() => onSectionChange('analyze')}
+            className={getButtonClasses('analyze')}
+            aria-current={activeSection === 'analyze' ? 'page' : undefined}
+          >
+            <Monitor className="w-5 h-5" aria-hidden="true" />
+            <span className="font-medium">Votre analyse</span>
+          </button>
+        )}
+        
+        <button
+          onClick={() => onSectionChange('manual-audit')}
+          className={getButtonClasses('manual-audit')}
+          aria-current={activeSection === 'manual-audit' ? 'page' : undefined}
+        >
+          <FileCheck className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">Audit manuel</span>
+        </button>
+        
+        <button
+          onClick={() => onSectionChange('rgaa-reference')}
+          className={getButtonClasses('rgaa-reference')}
+          aria-current={activeSection === 'rgaa-reference' ? 'page' : undefined}
+        >
+          <BookOpen className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">Référentiel RGAA</span>
+        </button>
+      </nav>
+      
+      {/* Section Alpha en bas */}
+      <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <div className="text-center">
+          <div className="border border-orange-500 text-orange-600 text-xs font-bold px-2 py-1 rounded-full inline-flex items-center gap-1 mb-2">
+            <span className="text-[10px]">⚠️</span>
+            VERSION ALPHA
+          </div>
+          <p className="text-xs text-gray-600 leading-relaxed">
+            Il est probable que vous rencontriez des bugs, merci de bien vouloir les remonter :
+          </p>
+          <a 
+            href="https://trello.com/invite/b/685bed1c2b11059cc9d7e615/ATTI78b0cb2e987bf68a04e1f1e4198c0cb11AFF68E6/backlog-rgaa-audit" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-blue-600 hover:text-blue-800 underline mt-1 inline-block"
+          >
+            Signaler un bug
+          </a>
+        </div>
+      </div>
+    </aside>
+  );
+} 
