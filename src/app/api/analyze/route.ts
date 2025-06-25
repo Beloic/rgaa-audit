@@ -1010,21 +1010,23 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
 
 // Fonction pour lancer l'analyse Axe Core
 async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
-  console.log(`🔧 Lancement d'Axe Core pour l'URL: ${url}`);
+  console.log(`🔍 Injection d'Axe Core et lancement de l'analyse pour: ${url}`);
+
+  // Détecter l'environnement Vercel/production
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+  
+  if (isProduction) {
+    console.log('🔧 Environnement de production détecté pour Axe - utilisation du mode headless strict');
+  }
 
   try {
-    // Vérifier l'URL avant de commencer
-    if (!url || !url.startsWith('http')) {
-      throw new Error(`URL invalide: ${url}`);
-    }
-
-    // Import dynamique de Puppeteer et Axe Core
+    // Import dynamique de Puppeteer
     const puppeteer = await import('puppeteer');
     
     // Lancer directement une instance headless pour Axe Core (pas besoin d'interface visuelle)
     console.log(`🚀 Lancement d'une instance Chrome headless pour Axe Core...`);
     const browser = await puppeteer.default.launch({
-      headless: true, // Mode headless pour Axe Core
+      headless: true, // Mode headless pour Axe Core (compatible production)
       protocolTimeout: 180000, // 3 minutes
       args: [
         '--no-sandbox',
@@ -1038,7 +1040,22 @@ async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
         '--disable-renderer-backgrounding',
         '--ignore-certificate-errors',
         '--ignore-ssl-errors',
-        '--ignore-certificate-errors-spki-list'
+        '--ignore-certificate-errors-spki-list',
+        // Args spécifiques pour la production/Vercel
+        ...(isProduction ? [
+          '--disable-gpu',
+          '--disable-software-rasterizer',
+          '--disable-background-networking',
+          '--disable-default-apps',
+          '--disable-extensions',
+          '--disable-sync',
+          '--disable-translate',
+          '--hide-scrollbars',
+          '--mute-audio',
+          '--no-first-run',
+          '--safebrowsing-disable-auto-update',
+          '--single-process'
+        ] : [])
       ]
     });
     console.log(`✅ Instance Chrome headless lancée pour Axe Core!`);
