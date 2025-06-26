@@ -192,7 +192,7 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
                       </h3>
                       <p className={`text-sm mt-1 ${selectedEngine === 'rgaa' ? 'text-green-700' : 'text-gray-500'}`}>
                         {language === 'fr' 
-                          ? 'Le moteur le plus rapide'
+                          ? 'Notre moteur le plus rapide'
                           : 'Our fastest engine'
                         }
                       </p>
