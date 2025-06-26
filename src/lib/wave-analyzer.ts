@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { RGAAViolation } from '@/types/audit';
 
-const WAVE_API_KEY = 'BXfRFuh35509';
+const WAVE_API_KEY = process.env.WAVE_API_KEY || '';
 const WAVE_API_URL = 'https://wave.webaim.org/api/request';
 
 interface WaveError {

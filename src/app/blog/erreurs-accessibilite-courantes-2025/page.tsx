@@ -8,7 +8,7 @@ import { Shield, Calendar, Clock, ArrowLeft, AlertTriangle, Eye, Mouse, Keyboard
 import Footer from '@/components/Footer';
 
 export default function ErreursCourantesPage() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -17,7 +17,7 @@ export default function ErreursCourantesPage() {
         href="#main-content" 
         className="sr-only focus:not-sr-only focus:absolute focus:top-16 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-lg z-50 focus:ring-2 focus:ring-blue-300"
       >
-        Aller au contenu principal
+        {t('blog.skipToContent')}
       </a>
 
       {/* Topbar Navigation */}
@@ -32,10 +32,10 @@ export default function ErreursCourantesPage() {
             <Link 
               href="/blog" 
               className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg px-2 py-1 transition-colors"
-              aria-label="Retour au blog"
+              aria-label={t('blog.backToBlog')}
             >
               <ArrowLeft className="w-4 h-4 mr-2" aria-hidden="true" />
-              Retour au blog
+              {t('blog.backToBlog')}
             </Link>
           </nav>
 
@@ -49,16 +49,16 @@ export default function ErreursCourantesPage() {
                 </div>
                 <div className="flex items-center">
                   <Clock className="w-4 h-4 mr-2" aria-hidden="true" />
-                  <span>8 min de lecture</span>
+                  <span>8 {t('common.readingTime')}</span>
                 </div>
               </div>
               
               <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                Les erreurs d'accessibilité les plus courantes en 2025
+                {t('errors2025.title')}
               </h1>
               
               <p className="text-xl text-gray-600 leading-relaxed">
-                Découvrez les 10 problèmes d'accessibilité web les plus fréquemment rencontrés et comment les corriger facilement pour améliorer l'expérience de tous vos utilisateurs.
+                {t('errors2025.subtitle')}
               </p>
             </div>
           </header>
@@ -69,16 +69,16 @@ export default function ErreursCourantesPage() {
             {/* Introduction */}
             <section className="mb-12">
               <p className="text-gray-700 leading-relaxed mb-6">
-                Malgré une sensibilisation croissante à l'accessibilité web, certaines erreurs persistent de manière récurrente sur une majorité de sites internet. D'après nos analyses de milliers de sites web en 2024 et 2025, voici les problèmes les plus fréquents que nous rencontrons.
+                {t('errors2025.intro')}
               </p>
               
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <div className="flex items-start">
                   <Lightbulb className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
                   <div>
-                    <p className="text-blue-800 font-medium mb-2">Bonne nouvelle !</p>
+                    <p className="text-blue-800 font-medium mb-2">{t('message.goodNews')}</p>
                     <p className="text-blue-700 text-sm">
-                      La plupart de ces erreurs sont facilement corrigibles avec quelques ajustements simples. Chaque correction apporte une amélioration significative de l'expérience utilisateur.
+                      {t('errors2025.goodNews')}
                     </p>
                   </div>
                 </div>
@@ -89,7 +89,7 @@ export default function ErreursCourantesPage() {
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <span className="bg-red-100 text-red-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">1</span>
-                Textes alternatifs manquants ou inadéquats
+                {t('errors2025.error1.title')}
               </h2>
               
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
@@ -97,7 +97,7 @@ export default function ErreursCourantesPage() {
                   <div>
                     <h3 className="font-semibold text-red-600 mb-3 flex items-center">
                       <XCircle className="w-5 h-5 mr-2" />
-                      Erreur fréquente
+                      {t('common.frequentError')}
                     </h3>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                       <code className="text-sm text-red-800">
@@ -111,7 +111,7 @@ export default function ErreursCourantesPage() {
                   <div>
                     <h3 className="font-semibold text-green-600 mb-3 flex items-center">
                       <CheckCircle className="w-5 h-5 mr-2" />
-                      Correction
+                      {t('common.correction')}
                     </h3>
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                       <code className="text-sm text-green-800">
@@ -125,7 +125,7 @@ export default function ErreursCourantesPage() {
                 
                 <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                   <p className="text-gray-700 text-sm">
-                    <strong>Impact :</strong> 96% des sites analysés présentent cette erreur. Les lecteurs d'écran ne peuvent pas décrire le contenu visuel aux utilisateurs malvoyants.
+                    <strong>{t('common.impact')} :</strong> {t('errors2025.error1.impact')}
                   </p>
                 </div>
               </div>
@@ -135,24 +135,24 @@ export default function ErreursCourantesPage() {
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <span className="bg-red-100 text-red-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">2</span>
-                Contraste de couleurs insuffisant
+                {t('errors2025.error2.title')}
               </h2>
               
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Les ratios de contraste minimum requis par le RGAA sont souvent ignorés, rendant le texte difficile à lire pour les personnes ayant des difficultés visuelles.
+                  {t('errors2025.error2.description')}
                 </p>
                 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="font-semibold text-red-600 mb-3">Exemple problématique</h3>
+                    <h3 className="font-semibold text-red-600 mb-3">{t('common.problematicExample')}</h3>
                     <div className="bg-blue-100 p-4 rounded-lg">
                       <p className="text-blue-300 text-sm">Texte en bleu clair sur fond bleu (ratio 1.5:1)</p>
                     </div>
                   </div>
                   
                   <div>
-                    <h3 className="font-semibold text-green-600 mb-3">Correction appropriée</h3>
+                    <h3 className="font-semibold text-green-600 mb-3">{t('common.appropriateCorrection')}</h3>
                     <div className="bg-blue-100 p-4 rounded-lg">
                       <p className="text-blue-900 text-sm font-medium">Texte en bleu foncé sur fond bleu clair (ratio 7.2:1)</p>
                     </div>
@@ -161,7 +161,7 @@ export default function ErreursCourantesPage() {
                 
                 <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-yellow-800 text-sm">
-                    <strong>Ratios minimum :</strong> 4.5:1 pour le texte normal, 3:1 pour le texte large (18pt+ ou 14pt+ en gras)
+                    <strong>{t('errors2025.error2.ratios')}</strong>
                   </p>
                 </div>
               </div>
@@ -171,7 +171,7 @@ export default function ErreursCourantesPage() {
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <span className="bg-red-100 text-red-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">3</span>
-                Navigation au clavier impossible
+                {t('errors2025.error3.title')}
               </h2>
               
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
@@ -179,13 +179,13 @@ export default function ErreursCourantesPage() {
                   <Keyboard className="w-6 h-6 text-purple-600 mr-3 mt-1 flex-shrink-0" />
                   <div>
                     <p className="text-gray-700 leading-relaxed mb-4">
-                      De nombreux utilisateurs naviguent uniquement au clavier (handicap moteur, préférence, etc.). Les éléments interactifs doivent être accessibles via les touches Tab, Entrée et Espace.
+                      {t('errors2025.error3.description')}
                     </p>
                   </div>
                 </div>
                 
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-800 mb-3">Problèmes fréquents :</h4>
+                  <h4 className="font-semibold text-gray-800 mb-3">{t('errors2025.error3.problems')}</h4>
                   <ul className="text-gray-700 space-y-2 text-sm">
                     <li>• Boutons créés avec des <code>&lt;div&gt;</code> non focusables</li>
                     <li>• Menus déroulants qui se ferment au focus clavier</li>
@@ -197,7 +197,7 @@ export default function ErreursCourantesPage() {
                 
                 <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-green-800 text-sm">
-                    <strong>Solution :</strong> Utiliser les éléments HTML sémantiques (&lt;button&gt;, &lt;a&gt;) et tester la navigation avec la touche Tab uniquement.
+                    <strong>{t('common.solution')} :</strong> {t('errors2025.error3.solution')}
                   </p>
                 </div>
               </div>

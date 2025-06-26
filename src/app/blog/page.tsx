@@ -8,51 +8,73 @@ import { Shield, Calendar, Clock, ArrowRight, Users, AlertTriangle, TrendingUp }
 import Footer from '@/components/Footer';
 
 export default function BlogPage() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   const articles = [
     {
       id: 'rgaa-2025-nouvelles-regles',
-      title: 'RGAA 2025 : 5 nouvelles règles à connaître',
-      excerpt: 'Découvrez les évolutions majeures du RGAA qui entreront en vigueur en 2025. Nouvelles obligations, critères renforcés et impacts pour les sites web.',
+      title: t('article.rgaa2025.title'),
+      excerpt: t('article.rgaa2025.excerpt'),
       date: '2024-12-03',
-      readTime: '8 min',
-      category: 'Réglementation',
+      readTime: '8',
+      category: t('article.categories.regulation'),
       image: '🚨',
-      tags: ['RGAA', 'Réglementation', '2025'],
+      tags: ['RGAA', t('article.categories.regulation'), '2025'],
       featured: true
     },
     {
       id: 'erreurs-accessibilite-courantes-2025',
-      title: 'Top 10 des erreurs d\'accessibilité les plus courantes',
-      excerpt: 'Évitez les pièges les plus fréquents en matière d\'accessibilité web. Guide pratique avec exemples concrets et solutions pour chaque problème identifié.',
+      title: t('article.errors2025.title'),
+      excerpt: t('article.errors2025.excerpt'),
       date: '2024-11-28',
-      readTime: '12 min',
-      category: 'Guide',
+      readTime: '12',
+      category: t('article.categories.guide'),
       image: '⚠️',
-      tags: ['RGAA', 'Erreurs', 'Guide'],
+      tags: ['RGAA', t('article.categories.guide')],
       featured: false
     },
     {
       id: 'accessibilite-seo-guide-complet',
-      title: 'Accessibilité et SEO : le guide complet 2025',
-      excerpt: 'Comment l\'accessibilité web améliore votre référencement naturel. Techniques, outils et stratégies pour allier performance SEO et inclusion numérique.',
+      title: t('article.seoGuide.title'),
+      excerpt: t('article.seoGuide.excerpt'),
       date: '2024-11-25',
-      readTime: '15 min',
-      category: 'SEO',
+      readTime: '15',
+      category: t('article.categories.seo'),
       image: '🔍',
-      tags: ['SEO', 'RGAA', 'Performance'],
+      tags: [t('article.categories.seo'), 'RGAA', 'Performance'],
       featured: false
     },
     {
       id: 'accessibilite-mobile-bonnes-pratiques',
-      title: 'Accessibilité mobile : bonnes pratiques 2025',
-      excerpt: 'Optimisez l\'accessibilité de vos applications mobiles. Techniques de design inclusif, tests utilisateurs et conformité RGAA sur mobile.',
+      title: t('article.mobile.title'),
+      excerpt: t('article.mobile.excerpt'),
       date: '2024-11-20',
-      readTime: '10 min',
-      category: 'Mobile',
+      readTime: '10',
+      category: t('article.categories.mobile'),
       image: '📱',
-      tags: ['Mobile', 'RGAA', 'UX'],
+      tags: [t('article.categories.mobile'), 'RGAA', 'UX'],
+      featured: false
+    },
+    {
+      id: 'comment-tester-accessibilite-site-web',
+      title: t('article.testing.title'),
+      excerpt: t('article.testing.excerpt'),
+      date: '2024-11-15',
+      readTime: '10',
+      category: t('article.categories.testing'),
+      image: '🧪',
+      tags: [t('article.categories.testing'), 'RGAA', t('article.categories.guide')],
+      featured: false
+    },
+    {
+      id: 'couleurs-contrastes-wcag-guide',
+      title: t('article.colors.title'),
+      excerpt: t('article.colors.excerpt'),
+      date: '2024-11-10',
+      readTime: '12',
+      category: t('article.categories.colors'),
+      image: '🎨',
+      tags: [t('article.categories.colors'), 'WCAG', t('article.categories.guide')],
       featured: false
     }
   ];
@@ -64,7 +86,7 @@ export default function BlogPage() {
         href="#main-content" 
         className="sr-only focus:not-sr-only focus:absolute focus:top-16 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-lg z-50 focus:ring-2 focus:ring-blue-300"
       >
-        Aller au contenu principal
+        {t('blog.skipToContent')}
       </a>
 
       {/* Topbar Navigation */}
@@ -75,10 +97,10 @@ export default function BlogPage() {
         {/* Header */}
         <header className="text-center px-6 pt-16 pb-12 max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Blog RGAA Audit
+            {t('blog.title')}
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Actualités, guides et bonnes pratiques pour l'accessibilité web
+            {t('blog.subtitle')}
           </p>
         </header>
 
@@ -87,7 +109,7 @@ export default function BlogPage() {
           {/* Article mis en avant */}
           {articles.find(article => article.featured) && (
             <div className="mb-16">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">À la une</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-8">{t('blog.featured')}</h2>
               {(() => {
                 const featuredArticle = articles.find(article => article.featured)!;
                 return (
@@ -106,7 +128,7 @@ export default function BlogPage() {
                             </div>
                             <div className="flex items-center space-x-1">
                               <Clock className="w-4 h-4" aria-hidden="true" />
-                              <span>{featuredArticle.readTime} de lecture</span>
+                              <span>{featuredArticle.readTime} {t('blog.readTime')}</span>
                             </div>
                           </div>
                         </div>
@@ -129,7 +151,7 @@ export default function BlogPage() {
                         href={`/blog/${featuredArticle.id}`}
                         className="inline-flex items-center text-blue-600 hover:text-blue-700 focus:text-blue-700 font-medium transition-colors focus:outline-none focus:underline"
                       >
-                        Lire l'article complet
+                        {t('blog.readFullArticle')}
                         <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
                       </Link>
                     </div>
@@ -141,7 +163,7 @@ export default function BlogPage() {
 
           {/* Tous les articles */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Tous les articles</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">{t('blog.allArticles')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {articles.map((article) => (
                 <article key={article.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
@@ -173,7 +195,7 @@ export default function BlogPage() {
                       </div>
                       <div className="flex items-center space-x-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />
-                        <span>{article.readTime}</span>
+                        <span>{article.readTime} {t('blog.readTime')}</span>
                       </div>
                     </div>
                   </div>

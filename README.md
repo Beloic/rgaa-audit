@@ -1,342 +1,216 @@
-# Audit d'Accessibilité RGAA/WCAG
+# 🚀 RGAA Audit - Outil d'audit d'accessibilité
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Beloic/rgaa-audit)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Next.js](https://img.shields.io/badge/Next.js-15.3.3-blue.svg)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+Une application Next.js moderne pour l'audit d'accessibilité RGAA avec des moteurs d'analyse automatisée pour rendre le web plus inclusif.
 
-Une application web moderne pour effectuer des audits d'accessibilité automatisés avec trois moteurs d'analyse : **RGAA Engine personnalisé**, **WAVE**, et **Axe Core**. Support de l'analyse comparative et de l'intelligence artificielle via OpenAI.
+## ✨ Fonctionnalités
 
-## 🎯 Demo Live
+- **🔍 Audit automatisé** : Analyse complète avec WAVE et Axe Core
+- **📊 Rapports détaillés** : Violations détectées avec recommandations de correction
+- **🎯 Conformité RGAA** : Respect des critères d'accessibilité français
+- **🚦 Score d'accessibilité** : Évaluation instantanée de votre site
+- **📋 Export PDF** : Rapports professionnels téléchargeables
+- **🌐 Multilingue** : Interface disponible en français et anglais
+- **⚡ Performance** : Analyse rapide et optimisée
+- **🔒 Sécurisé** : Aucune donnée sensible stockée
 
-🚀 **[Démo en ligne sur Vercel](https://rgaa-audit.vercel.app)** 
+## 🛠️ Architecture technique
 
-## ✨ Nouveautés
+### Moteurs d'analyse
+- **WAVE** : WebAIM's Web Accessibility Evaluation Tool
+- **Axe Core** : Analyseur d'accessibilité Deque Systems
+- **RGAA** : Référentiel Général d'Amélioration de l'Accessibilité
 
-- **🔥 3 Moteurs d'analyse** : RGAA Engine, WAVE, Axe Core
-- **📊 Analyse comparative** : Comparaison des résultats entre moteurs
-- **🤖 IA intégrée** : Résumés et conseils via OpenAI
-- **📝 Blog intégré** : Articles sur l'accessibilité
-- **🎯 Quiz RGAA** : Quiz interactif pour tester ses connaissances
-- **📖 Guide d'audit manuel** : Guide étape par étape avec progression
+### Technologies
+- **Frontend** : Next.js 15.3, React 18, TypeScript
+- **Styling** : Tailwind CSS 4.0
+- **Icons** : Lucide React
+- **Analytics** : Vercel Analytics
+- **Deployment** : Vercel
 
-## 🚀 Fonctionnalités
+## 🚀 Installation
 
-- **Analyse exhaustive** : Audit complet selon les **106 critères RGAA 4.1** via l'API OpenAI
-- **Couverture totale WCAG 2.1** : Tous les niveaux A, AA et AAA analysés
-- **Standards RGAA/WCAG** : Conformité aux référentiels français et internationaux
-- **Interface multilingue** : Support français et anglais
-- **Analyse flexible** : Analyse par URL ou code HTML direct
-- **Rapports détaillés** : Résultats structurés avec recommandations techniques précises
-- **Interface moderne** : Design responsive avec Tailwind CSS
-- **Sécurité intégrée** : Sanitisation HTML et rate limiting
-
-## 🛠️ Technologies
-
-- **Frontend** : Next.js 14, React, TypeScript, Tailwind CSS
-- **Backend** : Next.js API Routes, Node.js
-- **IA** : OpenAI GPT-3.5-turbo API
-- **Sécurité** : DOMPurify, JSDOM, Rate limiting
-- **UI** : Lucide React icons, Headless UI
-
-## 📋 Prérequis
-
-- Node.js 18+ et npm
-- Clé API OpenAI (GPT-3.5-turbo access requis)
-
-## 🔧 Installation
-
-1. **Cloner le projet**
-   \`\`\`bash
-   git clone <url-du-repo>
-   cd rgaa-audit-app
-   \`\`\`
+1. **Cloner le repository**
+```bash
+git clone https://github.com/your-username/rgaa-audit-app.git
+cd rgaa-audit-app
+```
 
 2. **Installer les dépendances**
-   \`\`\`bash
-   npm install
-   \`\`\`
+```bash
+npm install
+```
 
 3. **Configuration des variables d'environnement**
-   \`\`\`bash
-   cp env.example .env.local
-   \`\`\`
+```bash
+cp env.example .env.local
+```
 
-   Éditer le fichier \`.env.local\` :
-   \`\`\`env
-   OPENAI_API_KEY=your_openai_api_key_here
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
-   \`\`\`
+Éditer `.env.local` :
+```env
+# Configuration RGAA Audit
+BETA_PASSWORD=rgaa2025beta
 
-4. **Lancer l'application**
-   \`\`\`bash
-   npm run dev
-   \`\`\`
+# Configuration WAVE API
+WAVE_API_KEY=your_wave_api_key_here
 
-   L'application sera accessible sur [http://localhost:3000](http://localhost:3000)
+# Configuration Next.js
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NODE_ENV=development
+```
 
-## 🎯 Utilisation
+4. **Lancer le serveur de développement**
+```bash
+npm run dev
+```
 
-### Analyse par URL
-1. Sélectionner "URL" dans le formulaire
-2. Entrer l'URL de la page à analyser
-3. Choisir la langue d'analyse (FR/EN)
-4. Cliquer sur "Analyser l'accessibilité"
-
-### Analyse par code HTML
-1. Sélectionner "HTML" dans le formulaire
- 2. Coller le code HTML (max 1MB)
-3. Choisir la langue d'analyse
-4. Lancer l'analyse
-
-### Résultats
-L'audit génère un rapport comprenant :
-- **Score global** sur 100
-- **Statistiques** par niveau WCAG et impact
-- **Liste détaillée** des non-conformités
-- **Recommandations** pour chaque problème
-
-## 📊 Critères d'Audit
-
-L'application analyse selon les critères RGAA 4.1 et WCAG 2.1 :
-
-### Domaines d'analyse
-- **Images** : Alternatives textuelles, descriptions
-- **Couleurs** : Contrastes, information par la couleur
-- **Multimédia** : Transcriptions, sous-titres
-- **Tableaux** : Structure, en-têtes
-- **Liens** : Intitulés explicites
-- **Scripts** : Accessibilité au clavier
-- **Éléments obligatoires** : Titre, langue
-- **Structure** : Hiérarchie des titres
-- **Formulaires** : Labels, aide à la saisie
-- **Navigation** : Mécanismes de navigation
-
-### Niveaux de conformité
-- **A** : Niveau de base
-- **AA** : Niveau standard (requis légalement)
-- **AAA** : Niveau avancé
-
-### Impacts
-- **Critique** : Bloque complètement l'accès
-- **Élevé** : Rend l'accès très difficile
-- **Moyen** : Complique l'utilisation
-- **Faible** : Problème mineur
-
-## 🔒 Sécurité
-
-- **Sanitisation HTML** : DOMPurify nettoie le contenu
-- **Rate limiting** : 10 requêtes/heure par IP
-- **Validation** : Contrôles stricts des entrées
-- **Timeout** : Limite de 60 secondes par requête
+5. **Ouvrir dans le navigateur**
+```
+http://localhost:3000
+```
 
 ## 📁 Structure du projet
 
-\`\`\`
+```
 rgaa-audit-app/
 ├── src/
-│   ├── app/
-│   │   ├── api/analyze/route.ts    # API d'analyse
-│   │   └── page.tsx                # Page principale
-│   ├── components/
-│   │   ├── AuditForm.tsx           # Formulaire d'audit
-│   │   └── AuditResults.tsx        # Affichage des résultats
-│   ├── lib/
-│   │   ├── constants.ts            # Constantes RGAA/WCAG
-│   │   ├── html-utils.ts           # Utilitaires HTML
-│   │   └── openai-utils.ts         # Intégration OpenAI
-│   └── types/
-│       └── audit.ts                # Types TypeScript
-├── env.example                     # Variables d'environnement
-└── README.md
-\`\`\`
+│   ├── app/                          # App Router Next.js 15
+│   │   ├── api/                      # API Routes
+│   │   │   └── analyze/              # Endpoint d'analyse
+│   │   ├── blog/                     # Blog sur l'accessibilité
+│   │   ├── globals.css               # Styles globaux
+│   │   ├── layout.tsx                # Layout principal
+│   │   └── page.tsx                  # Page d'accueil
+│   ├── components/                   # Composants React
+│   │   ├── AuditForm.tsx            # Formulaire d'audit
+│   │   ├── AuditResults.tsx         # Affichage des résultats
+│   │   ├── BetaProtection.tsx       # Protection beta
+│   │   ├── ClientLayout.tsx         # Layout client
+│   │   ├── Footer.tsx               # Pied de page
+│   │   ├── RGAAReference.tsx        # Référentiel RGAA
+│   │   └── TopBar.tsx               # Barre de navigation
+│   ├── contexts/                     # Contexts React
+│   │   └── LanguageContext.tsx      # Gestion multilingue
+│   ├── lib/                         # Utilitaires
+│   │   ├── constants.ts             # Constantes RGAA
+│   │   ├── report-generator.ts      # Générateur de rapports
+│   │   └── wave-analyzer.ts         # Analyseur WAVE
+│   └── types/                       # Types TypeScript
+│       └── audit.ts                 # Types d'audit
+├── public/                          # Assets statiques
+├── .eslintrc.json                   # Configuration ESLint
+├── next.config.js                   # Configuration Next.js
+├── package.json                     # Dépendances
+├── README.md                        # Documentation
+├── tailwind.config.ts               # Configuration Tailwind
+└── tsconfig.json                    # Configuration TypeScript
+```
 
-## 🤖 Exemples de prompts
+## 🔧 Scripts disponibles
 
-L'application génère automatiquement des prompts structurés pour GPT-3.5-turbo :
+```bash
+# Développement
+npm run dev                # Lancer en mode développement
+npm run build             # Build de production
+npm run start             # Lancer en mode production
+npm run lint              # Linter le code
+npm run type-check        # Vérification TypeScript
+npm run clean             # Nettoyer les caches
+```
 
-### Prompt système (français)
-\`\`\`
-Tu es un expert en accessibilité numérique spécialisé dans les audits RGAA et WCAG.
-Analyse le code HTML fourni et identifie toutes les non-conformités selon les critères RGAA et WCAG.
-[...critères détaillés...]
-\`\`\`
+## 📊 Fonctionnement de l'audit
 
-### Réponse attendue
-\`\`\`json
-{
-  "violations": [
-    {
-      "criterion": "1.1",
-      "level": "A",
-      "description": "Images sans alternative textuelle",
-      "element": "img[src='image.jpg']",
-      "recommendation": "Ajouter un attribut alt descriptif",
-      "impact": "high"
-    }
-  ],
-  "summary": "L'audit révèle 5 problèmes majeurs...",
-  "score": 75
-}
-\`\`\`
+### 1. Analyse automatisée
+- **WAVE** : Détection des violations d'accessibilité via l'API WebAIM
+- **Axe Core** : Analyse complémentaire avec le moteur Deque Systems
+- **RGAA** : Vérification des 106 critères du référentiel français
+
+### 2. Génération de rapport
+- Compilation des résultats de tous les moteurs
+- Classification par niveau de gravité (A, AA, AAA)
+- Recommandations de correction pour chaque violation
+- Score d'accessibilité global
+
+### 3. Export et partage
+- Génération de rapports PDF professionnels
+- Interface web responsive pour consultation
+- Liens de partage sécurisés
+
+## 🌐 Gestion multilingue
+
+L'application supporte le français et l'anglais :
+- Interface utilisateur complètement traduite
+- Rapports d'audit dans les deux langues
+- Métadonnées SEO localisées
+- Contexte de langue React centralisé
+
+## 🔒 Sécurité et confidentialité
+
+- Aucune donnée utilisateur stockée
+- Analyses effectuées côté client quand possible
+- Variables d'environnement pour les clés API
+- Validation stricte des entrées utilisateur
+- Protection CSRF et XSS
+
+## 📋 Critères RGAA supportés
+
+L'application vérifie les 106 critères RGAA 4.1 répartis en 13 thématiques :
+- Images (9 critères)
+- Cadres (2 critères)
+- Couleurs (3 critères)
+- Multimédia (13 critères)
+- Tableaux (8 critères)
+- Liens (2 critères)
+- Scripts (5 critères)
+- Éléments obligatoires (10 critères)
+- Structuration de l'information (4 critères)
+- Présentation de l'information (14 critères)
+- Formulaires (13 critères)
+- Navigation (11 critères)
+- Consultation (12 critères)
 
 ## 🚀 Déploiement
 
 ### Vercel (recommandé)
-\`\`\`bash
-npm run build
-vercel --prod
-\`\`\`
+```bash
+# Connecter le repository à Vercel
+npx vercel
+
+# Configurer les variables d'environnement dans Vercel Dashboard
+# Déployer
+npx vercel --prod
+```
 
 ### Docker
-\`\`\`dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-\`\`\`
+```bash
+# Build de l'image
+docker build -t rgaa-audit-app .
+
+# Lancer le container
+docker run -p 3000:3000 rgaa-audit-app
+```
 
 ## 🤝 Contribution
 
 1. Fork le projet
-2. Créer une branche feature (\`git checkout -b feature/AmazingFeature\`)
-3. Commit les changements (\`git commit -m 'Add AmazingFeature'\`)
-4. Push sur la branche (\`git push origin feature/AmazingFeature\`)
+2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
+3. Commit les changements (`git commit -m 'Add AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
 5. Ouvrir une Pull Request
 
 ## 📄 Licence
 
-Ce projet est sous licence MIT. Voir le fichier \`LICENSE\` pour plus de détails.
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## 🆘 Support
+## 📞 Support
 
-- **Documentation RGAA** : [rgaa.numerique.gouv.fr](https://rgaa.numerique.gouv.fr/)
-- **WCAG Guidelines** : [w3.org/WAI/WCAG21](https://www.w3.org/WAI/WCAG21/)
-- **Ressource de référence** : [boscop.fr/audit-rgaa-wcag](https://boscop.fr/audit-rgaa-wcag/)
+- 📧 Email : support@rgaa-audit.fr
+- 📖 Documentation : [wiki](https://github.com/your-username/rgaa-audit-app/wiki)
+- 🐛 Issues : [GitHub Issues](https://github.com/your-username/rgaa-audit-app/issues)
 
-## ⚠️ Limitations
+## 🙏 Remerciements
 
-- L'analyse automatisée ne remplace pas un audit manuel
-- Certains critères nécessitent une validation humaine
-- Les contrastes de couleurs doivent être vérifiés avec des outils spécialisés
-- L'analyse se base sur le DOM statique (pas d'interactions dynamiques)
-
-## 🔮 Roadmap
-
-- [ ] Historique des audits persistant
-- [ ] Export PDF des rapports
-- [ ] Tests de contrastes automatisés
-- [ ] Analyse de performance
-- [ ] API publique
-- [ ] Plugins navigateur
-
-## 📋 Analyse Exhaustive - 106 Critères RGAA 4.1
-
-L'application analyse **TOUS** les critères RGAA selon les 13 thématiques officielles :
-
-### 🖼️ Images (9 critères : 1.1 à 1.9)
-- Alternatives textuelles manquantes, inadéquates ou trop longues
-- Images décoratives avec texte alternatif non vide
-- Images complexes sans description détaillée
-- Images-liens sans intitulé approprié
-- Images légendées incorrectement
-- Images SVG sans alternatives
-- Images bitmap contenant du texte
-- Images objets sans alternatives
-
-### 🖼️ Cadres (2 critères : 2.1 à 2.2)
-- Frames/iframes sans titre ou avec titres non pertinents
-
-### 🎨 Couleurs (3 critères : 3.1 à 3.3)
-- Information véhiculée uniquement par la couleur
-- Contrastes insuffisants (4.5:1 minimum, 3:1 pour gros texte)
-- Contrastes éléments d'interface (3:1 minimum)
-
-### 📺 Multimédia (13 critères : 4.1 à 4.13)
-- Médias temporels sans transcription/sous-titres
-- Médias synchronisés sans audio-description
-- Contrôles de lecture inaccessibles
-- Auto-play sans contrôle utilisateur
-- Clignotements dangereux
-
-### 📊 Tableaux (8 critères : 5.1 à 5.8)
-- Tableaux de données sans en-têtes appropriés
-- Cellules mal associées aux en-têtes
-- Résumés/titres manquants
-- Tableaux de mise en forme non linéarisables
-- Navigation clavier dans tableaux complexes
-
-### 🔗 Liens (2 critères : 6.1 à 6.2)
-- Liens sans intitulé explicite
-- Liens vides ou ambigus
-- Liens identiques avec destinations différentes
-
-### ⚙️ Scripts (5 critères : 7.1 à 7.5)
-- Contenus générés inaccessibles au clavier
-- Scripts modifiant le contenu sans prévenir l'utilisateur
-- Fonctionnalités JavaScript inaccessibles
-- Changements de contexte sans action utilisateur
-- Gestion du focus incorrecte
-
-### 📋 Éléments obligatoires (10 critères : 8.1 à 8.10)
-- Titre de page manquant/inadéquat
-- Langue de la page non définie/invalide
-- Changements de langue non indiqués
-- Balises mal utilisées (détournement sémantique)
-- Ouverture de nouvelle fenêtre non signalée
-
-### 🏗️ Structuration (4 critères : 9.1 à 9.4)
-- Hiérarchie des titres incorrecte
-- Structure HTML non sémantique
-- Listes non balisées comme listes
-- Citations non balisées appropriément
-
-### 🎨 Présentation (14 critères : 10.1 à 10.14)
-- CSS obligatoire pour la mise en forme
-- Taille de texte non redimensionnable
-- Largeur non responsive
-- Texte justifié trop dense
-- Propriétés d'espacement forcées
-- Contenus cachés/tronqués
-- Effet de survol/focus sans équivalent
-- Éléments décoratifs non CSS
-
-### 📝 Formulaires (13 critères : 11.1 à 11.13)
-- Champs sans étiquettes appropriées
-- Étiquettes mal associées aux contrôles
-- Regroupements fieldset manquants
-- Contrôles de saisie sans aide
-- Messages d'erreur non explicitées
-- Contrôle de saisie utilisateur défaillant
-- Aide contextuelle inaccessible
-- Listes de choix multiples problématiques
-- Boutons sans intitulé
-- Validation automatique problématique
-
-### 🧭 Navigation (11 critères : 12.1 à 12.11)
-- Liens d'évitement manquants
-- Plan du site absent
-- Barre de navigation incohérente
-- Fil d'Ariane manquant
-- Regroupements de liens inappropriés
-- Raccourcis clavier conflictuels
-- Landmarks ARIA manquants
-- Ordre de tabulation incorrect
-- Systèmes de navigation non évidents
-- Moteur de recherche manquant
-
-### 📖 Consultation (12 critères : 13.1 à 13.12)
-- Limites de temps sans contrôle utilisateur
-- Ouverture forcée de nouvelle fenêtre
-- Fichiers téléchargeables non identifiés
-- Services/plugins sans alternatives
-- Contenus flash/animés non pausables
-- Captcha sans alternative
-- Messages d'alerte temporaires
-- Redirections automatiques
-- Rafraîchissement automatique sans contrôle
-- Contenus additionnels inaccessibles au clavier
+- [WebAIM](https://webaim.org/) pour l'API WAVE
+- [Deque Systems](https://www.deque.com/) pour Axe Core
+- [DINUM](https://www.numerique.gouv.fr/) pour le référentiel RGAA
+- [Next.js team](https://nextjs.org/) pour le framework
+- [Vercel](https://vercel.com/) pour l'hébergement
