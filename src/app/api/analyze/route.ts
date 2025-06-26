@@ -356,8 +356,26 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
   console.log(`🌊 Lancement de WAVE via le site web avec l'URL: ${url}`);
 
   try {
-    // Import dynamique de Puppeteer standard avec anti-détection manuel
-    const puppeteer = await import('puppeteer');
+    // Utiliser le nouveau module Vercel-compatible
+    const { analyzeWithWaveServerless } = await import('./vercel-puppeteer');
+    
+    const rawResults = await analyzeWithWaveServerless(url);
+    
+    // Convertir les résultats au format RGAA
+    const violations: RGAAViolation[] = rawResults.map((result, index) => ({
+      id: `wave-${index}`,
+      description: result.description,
+      impact: result.impact === 'critical' ? 'critical' : 
+              result.impact === 'serious' ? 'high' : 'medium',
+      help: result.help,
+      selector: result.selector,
+      context: result.context,
+      level: 'AA' as const,
+      recommendation: result.help
+    }));
+    
+    console.log(`🎉 Analyse WAVE terminée: ${violations.length} violations`);
+    return violations;
     
     let browser;
     let isConnectedToExisting = false;
@@ -376,7 +394,7 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
     console.log(`📱 Lancement d'une nouvelle instance Chrome pour WAVE...`);
     
     // Détecter l'environnement (local vs production)
-    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+    const isProductionEnv = process.env.NODE_ENV === 'production' || process.env.VERCEL;
     const isMacOS = process.platform === 'darwin';
     
     try {
