@@ -36,6 +36,7 @@ export interface AuditResult {
   summary?: string;
   score: number; // Score sur 100
   engine?: 'wave' | 'axe' | 'rgaa'; // Moteur d'analyse utilisé
+  waveReportUrl?: string; // URL du rapport WAVE web pour consultation visuelle
 }
 
 export interface EngineResult {

@@ -106,7 +106,9 @@ export async function POST(request: NextRequest) {
       summary,
       violationsByImpact: impactGroups,
       violationsByLevel: levelGroups,
-      engine
+      engine,
+      // URL du rapport WAVE web pour consultation visuelle
+      waveReportUrl: engine === 'wave' ? `https://wave.webaim.org/report#/${encodeURIComponent(url)}` : undefined
     };
 
     return NextResponse.json(result, {
@@ -187,7 +189,9 @@ async function runComparativeAnalysis(url: string): Promise<ComparativeResult> {
         summary,
         violationsByImpact: impactGroups,
         violationsByLevel: levelGroups,
-        engine: engineName
+        engine: engineName,
+        // URL du rapport WAVE web pour consultation visuelle
+        waveReportUrl: engineName === 'wave' ? `https://wave.webaim.org/report#/${encodeURIComponent(url)}` : undefined
       };
       
       console.log(`✅ ${engineName.toUpperCase()} terminé: ${violations.length} violations, score: ${score}/100, temps: ${analysisTime}ms`);

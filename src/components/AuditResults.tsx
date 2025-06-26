@@ -95,6 +95,8 @@ const translations = {
     tryChangingFilters: 'Essayez de modifier les filtres pour voir d\'autres problèmes.',
     showingResults: 'Affichage de {count} problème(s) sur {total}',
     backToTop: 'Remonter en haut',
+    viewWaveReport: 'Voir le rapport WAVE complet',
+    waveReportDescription: 'Ouvrir le rapport détaillé WAVE dans un nouvel onglet',
     
   },
   en: {
@@ -144,6 +146,8 @@ const translations = {
     tryChangingFilters: 'Try changing the filters to see other issues.',
     showingResults: 'Showing {count} issue(s) out of {total}',
     backToTop: 'Back to top',
+    viewWaveReport: 'View Full WAVE Report',
+    waveReportDescription: 'Open detailed WAVE report in new tab',
     
   }
 };
@@ -1068,6 +1072,20 @@ export default function AuditResults({ result, language, onNewAudit }: AuditResu
             </div>
             
             <div className="flex space-x-3 flex-wrap gap-2">
+              {/* Bouton Rapport WAVE - affiché seulement si waveReportUrl est disponible */}
+              {result.waveReportUrl && (
+                <a
+                  href={result.waveReportUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 focus:from-green-700 focus:to-green-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 font-medium shadow-sm whitespace-nowrap transform hover:scale-105"
+                  title={t.waveReportDescription}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" aria-hidden="true" />
+                  {t.viewWaveReport}
+                </a>
+              )}
+              
               <button 
                 onClick={handleDownloadReport}
                 data-download-button
