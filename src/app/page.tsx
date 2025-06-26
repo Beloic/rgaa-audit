@@ -10,7 +10,7 @@ import ManualAuditPage from '@/components/ManualAuditPage';
 import RGAAReference from '@/components/RGAAReference';
 
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Shield, Zap, Target, Users, Star, AlertTriangle } from 'lucide-react';
+import { Shield, Zap, Target, Users, AlertTriangle } from 'lucide-react';
 import Footer from '@/components/Footer';
 import type { AuditRequest, AuditResult, ComparativeResult, AnalysisProgress } from '@/types/audit';
 
@@ -217,23 +217,14 @@ export default function HomePage() {
               <div className="relative">
                 {/* Hero Content */}
                 <header className="text-center px-6 py-20 max-w-4xl mx-auto">
-                  {/* Badge Product Hunt centré */}
-                  <div className="flex justify-center mb-8">
-                    <div className="flex items-center space-x-2 bg-white/90 backdrop-blur rounded-full px-4 py-2 shadow-sm border border-white/30" aria-label="Note sur Product Hunt">
-                      <div className="flex" role="img" aria-label="5 étoiles sur 5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" aria-hidden="true" />
-                        ))}
-                      </div>
-                      <span className="text-sm text-gray-600 font-medium">5.0 sur Product Hunt</span>
-                    </div>
-                  </div>
                   <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
                     <span className="text-gray-900">Audit d'accessibilité </span>
                     <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">RGAA</span>
                   </h1>
                   <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
-                    Découvrez et analysez l'accessibilité de votre site web selon les standards RGAA
+                    Cette version alpha utilise les moteurs les plus performants pour aider les professionnels à réaliser leurs audits. Cet outil n'a pas vocation à remplacer l'expertise humaine.
+                    <br /><br />
+                    Nous travaillons actuellement sur le projet qui n'est pas toujours disponible.
                   </p>
                 </header>
               </div>
@@ -257,7 +248,7 @@ export default function HomePage() {
                   <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
                     <Zap className="w-12 h-12 text-blue-600 mb-4" aria-hidden="true" />
                     <h3 className="font-semibold text-gray-900 mb-2 text-center">Analyse semi-automatique</h3>
-                    <p className="text-gray-600 text-center">Analyse rapide avec WAVE, Axe Core et notre moteur RGAA exclusif</p>
+                    <p className="text-gray-600 text-center">Analyse rapide avec WAVE, Axe Core et notre moteur RGAA exclusif. Aucune intelligence artificielle n'est utilisée.</p>
                   </article>
                   <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
                     <Shield className="w-12 h-12 text-purple-600 mb-4" aria-hidden="true" />
