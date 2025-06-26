@@ -8,7 +8,7 @@ import TopBar from '@/components/TopBar';
 import Sidebar from '@/components/Sidebar';
 import ManualAuditPage from '@/components/ManualAuditPage';
 import RGAAReference from '@/components/RGAAReference';
-import BetaProtection from '@/components/BetaProtection';
+
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Shield, Zap, Target, Users, Star, AlertTriangle } from 'lucide-react';
 import Footer from '@/components/Footer';
@@ -196,8 +196,7 @@ export default function HomePage() {
   };
 
   return (
-    <BetaProtection>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         {/* Skip to main content link pour l'accessibilité */}
         <a 
           href="#main-content" 
@@ -352,6 +351,5 @@ export default function HomePage() {
         {/* Footer - seulement sur la page d'accueil */}
         {activeSection === 'home' && <Footer />}
       </div>
-    </BetaProtection>
   );
 }

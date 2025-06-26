@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import ClientLayout from '@/components/ClientLayout';
 
 export const metadata: Metadata = {
   title: "RGAA Audit - Testez l'accessibilité de votre site",
@@ -16,7 +17,9 @@ export default function RootLayout({
     <html lang="fr">
       <body className="antialiased">
         <LanguageProvider>
-          {children}
+          <ClientLayout>
+            {children}
+          </ClientLayout>
         </LanguageProvider>
       </body>
     </html>
