@@ -5,9 +5,9 @@ const BETA_PASSWORD = process.env.BETA_PASSWORD || 'rgaa2025beta';
 const BETA_COOKIE_NAME = 'rgaa-beta-access';
 const BETA_COOKIE_VALUE = 'authenticated';
 
-// Pages qui ne nécessitent pas d'authentification (page de connexion, assets, API publiques)
+// Pages qui ne nécessitent pas d'authentification
 const PUBLIC_PATHS = [
-  '/api/auth/beta',
+  '/api',
   '/favicon.ico',
   '/_next',
   '/static',
@@ -18,36 +18,41 @@ const PUBLIC_PATHS = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
+  console.log(`🔍 Middleware - Path: ${pathname}`);
+  
   // Vérifier si c'est une page publique
   const isPublicPath = PUBLIC_PATHS.some(path => pathname.startsWith(path));
+  
   if (isPublicPath) {
+    console.log(`✅ Public path, allowing: ${pathname}`);
     return NextResponse.next();
   }
 
   // Vérifier le cookie d'authentification
   const betaCookie = request.cookies.get(BETA_COOKIE_NAME);
   const isAuthenticated = betaCookie?.value === BETA_COOKIE_VALUE;
+  
+  console.log(`🔐 Auth check - Cookie: ${betaCookie?.value}, Authenticated: ${isAuthenticated}`);
 
   if (!isAuthenticated) {
+    console.log(`🚫 Not authenticated, redirecting to login from: ${pathname}`);
     // Rediriger vers la page de connexion bêta
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('from', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
+  console.log(`✅ Authenticated, allowing access to: ${pathname}`);
   return NextResponse.next();
 }
 
 export const config = {
-  // Appliquer le middleware sur toutes les routes sauf les exclusions
+  // Matcher simplifié pour intercepter toutes les pages principales
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/',
+    '/blog/:path*',
+    '/quiz/:path*',
+    '/politique-confidentialite',
+    '/mentions-legales'
   ],
 }; 
