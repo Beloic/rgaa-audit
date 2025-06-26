@@ -399,10 +399,10 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
           defaultViewport: { width: 1920, height: 1080 }
         };
       } else {
-        // Configuration locale
-        console.log(`🏠 Configuration locale pour développement...`);
+        // Configuration locale - Chrome visible pour WAVE
+        console.log(`🏠 Configuration locale pour développement (mode visible)...`);
         launchConfig = {
-          headless: false, // Visible en local
+          headless: false, // TOUJOURS visible en local pour WAVE
           args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -411,7 +411,9 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
             '--allow-running-insecure-content',
             '--disable-blink-features=AutomationControlled',
             '--exclude-switches=enable-automation',
-            '--user-agent=' + randomUserAgent
+            '--user-agent=' + randomUserAgent,
+            '--new-window', // Ouvrir dans une nouvelle fenêtre
+            '--start-maximized' // Démarrer maximisé pour une meilleure visibilité
           ],
           defaultViewport: null,
           ignoreDefaultArgs: ['--enable-automation', '--enable-blink-features=AutomationControlled'],
@@ -930,7 +932,12 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
     const violations = parseWaveResults(JSON.stringify(waveResults));
     
     // Laisser l'onglet/navigateur ouvert pour consultation manuelle
-    console.log(`📋 Rapport WAVE disponible dans l'onglet Chrome ouvert pour consultation détaillée.`);
+    if (!isProduction) {
+      console.log(`📋 ✨ Rapport WAVE visible dans la fenêtre Chrome ouverte pour consultation détaillée!`);
+      console.log(`🔍 Vous pouvez maintenant consulter le rapport complet dans Chrome.`);
+    } else {
+      console.log(`📋 Rapport WAVE généré (mode production - pas d'interface visuelle).`);
+    }
     
     return violations;
     
