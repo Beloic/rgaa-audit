@@ -9,6 +9,7 @@ interface AuditFormProps {
   onAuditStart: (request: AuditRequest) => void;
   progress: AnalysisProgress;
   isAnalyzing: boolean;
+  analysisError?: string | null;
 }
 
 const translations = {
@@ -62,7 +63,7 @@ const translations = {
   }
 };
 
-export default function AuditForm({ onAuditStart, progress, isAnalyzing }: AuditFormProps) {
+export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysisError }: AuditFormProps) {
   const { language } = useLanguage();
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
@@ -329,6 +330,27 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing }: Audit
                     aria-valuemax={100}
                     aria-label={t.progressStatus}
                   />
+                </div>
+              </div>
+            )}
+
+            {/* Analysis Error message */}
+            {analysisError && !isAnalyzing && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-6" role="alert">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="w-5 h-5 text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800 mb-2">
+                      {language === 'fr' ? 'Erreur lors de l\'analyse' : 'Analysis Error'}
+                    </h3>
+                    <p className="text-sm text-red-700 whitespace-pre-line">
+                      {analysisError}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

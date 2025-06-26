@@ -149,6 +149,23 @@ export default function HomePage() {
     }
   };
 
+  // Nouvelle fonction pour démarrer une nouvelle analyse sans effacer les résultats précédents
+  const handleStartNewAnalysis = () => {
+    // Réinitialiser seulement l'état de progression et les erreurs
+    setError(null);
+    setProgress({ step: 'idle', message: 'En attente...', progress: 0 });
+    
+    // Scroll vers le formulaire avec focus pour l'accessibilité
+    const formElement = document.getElementById('audit-form');
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: 'smooth' });
+      const firstInput = formElement.querySelector('input, select, textarea') as HTMLElement;
+      if (firstInput) {
+        firstInput.focus();
+      }
+    }
+  };
+
   // Fonction pour gérer le clic sur "Analyser" depuis la TopBar
   const handleAnalyzeClick = () => {
     setActiveSection('analyze');
@@ -201,7 +218,7 @@ export default function HomePage() {
           <Sidebar 
             activeSection={activeSection} 
             onSectionChange={setActiveSection}
-            onNewAnalysis={handleNewAudit}
+            onNewAnalysis={handleStartNewAnalysis}
             hasAnalysis={!!auditResult || !!comparativeResult || isAnalyzing}
           />
         )}
@@ -244,6 +261,7 @@ export default function HomePage() {
                   onAuditStart={handleAuditStart}
                   progress={progress}
                   isAnalyzing={isAnalyzing}
+                  analysisError={error}
                 />
               </section>
 
@@ -280,19 +298,18 @@ export default function HomePage() {
           {/* Page Analyser */}
           {activeSection === 'analyze' && (
             <>
-              {/* Formulaire d'audit */}
-              {!auditResult && !comparativeResult && (
-                <section id="audit-form" className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-6" aria-labelledby="audit-form-heading">
-                  <div className="w-full max-w-4xl">
-                    <h2 id="audit-form-heading" className="sr-only">Formulaire d'audit d'accessibilité</h2>
-                    <AuditForm
-                      onAuditStart={handleAuditStart}
-                      progress={progress}
-                      isAnalyzing={isAnalyzing}
-                    />
-                  </div>
-                </section>
-              )}
+              {/* Formulaire d'audit - toujours visible */}
+              <section id="audit-form" className={`px-6 ${!auditResult && !comparativeResult ? 'min-h-[calc(100vh-4rem)] flex items-center justify-center' : 'pt-8'}`} aria-labelledby="audit-form-heading">
+                <div className="w-full max-w-4xl mx-auto">
+                  <h2 id="audit-form-heading" className="sr-only">Formulaire d'audit d'accessibilité</h2>
+                  <AuditForm
+                    onAuditStart={handleAuditStart}
+                    progress={progress}
+                    isAnalyzing={isAnalyzing}
+                    analysisError={error}
+                  />
+                </div>
+              </section>
 
               {/* Résultats d'audit - si disponibles */}
               {auditResult && (
@@ -316,26 +333,7 @@ export default function HomePage() {
                 </section>
               )}
 
-              {/* Affichage de l'erreur - si présente */}
-              {error && (
-                <section className="mt-8 px-6 max-w-4xl mx-auto">
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                    <div className="flex">
-                      <AlertTriangle className="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" aria-hidden="true" />
-                      <div>
-                        <h3 className="text-lg font-medium text-red-800 mb-2">Erreur lors de l'analyse</h3>
-                        <div className="text-red-700 whitespace-pre-line">{error}</div>
-                        <button
-                          onClick={handleNewAudit}
-                          className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-                        >
-                          Nouvelle analyse
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              )}
+
             </>
           )}
 
