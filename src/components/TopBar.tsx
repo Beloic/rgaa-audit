@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { Shield, LogOut } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
 interface TopBarProps {
   activeSection?: 'home' | 'analyze' | 'manual-audit' | 'rgaa-reference';
@@ -15,7 +14,6 @@ interface TopBarProps {
 export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick }: TopBarProps) {
   const pathname = usePathname();
   const { language, setLanguage } = useLanguage();
-  const { logout } = useAuth();
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -52,12 +50,6 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
       } else if (section === 'analyze') {
         window.location.href = '/?section=analyze';
       }
-    }
-  };
-
-  const handleLogout = () => {
-    if (confirm('Êtes-vous sûr de vouloir vous déconnecter de la bêta ?')) {
-      logout();
     }
   };
 
@@ -110,20 +102,8 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
             </Link>
           </div>
 
-          {/* Actions et Sélecteur de langue */}
+          {/* Sélecteur de langue */}
           <div className="flex items-center space-x-4 flex-shrink-0">
-            {/* Bouton de déconnexion */}
-            <button
-              onClick={handleLogout}
-              className="flex items-center space-x-1 text-gray-600 hover:text-red-600 focus:text-red-600 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded-lg px-2 py-1"
-              aria-label="Se déconnecter de la bêta"
-              title="Se déconnecter"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Déconnexion</span>
-            </button>
-
-            {/* Sélecteur de langue */}
             <label htmlFor="language-select-topbar" className="sr-only">Choisir la langue</label>
             <div className="relative">
               <select 

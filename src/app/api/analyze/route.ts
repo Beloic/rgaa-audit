@@ -355,54 +355,7 @@ export async function OPTIONS(request: NextRequest) {
 async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
   console.log(`🌊 Lancement de WAVE via le site web avec l'URL: ${url}`);
 
-  // Détecter l'environnement Vercel/production
-  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-  
-  if (isProduction) {
-    console.log('🔧 Environnement de production détecté - utilisation de l\'API WAVE alternative');
-    
-    // En production, utiliser l'API publique de WAVE ou un fallback
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-      
-      const response = await fetch(`https://wave.webaim.org/api/request?key=${process.env.WAVE_API_KEY}&url=${encodeURIComponent(url)}&format=json`, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; RGAA-Audit-Tool/1.0)',
-        },
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const waveData = await response.text();
-        return parseWaveResults(waveData);
-      } else {
-        console.log('⚠️ API WAVE non disponible, utilisation du fallback');
-        throw new Error('API WAVE non disponible');
-      }
-    } catch (error) {
-      console.log('⚠️ Erreur API WAVE, utilisation du fallback minimal');
-      
-      // Fallback : analyse basique sans WAVE
-      return [{
-        ruleId: 'wave-fallback',
-        criterion: 'N/A',
-        level: 'AA',
-        impact: 'medium',
-        description: 'Analyse WAVE non disponible en production',
-        element: 'body',
-        recommendation: 'Veuillez utiliser l\'outil WAVE directement sur https://wave.webaim.org/ pour une analyse complète.',
-        context: 'Production environment fallback',
-        htmlSnippet: '<body>Production environment - WAVE analysis requires manual verification</body>'
-      }];
-    }
-  }
-
   try {
-    // Code existant pour l'environnement local...
     // Import dynamique de Puppeteer standard avec anti-détection manuel
     const puppeteer = await import('puppeteer');
     
@@ -419,22 +372,16 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
     ];
     const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
     
+    // Configuration simplifiée pour macOS avec gestion robuste des erreurs
+    console.log(`📱 Lancement d'une nouvelle instance Chrome pour WAVE...`);
+    
+    // Détecter l'environnement (local vs production)
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+    const isMacOS = process.platform === 'darwin';
+    
     try {
-      // Essayer d'abord de se connecter à une instance Chrome existante
-      console.log(`🔗 Tentative de connexion à une instance Chrome existante...`);
-      browser = await puppeteer.default.connect({
-        browserURL: 'http://localhost:9222',
-        defaultViewport: null,
-        protocolTimeout: 180000 // 3 minutes
-      });
-      isConnectedToExisting = true;
-      console.log(`✅ Connecté à l'instance Chrome existante!`);
-    } catch (connectError) {
-      // Si la connexion échoue, lancer une nouvelle instance Chrome avec anti-détection maximale
-      console.log(`📱 Aucune instance Chrome trouvée, lancement d'une nouvelle instance...`);
-      browser = await puppeteer.default.launch({
-        headless: false, // Mode visible pour permettre à l'utilisateur de voir le rapport WAVE
-        protocolTimeout: 180000, // 3 minutes
+      const launchConfig: any = {
+        headless: isProduction ? true : false, // Headless en production, visible en local
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -444,96 +391,59 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
           '--no-first-run',
           '--disable-default-apps',
           '--disable-popup-blocking',
-          '--remote-debugging-port=9222',
-          '--user-data-dir-name=wave-audit',
-          // Anti-détection avancé - Masquer tous les signaux d'automation
           '--disable-blink-features=AutomationControlled',
           '--exclude-switches=enable-automation',
-          '--disable-plugins-discovery',
-          '--disable-features=VizDisplayCompositor,TranslateUI',
-          '--disable-ipc-flooding-protection',
-          '--disable-renderer-backgrounding',
-          '--disable-backgrounding-occluded-windows',
-          '--disable-field-trial-config',
-          '--disable-back-forward-cache',
-          '--disable-hang-monitor',
-          '--disable-client-side-phishing-detection',
-          '--disable-sync',
-          '--disable-prompt-on-repost',
-          '--no-crash-upload',
-          '--disable-logging',
-          '--disable-gpu-logging',
-          '--silent',
-          '--log-level=3',
-          // Masquer complètement qu'on est en automation
-          '--disable-features=VizDisplayCompositor',
-          '--disable-dev-shm-usage',
-
-          '--disable-plugins',
-          '--user-agent=' + randomUserAgent
+          '--user-agent=' + randomUserAgent,
+          // Arguments spécifiques pour la production/Vercel
+          ...(isProduction ? [
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--disable-extensions',
+            '--no-zygote',
+            '--single-process'
+          ] : [])
         ],
         defaultViewport: null,
-        ignoreDefaultArgs: ['--enable-automation', '--enable-blink-features=AutomationControlled']
-      });
+        ignoreDefaultArgs: ['--enable-automation', '--enable-blink-features=AutomationControlled'],
+        timeout: 30000
+      };
+
+      // Ajouter le chemin explicite seulement sur macOS en local
+      if (isMacOS && !isProduction) {
+        launchConfig.executablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+      }
+
+      browser = await puppeteer.default.launch(launchConfig);
       isConnectedToExisting = false;
-      console.log(`✅ Nouvelle instance Chrome lancée avec protection anti-détection maximale!`);
+      console.log(`✅ Chrome lancé avec succès pour WAVE! (${isProduction ? 'production' : 'local'}, ${process.platform})`);
+      
+    } catch (launchError) {
+      console.log(`⚠️ Échec du lancement, essai avec configuration minimale...`);
+      
+      // Fallback : configuration ultra-minimale
+      browser = await puppeteer.default.launch({
+        headless: true, // Forcer headless en fallback
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-web-security',
+          '--disable-dev-shm-usage'
+        ],
+        defaultViewport: null,
+        timeout: 30000
+      });
+      console.log(`✅ Chrome lancé en mode fallback pour WAVE!`);
     }
 
     const page = await browser.newPage();
     
-    // Anti-détection avancé - Script exécuté avant chaque navigation
+    // Anti-détection simplifié pour éviter les erreurs
     await page.evaluateOnNewDocument(() => {
-      // 1. Supprimer complètement navigator.webdriver
+      // Masquer seulement les traces principales d'automation
       Object.defineProperty(navigator, 'webdriver', {
         get: () => undefined,
         configurable: true
       });
-      
-      // 2. Masquer toutes les traces d'automation Chrome
-      delete (window as any).cdc_adoQpoasnfa76pfcZLmcfl_Array;
-      delete (window as any).cdc_adoQpoasnfa76pfcZLmcfl_Promise;
-      delete (window as any).cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
-      delete (window as any).cdc_adoQpoasnfa76pfcZLmcfl_Object;
-      
-      // 3. Redéfinir navigator.plugins pour simuler un vrai navigateur
-      Object.defineProperty(navigator, 'plugins', {
-        get: () => ({
-          length: 5,
-          0: { name: 'Chrome PDF Plugin', description: 'Portable Document Format' },
-          1: { name: 'Chrome PDF Viewer', description: 'PDF Viewer' },
-          2: { name: 'Native Client', description: 'Native Client' },
-          3: { name: 'WebKit built-in PDF', description: 'PDF' },
-          4: { name: 'Widevine Content Decryption Module', description: 'Enables Widevine licenses' }
-        }),
-        configurable: true
-      });
-      
-      // 4. Simuler navigator.languages réaliste
-      Object.defineProperty(navigator, 'languages', {
-        get: () => ['fr-FR', 'fr', 'en-US', 'en'],
-        configurable: true
-      });
-      
-
-      
-             // 6. Masquer les détections de permission
-       const originalQuery = window.navigator.permissions.query;
-       window.navigator.permissions.query = (parameters: any) => originalQuery(parameters);
-      
-      // 7. Simuler un vraie gestion du performance timing
-      Object.defineProperty(window.performance, 'now', {
-        value: () => Date.now() + Math.random() * 100,
-        configurable: true
-      });
-      
-      // 8. Overrider Object.getOwnPropertyDescriptor pour masquer les modifications
-      const originalGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-      Object.getOwnPropertyDescriptor = function(obj: any, prop: any) {
-        if (prop === 'webdriver') {
-          return undefined;
-        }
-        return originalGetOwnPropertyDescriptor.call(this, obj, prop);
-      };
     });
     
     // User agent personnalisé
@@ -584,13 +494,23 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
       });
     };
     
-    // Naviguer vers WAVE avec comportement ultra-humain
+    // Naviguer vers WAVE avec gestion d'erreur robuste
     console.log(`📄 Ouverture du site WAVE...`);
     await randomMove();
-    await page.goto('https://wave.webaim.org/', { 
-      waitUntil: 'networkidle0',
-      timeout: 30000 
-    });
+    
+    try {
+      await page.goto('https://wave.webaim.org/', { 
+        waitUntil: 'networkidle0',
+        timeout: 45000 
+      });
+      console.log(`✅ Site WAVE chargé avec succès`);
+    } catch (navError) {
+      console.log(`⚠️ Erreur de navigation vers WAVE, nouvelle tentative...`);
+      await page.goto('https://wave.webaim.org/', { 
+        waitUntil: 'domcontentloaded',
+        timeout: 30000 
+      });
+    }
 
     // Simulation d'un utilisateur qui lit la page
     await new Promise(resolve => setTimeout(resolve, humanDelay()));
@@ -1004,30 +924,31 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
     
   } catch (error) {
     console.error('❌ Erreur lors de l\'analyse WAVE:', error);
-    throw new Error(`Erreur lors de l'analyse WAVE: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+    console.log('⚠️ L\'analyse WAVE a échoué, mais l\'application continuera avec les autres moteurs d\'analyse');
+    
+    // Retourner un tableau vide au lieu de faire planter l'application
+    // L'analyse comparative utilisera seulement Axe et RGAA
+    return [];
   }
 }
 
 // Fonction pour lancer l'analyse Axe Core
 async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
-  console.log(`🔍 Injection d'Axe Core et lancement de l'analyse pour: ${url}`);
-
-  // Détecter l'environnement Vercel/production
-  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-  
-  if (isProduction) {
-    console.log('🔧 Environnement de production détecté pour Axe - utilisation du mode headless strict');
-  }
+  console.log(`🔧 Lancement d'Axe Core pour l'URL: ${url}`);
 
   try {
-    // Import dynamique de Puppeteer
+    // Vérifier l'URL avant de commencer
+    if (!url || !url.startsWith('http')) {
+      throw new Error(`URL invalide: ${url}`);
+    }
+
+    // Import dynamique de Puppeteer et Axe Core
     const puppeteer = await import('puppeteer');
     
     // Lancer directement une instance headless pour Axe Core (pas besoin d'interface visuelle)
     console.log(`🚀 Lancement d'une instance Chrome headless pour Axe Core...`);
     const browser = await puppeteer.default.launch({
-      headless: true, // Mode headless pour Axe Core (compatible production)
-      protocolTimeout: 180000, // 3 minutes
+      headless: true, // Mode headless pour Axe Core
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -1040,22 +961,7 @@ async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
         '--disable-renderer-backgrounding',
         '--ignore-certificate-errors',
         '--ignore-ssl-errors',
-        '--ignore-certificate-errors-spki-list',
-        // Args spécifiques pour la production/Vercel
-        ...(isProduction ? [
-          '--disable-gpu',
-          '--disable-software-rasterizer',
-          '--disable-background-networking',
-          '--disable-default-apps',
-          '--disable-extensions',
-          '--disable-sync',
-          '--disable-translate',
-          '--hide-scrollbars',
-          '--mute-audio',
-          '--no-first-run',
-          '--safebrowsing-disable-auto-update',
-          '--single-process'
-        ] : [])
+        '--ignore-certificate-errors-spki-list'
       ]
     });
     console.log(`✅ Instance Chrome headless lancée pour Axe Core!`);
@@ -1560,7 +1466,6 @@ async function launchRGAAAnalysis(url: string): Promise<RGAAViolation[]> {
     console.log(`🚀 Lancement d'une instance Chrome headless pour le moteur RGAA...`);
     const browser = await puppeteer.default.launch({
       headless: true, // Mode headless strict
-      protocolTimeout: 180000, // 3 minutes
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',

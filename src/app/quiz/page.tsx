@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Shield } from 'lucide-react';
 import TopBar from '@/components/TopBar';
-import AuthWrapper from '@/components/AuthWrapper';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -348,21 +347,20 @@ export default function QuizPage() {
   const scorePercentage = Math.round((score / totalQuestions) * 100);
 
   return (
-    <AuthWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        {/* Skip to main content link pour l'accessibilité */}
-        <a 
-          href="#main-content" 
-          className="sr-only focus:not-sr-only focus:absolute focus:top-16 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-lg z-50 focus:ring-2 focus:ring-blue-300"
-        >
-          Aller au contenu principal
-        </a>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Skip to main content link pour l'accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-16 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-lg z-50 focus:ring-2 focus:ring-blue-300"
+      >
+        Aller au contenu principal
+      </a>
 
-        {/* Topbar Navigation */}
-        <TopBar />
+      {/* Topbar Navigation */}
+      <TopBar />
 
-        {/* Main Content */}
-        <main id="main-content" className="relative z-10">
+      {/* Main Content */}
+      <main id="main-content" className="relative z-10">
         {/* Header */}
         <header className="text-center px-6 pt-16 pb-8 max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-900">
@@ -495,6 +493,5 @@ export default function QuizPage() {
         <Footer />
       </main>
     </div>
-    </AuthWrapper>
   );
 }
