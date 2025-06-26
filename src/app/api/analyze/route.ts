@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+// Configuration pour Vercel Pro - durée maximale pour les analyses complexes
+export const maxDuration = 300; // 5 minutes
 import type { AuditResult, RGAAViolation, EngineResult, ComparativeResult } from '@/types/audit';
 
 interface WaveResults {
@@ -351,150 +354,112 @@ export async function OPTIONS(request: NextRequest) {
   });
 }
 
-// Fonction pour lancer l'analyse WAVE avec Playwright optimisé pour Vercel
+// Fonction pour lancer l'analyse WAVE avec Puppeteer (intégrée)
 async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
-  console.log(`🌊 Lancement de WAVE avec Playwright optimisé pour Vercel: ${url}`);
+  console.log(`🌊 Lancement de WAVE via le site web avec l'URL: ${url}`);
 
   try {
-    // Détecter l'environnement
-    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+    // Import dynamique de Puppeteer-core et Chromium pour Vercel
+    const puppeteer = await import('puppeteer-core');
+    const chromium = await import('@sparticuz/chromium-min');
     
     let browser;
+    let isConnectedToExisting = false;
     
-    if (isProduction) {
-      // Configuration Vercel avec @sparticuz/chromium
-      const chromium = await import('@sparticuz/chromium');
-      const { chromium: playwright } = await import('playwright');
-      
-      console.log('🚀 Lancement Playwright avec @sparticuz/chromium pour Vercel...');
-      
-      browser = await playwright.launch({
-        args: [...(chromium.args || []), '--no-sandbox', '--disable-setuid-sandbox'],
-        executablePath: await chromium.executablePath(),
-        headless: true,
-      });
-      
-    } else {
-      // Configuration locale avec Playwright natif
-      const { chromium } = await import('playwright');
-      
-      console.log('🚀 Lancement Playwright local...');
-      
-      browser = await chromium.launch({
-        headless: false,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'],
-      });
-    }
-
-    console.log(`✅ Playwright lancé avec succès (${isProduction ? 'production' : 'local'})`);
-
-    const context = await browser.newContext({
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      viewport: { width: 1920, height: 1080 },
-      extraHTTPHeaders: {
-        'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
-      },
-    });
-
-    const page = await context.newPage();
-
-    // Naviguer vers WAVE
-    console.log('📄 Navigation vers WAVE...');
-    await page.goto('https://wave.webaim.org/', { waitUntil: 'networkidle', timeout: 30000 });
-    console.log('✅ Site WAVE chargé');
-
-    // Saisir l'URL à analyser
-    console.log(`🔗 Saisie de l'URL: ${url}`);
-    await page.fill('input[name="url"], input#url, input[type="url"]', url);
+    // User agents aléatoires pour éviter la détection
+    const userAgents = [
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0'
+    ];
+    const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
     
-    // Soumettre l'analyse
-    console.log('🚀 Lancement de l\'analyse...');
-    await page.click('input[type="submit"], button[type="submit"]');
-
-    // Attendre les résultats
-    console.log('⏳ Attente des résultats...');
+    // Configuration simplifiée pour macOS avec gestion robuste des erreurs
+    console.log(`📱 Lancement d'une nouvelle instance Chrome pour WAVE...`);
+    
+    // Détecter l'environnement (local vs production)
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+    const isMacOS = process.platform === 'darwin';
+    
+    // URL du package Chromium pour Vercel
+    const chromiumPack = "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar";
+    
     try {
-      await page.waitForLoadState('networkidle', { timeout: 60000 });
-      await page.waitForSelector('.summary, #summary, [class*="summary"]', { timeout: 30000 });
-      console.log('✅ Résultats WAVE chargés');
-    } catch (timeoutError) {
-      console.log('⚠️ Timeout dépassé, récupération des données disponibles...');
-    }
+      let launchConfig: any;
+      
+      if (isProduction) {
+        // Configuration Vercel avec chromium-min
+        console.log(`🏗️ Configuration Vercel avec chromium-min...`);
+        launchConfig = {
+          args: chromium.default.args,
+          executablePath: await chromium.default.executablePath(chromiumPack),
+          headless: true,
+          defaultViewport: { width: 1920, height: 1080 }
+        };
+      } else {
+        // Configuration locale
+        console.log(`🏠 Configuration locale pour développement...`);
+        launchConfig = {
+          headless: false, // Visible en local
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-web-security',
+            '--allow-running-insecure-content',
+            '--disable-blink-features=AutomationControlled',
+            '--exclude-switches=enable-automation',
+            '--user-agent=' + randomUserAgent
+          ],
+          defaultViewport: null,
+          ignoreDefaultArgs: ['--enable-automation', '--enable-blink-features=AutomationControlled'],
+          timeout: 30000
+        };
 
-    // Extraire les résultats WAVE
-    const waveResults = await page.evaluate(() => {
-      const results = {
-        errors: [] as any[],
-        alerts: [] as any[],
-        features: [] as any[],
-        summary: { errors: 0, alerts: 0, features: 0 },
-        raw_data: {}
-      };
-
-      try {
-        const pageText = document.body.textContent || '';
-        
-        // Extraire les compteurs avec regex robuste
-        const errorMatch = pageText.match(/(\d+)\s*error[s]?/i);
-        const alertMatch = pageText.match(/(\d+)\s*alert[s]?/i);
-        const featureMatch = pageText.match(/(\d+)\s*feature[s]?/i);
-
-        const errorsCount = errorMatch ? parseInt(errorMatch[1]) : 0;
-        const alertsCount = alertMatch ? parseInt(alertMatch[1]) : 0;
-        const featuresCount = featureMatch ? parseInt(featureMatch[1]) : 0;
-
-        console.log(`WAVE trouvé: ${errorsCount} erreurs, ${alertsCount} alertes, ${featuresCount} fonctionnalités`);
-
-        // Créer des violations basées sur les compteurs WAVE
-        for (let i = 0; i < errorsCount; i++) {
-          results.errors.push({
-            type: 'error',
-            description: `Erreur d'accessibilité WAVE ${i + 1}`,
-            selector: `wave-error-${i + 1}`,
-            context: 'WAVE detection',
-            raw_text: `WAVE Error ${i + 1}`,
-            severity: 'high'
-          });
+        // Ajouter le chemin explicite sur macOS
+        if (isMacOS) {
+          launchConfig.executablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
         }
-
-        for (let i = 0; i < alertsCount; i++) {
-          results.alerts.push({
-            type: 'alert',
-            description: `Alerte d'accessibilité WAVE ${i + 1}`,
-            selector: `wave-alert-${i + 1}`,
-            context: 'WAVE detection',
-            raw_text: `WAVE Alert ${i + 1}`,
-            severity: 'medium'
-          });
-        }
-
-        results.summary = { errors: errorsCount, alerts: alertsCount, features: featuresCount };
-        return results;
-      } catch (e) {
-        console.error('Erreur extraction WAVE:', e);
-        return results;
       }
-    });
 
-    console.log(`🎉 Analyse WAVE terminée: ${waveResults.summary.errors} erreurs, ${waveResults.summary.alerts} alertes`);
-
-    // Fermer le navigateur en production
-    if (isProduction) {
-      await browser.close();
+      browser = await puppeteer.default.launch(launchConfig);
+      isConnectedToExisting = false;
+      console.log(`✅ Chrome lancé avec succès pour WAVE! (${isProduction ? 'production/Vercel' : 'local'}, ${process.platform})`);
+      
+    } catch (launchError) {
+      console.log(`⚠️ Échec du lancement, essai avec configuration minimale...`, launchError);
+      
+      // Fallback : configuration ultra-minimale
+      browser = await puppeteer.default.launch({
+        headless: true,
+        args: isProduction ? chromium.default.args : [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-web-security',
+          '--disable-dev-shm-usage'
+        ],
+        executablePath: isProduction ? await chromium.default.executablePath(chromiumPack) : undefined,
+        defaultViewport: null,
+        timeout: 30000
+      });
+      console.log(`✅ Chrome lancé en mode fallback pour WAVE!`);
     }
 
-    // Convertir en format RGAA
-    const violations = parseWaveResults(JSON.stringify(waveResults));
-    console.log(`📊 ${violations.length} violations WAVE converties au format RGAA`);
+    const page = await browser.newPage();
     
-    return violations;
+    // Anti-détection simplifié pour éviter les erreurs
+    await page.evaluateOnNewDocument(() => {
+      // Masquer seulement les traces principales d'automation
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => undefined,
+        configurable: true
+      });
+    });
     
-  } catch (error) {
-    console.error('❌ Erreur WAVE:', error);
-    console.log('⚠️ WAVE a échoué, continuation avec les autres moteurs');
-    return [];
-  }
-}
+    // User agent personnalisé
+    await page.setUserAgent(randomUserAgent);
     
     // Viewport aléatoire pour paraître naturel
     const viewports = [
@@ -989,28 +954,44 @@ async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
       throw new Error(`URL invalide: ${url}`);
     }
 
-    // Import dynamique de Puppeteer et Axe Core
-    const puppeteer = await import('puppeteer');
+    // Import dynamique de Puppeteer-core et Chromium pour Axe Core
+    const puppeteer = await import('puppeteer-core');
+    const chromium = await import('@sparticuz/chromium-min');
     
-    // Lancer directement une instance headless pour Axe Core (pas besoin d'interface visuelle)
+    // Détecter l'environnement
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+    const chromiumPack = "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar";
+    
+    // Lancer directement une instance headless pour Axe Core
     console.log(`🚀 Lancement d'une instance Chrome headless pour Axe Core...`);
-    const browser = await puppeteer.default.launch({
-      headless: true, // Mode headless pour Axe Core
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-web-security',
-        '--allow-running-insecure-content',
-        '--disable-features=VizDisplayCompositor',
-        '--disable-background-timer-throttling',
-        '--disable-backgrounding-occluded-windows',
-        '--disable-renderer-backgrounding',
-        '--ignore-certificate-errors',
-        '--ignore-ssl-errors',
-        '--ignore-certificate-errors-spki-list'
-      ]
-    });
+    
+    let browser;
+    if (isProduction) {
+      // Configuration Vercel
+      browser = await puppeteer.default.launch({
+        args: chromium.default.args,
+        executablePath: await chromium.default.executablePath(chromiumPack),
+        headless: true,
+        defaultViewport: { width: 1920, height: 1080 }
+      });
+    } else {
+      // Configuration locale
+      browser = await puppeteer.default.launch({
+        headless: true, // Toujours headless pour Axe Core
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-web-security',
+          '--allow-running-insecure-content',
+          '--disable-features=VizDisplayCompositor',
+          '--ignore-certificate-errors'
+        ],
+        ...(process.platform === 'darwin' ? { 
+          executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' 
+        } : {})
+      });
+    }
     console.log(`✅ Instance Chrome headless lancée pour Axe Core!`);
 
     const page = await browser.newPage();
@@ -1506,35 +1487,49 @@ async function launchRGAAAnalysis(url: string): Promise<RGAAViolation[]> {
       throw new Error(`URL invalide: ${url}`);
     }
 
-    // Import dynamique de Puppeteer
-    const puppeteer = await import('puppeteer');
+    // Import dynamique de Puppeteer-core et Chromium pour RGAA
+    const puppeteer = await import('puppeteer-core');
+    const chromium = await import('@sparticuz/chromium-min');
+    
+    // Détecter l'environnement
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+    const chromiumPack = "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar";
     
     // Lancer une instance headless pour le moteur RGAA
     console.log(`🚀 Lancement d'une instance Chrome headless pour le moteur RGAA...`);
-    const browser = await puppeteer.default.launch({
-      headless: true, // Mode headless strict
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu',
-        '--disable-web-security',
-        '--disable-features=VizDisplayCompositor',
-        '--disable-background-networking',
-        '--disable-background-timer-throttling',
-        '--disable-renderer-backgrounding',
-        '--disable-backgrounding-occluded-windows',
-        '--disable-ipc-flooding-protection',
-        '--hide-scrollbars',
-        '--mute-audio'
-      ],
-      timeout: 45000,
-      dumpio: false, // Désactiver la sortie console
-      devtools: false // Désactiver les devtools
-    });
+    
+    let browser;
+    if (isProduction) {
+      // Configuration Vercel
+      browser = await puppeteer.default.launch({
+        args: chromium.default.args,
+        executablePath: await chromium.default.executablePath(chromiumPack),
+        headless: true,
+        defaultViewport: { width: 1920, height: 1080 }
+      });
+    } else {
+      // Configuration locale
+      browser = await puppeteer.default.launch({
+        headless: true, // Mode headless strict
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--disable-gpu',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor',
+          '--hide-scrollbars',
+          '--mute-audio'
+        ],
+        timeout: 45000,
+        ...(process.platform === 'darwin' ? { 
+          executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' 
+        } : {})
+      });
+    }
 
     console.log(`✅ Instance Chrome headless lancée pour le moteur RGAA!`);
 

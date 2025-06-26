@@ -7,9 +7,6 @@
   "functions": {
     "src/app/api/**/*.ts": {
       "maxDuration": 60
-    },
-    "app/api/analyze/route.js": {
-      "maxDuration": 60
     }
   },
   "env": {
