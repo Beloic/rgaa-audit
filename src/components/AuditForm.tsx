@@ -282,9 +282,9 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
                   } ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   disabled={isAnalyzing}
                 >
-                  {/* Badge NOUVEAU */}
-                  <div className="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
-                    NOUVEAU
+                  {/* Badge ALPHA */}
+                  <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                    ALPHA
                   </div>
                   <div className="flex flex-col items-center space-y-3">
                     <BarChart3 className={`w-8 h-8 ${selectedEngine === 'all' ? 'text-indigo-600' : 'text-gray-400'}`} />

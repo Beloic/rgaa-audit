@@ -1,15 +1,14 @@
 'use client';
 
-import { Monitor, FileCheck, BookOpen, Plus } from 'lucide-react';
+import { Monitor, FileCheck, BookOpen } from 'lucide-react';
 
 interface SidebarProps {
   activeSection: 'analyze' | 'manual-audit' | 'rgaa-reference';
   onSectionChange: (section: 'analyze' | 'manual-audit' | 'rgaa-reference') => void;
-  onNewAnalysis?: () => void;
   hasAnalysis?: boolean;
 }
 
-export default function Sidebar({ activeSection, onSectionChange, onNewAnalysis, hasAnalysis = false }: SidebarProps) {
+export default function Sidebar({ activeSection, onSectionChange, hasAnalysis = false }: SidebarProps) {
   const getButtonClasses = (section: string) => {
     const baseClasses = "w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500";
     if (activeSection === section) {
@@ -21,21 +20,6 @@ export default function Sidebar({ activeSection, onSectionChange, onNewAnalysis,
   return (
     <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 flex flex-col">
       <nav className="p-4 space-y-2 flex-1" aria-label="Navigation secondaire">
-        {/* Bouton Nouvelle analyse */}
-        {onNewAnalysis && (
-          <button
-            onClick={() => {
-              onSectionChange('analyze'); // Changer vers la section analyze
-              onNewAnalysis(); // Déclencher la nouvelle analyse
-            }}
-            className={getButtonClasses('new-analysis')}
-            aria-label="Nouvelle analyse"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Nouvelle analyse</span>
-          </button>
-        )}
-        
         {hasAnalysis && (
           <button
             onClick={() => onSectionChange('analyze')}
@@ -43,7 +27,7 @@ export default function Sidebar({ activeSection, onSectionChange, onNewAnalysis,
             aria-current={activeSection === 'analyze' ? 'page' : undefined}
           >
             <Monitor className="w-5 h-5" aria-hidden="true" />
-            <span className="font-medium">Votre analyse</span>
+            <span className="font-medium">Analyse intelligente</span>
           </button>
         )}
         

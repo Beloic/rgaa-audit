@@ -217,7 +217,6 @@ export default function HomePage() {
           <Sidebar 
             activeSection={activeSection} 
             onSectionChange={setActiveSection}
-            onNewAnalysis={handleStartNewAnalysis}
             hasAnalysis={!!auditResult || !!comparativeResult || isAnalyzing}
           />
         )}
