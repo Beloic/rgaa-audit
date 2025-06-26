@@ -1585,7 +1585,7 @@ async function launchRGAAAnalysis(url: string): Promise<RGAAViolation[]> {
       // Attendre que la page soit entièrement rendue
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Injection et exécution de notre moteur RGAA
+              // Injection et exécution du moteur RGAA
       console.log(`🔍 Injection du moteur RGAA et lancement de l'analyse...`);
       
       const rgaaResults = await page.evaluate(() => {
