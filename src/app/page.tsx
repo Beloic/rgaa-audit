@@ -248,7 +248,7 @@ export default function HomePage() {
                   <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
                     <Zap className="w-12 h-12 text-blue-600 mb-4" aria-hidden="true" />
                     <h3 className="font-semibold text-gray-900 mb-2 text-center">Analyse semi-automatique</h3>
-                    <p className="text-gray-600 text-center">Analyse rapide avec WAVE, Axe Core et notre moteur RGAA exclusif. Aucune intelligence artificielle n'est utilisée.</p>
+                    <p className="text-gray-600 text-center">Analyse rapide avec WAVE, Axe Core et le moteur RGAA exclusif. Aucune intelligence artificielle n'est utilisée.</p>
                   </article>
                   <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
                     <Shield className="w-12 h-12 text-purple-600 mb-4" aria-hidden="true" />
