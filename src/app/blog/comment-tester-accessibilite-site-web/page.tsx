@@ -103,7 +103,7 @@ export default function TesterAccessibilitePage() {
                     <div className="space-y-3">
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <h4 className="font-medium text-blue-800 mb-1">RGAA Audit</h4>
-                        <p className="text-blue-700 text-sm">Audit complet automatisé, gratuit et en français</p>
+                        <p className="text-blue-700 text-sm">Audit complet avec IA, gratuit et en français</p>
                       </div>
                       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <h4 className="font-medium text-gray-800 mb-1">axe DevTools</h4>

@@ -1,7 +1,14 @@
 import axios from 'axios';
 import type { RGAAViolation } from '@/types/audit';
+import puppeteer, { Browser, Page } from 'puppeteer';
 
+// Configuration sécurisée
 const WAVE_API_KEY = process.env.WAVE_API_KEY || '';
+
+if (!WAVE_API_KEY) {
+  console.warn('⚠️ WAVE_API_KEY non configurée - certaines fonctionnalités peuvent être limitées');
+}
+
 const WAVE_API_URL = 'https://wave.webaim.org/api/request';
 
 interface WaveError {

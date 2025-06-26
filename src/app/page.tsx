@@ -121,8 +121,10 @@ export default function HomePage() {
       let errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
       
       // Améliorer le message pour les erreurs de rate limiting
-      if (errorMessage.includes('429') || errorMessage.includes('rate') || errorMessage.includes('limite') || errorMessage.includes('limit')) {
-        errorMessage = `⏰ ${errorMessage}\n\n💡 L'application utilise des ressources limitées pour l'analyse. Cette limite aide à maintenir le service gratuit pour tous.`;
+      if (errorMessage.includes('quota') || errorMessage.includes('limit')) {
+        errorMessage = language === 'fr' 
+          ? `⏰ Limite d'analyse atteinte. L'outil gratuit a des limitations pour maintenir le service accessible à tous.`
+          : `⏰ Analysis limit reached. The free tool has limitations to keep the service accessible to everyone.`;
       }
       
       setError(errorMessage);

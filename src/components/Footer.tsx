@@ -17,8 +17,8 @@ export default function Footer() {
             </div>
             <p className="text-gray-400">
               {language === 'fr' 
-                ? "Outil d'audit d'accessibilité pour un web plus inclusif."
-                : "Accessibility audit tool for a more inclusive web."
+                ? "Outil d'audit d'accessibilité propulsé par l'intelligence artificielle pour un web plus inclusif."
+                : "AI-powered accessibility audit tool for a more inclusive web."
               }
             </p>
           </div>
