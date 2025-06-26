@@ -933,12 +933,12 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
     console.log(`🌐 Le rapport WAVE reste ouvert dans Chrome pour consultation manuelle.`);
     
     // Convertir les résultats WAVE en format RGAA
-    const violations = parseWaveResults(JSON.stringify(waveResults));
+    const waveViolations = parseWaveResults(JSON.stringify(waveResults));
     
     // Laisser l'onglet/navigateur ouvert pour consultation manuelle
     console.log(`📋 Rapport WAVE disponible dans l'onglet Chrome ouvert pour consultation détaillée.`);
     
-    return violations;
+    return waveViolations;
     
   } catch (error) {
     console.error('❌ Erreur lors de l\'analyse WAVE:', error);
