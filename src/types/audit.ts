@@ -15,6 +15,13 @@ export interface RGAAViolation {
   impact: 'low' | 'medium' | 'moderate' | 'high' | 'serious' | 'critical';
   ruleId?: string; // ID de la règle WAVE ou custom
   context?: string; // Contexte additionnel ou failureSummary
+  position?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    selector: string;
+  };
 }
 
 export interface AuditResult {

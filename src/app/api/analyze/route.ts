@@ -933,7 +933,10 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
     console.log(`🌐 Le rapport WAVE reste ouvert dans Chrome pour consultation manuelle.`);
     
     // Convertir les résultats WAVE en format RGAA
-    const violations = parseWaveResults(JSON.stringify(waveResults));
+    let violations = parseWaveResults(JSON.stringify(waveResults));
+    
+    // Capturer les positions des éléments avec violations
+    violations = await captureViolationPositions(page, violations);
     
     // Laisser l'onglet/navigateur ouvert pour consultation manuelle
     if (!isProduction) {
@@ -2037,3 +2040,100 @@ async function launchRGAAAnalysis(url: string): Promise<RGAAViolation[]> {
     throw error;
   }
 } 
+
+// Fonction pour capturer les positions des éléments avec violations
+async function captureViolationPositions(page: any, violations: RGAAViolation[]): Promise<RGAAViolation[]> {
+  try {
+    console.log('📍 Capture des positions des violations...');
+    
+    const violationsWithPositions = await page.evaluate((violationsData: any[]) => {
+      const results: any[] = [];
+      
+      violationsData.forEach((violation, index) => {
+        const enhanced = { ...violation };
+        
+        try {
+          // Essayer de trouver l'élément correspondant à la violation
+          let element = null;
+          
+          // Méthode 1: Utiliser le selector si disponible
+          if (violation.element) {
+            try {
+              element = document.querySelector(violation.element);
+            } catch (e) {
+              // Selector invalide, continuer avec d'autres méthodes
+            }
+          }
+          
+          // Méthode 2: Chercher par contenu HTML si disponible
+          if (!element && violation.htmlSnippet) {
+            const allElements = document.querySelectorAll('*');
+            for (const el of allElements) {
+              if (el.outerHTML.includes(violation.htmlSnippet.substring(0, 50))) {
+                element = el;
+                break;
+              }
+            }
+          }
+          
+          // Méthode 3: Chercher par type de violation (images sans alt, liens vides, etc.)
+          if (!element) {
+            switch (violation.criterion) {
+              case '1.1': // Images sans alternative textuelle
+                const images = document.querySelectorAll('img:not([alt]), img[alt=""]');
+                element = images[index % images.length];
+                break;
+              case '6.1': // Liens sans intitulé
+                const links = document.querySelectorAll('a:empty, a:not([aria-label]):not([title])');
+                element = links[index % links.length];
+                break;
+              case '9.1': // Informations structurées via des titres
+                const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                element = headings[index % headings.length];
+                break;
+              case '11.1': // Champs de formulaire avec étiquette
+                const inputs = document.querySelectorAll('input:not([id]), input:not([aria-label]):not([title])');
+                element = inputs[index % inputs.length];
+                break;
+            }
+          }
+          
+          // Si on a trouvé un élément, capturer sa position
+          if (element && element.getBoundingClientRect) {
+            const rect = element.getBoundingClientRect();
+            const computedStyle = window.getComputedStyle(element);
+            
+            // Vérifier que l'élément est visible
+            if (rect.width > 0 && rect.height > 0 && computedStyle.visibility !== 'hidden' && computedStyle.display !== 'none') {
+              enhanced.position = {
+                x: Math.round(rect.left + window.scrollX),
+                y: Math.round(rect.top + window.scrollY),
+                width: Math.round(rect.width),
+                height: Math.round(rect.height),
+                selector: element.tagName.toLowerCase() + 
+                         (element.id ? `#${element.id}` : '') +
+                         (element.className ? `.${element.className.split(' ')[0]}` : '') +
+                         `:nth-of-type(${Array.from(element.parentNode?.children || []).indexOf(element) + 1})`
+              };
+            }
+          }
+        } catch (error) {
+          // Si erreur pour cet élément, continuer sans position
+          console.warn('Erreur capture position pour violation:', error);
+        }
+        
+        results.push(enhanced);
+      });
+      
+      return results;
+    }, violations);
+    
+    const positionsFound = violationsWithPositions.filter(v => v.position).length;
+    console.log(`📍 Positions capturées: ${positionsFound}/${violations.length} violations`);
+    
+    return violationsWithPositions;
+  } catch (error) {
+    console.error('❌ Erreur lors de la capture des positions:', error);
+    return violations; // Retourner les violations originales en cas d'erreur
+  }
+}

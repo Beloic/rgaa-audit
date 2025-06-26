@@ -23,7 +23,8 @@ import {
   ChevronUp,
   Info,
   X,
-  ArrowUp
+  ArrowUp,
+  MapPin
 } from 'lucide-react';
 import { IMPACT_LEVELS, RGAA_LEVELS } from '@/lib/constants';
 import type { AuditResult, RGAAViolation } from '@/types/audit';
@@ -482,6 +483,60 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
     }
   };
 
+  const handleShowPosition = (violation: RGAAViolation) => {
+    if (!violation.position) return;
+    
+    // Créer un overlay pour montrer la position
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    `;
+    
+    const positionBox = document.createElement('div');
+    positionBox.style.cssText = `
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      text-align: center;
+    `;
+    
+    positionBox.innerHTML = `
+      <h3 style="margin: 0 0 10px 0; color: #1f2937;">Position de l'élément</h3>
+      <p style="margin: 0 0 15px 0; color: #6b7280; font-size: 14px;">${violation.description}</p>
+      <div style="background: #f3f4f6; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+        <strong>Coordonnées:</strong><br>
+        X: ${violation.position.x}px, Y: ${violation.position.y}px<br>
+        Taille: ${violation.position.width}px × ${violation.position.height}px<br>
+        <code style="font-size: 12px; color: #6b7280;">${violation.position.selector}</code>
+      </div>
+      <p style="margin: 0; color: #6b7280; font-size: 12px;">Cliquez n'importe où pour fermer</p>
+    `;
+    
+    overlay.appendChild(positionBox);
+    document.body.appendChild(overlay);
+    
+    overlay.onclick = () => document.body.removeChild(overlay);
+    
+    // Fermer automatiquement après 10 secondes
+    setTimeout(() => {
+      if (document.body.contains(overlay)) {
+        document.body.removeChild(overlay);
+      }
+    }, 10000);
+  };
+
   return (
     <div className="group border border-gray-200 rounded-xl bg-white overflow-hidden shadow-md">
       <div className="p-6">
@@ -573,7 +628,7 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
             )}
           </div>
           
-          <div className="flex-shrink-0 ml-6 flex items-center">
+          <div className="flex-shrink-0 ml-6 flex items-center gap-2">
             <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold border shadow-sm whitespace-nowrap ${
               violation.level === 'A' ? 'bg-orange-100 text-orange-800 border-orange-300' :
               violation.level === 'AA' ? 'bg-blue-100 text-blue-800 border-blue-300' :
@@ -582,6 +637,19 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
             }`}>
               RGAA {violation.level}
             </span>
+            {violation.position && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShowPosition(violation);
+                }}
+                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-indigo-100 text-indigo-800 border border-indigo-300 shadow-sm hover:bg-indigo-200 transition-colors whitespace-nowrap"
+                title="Voir la position de l'élément sur la page"
+              >
+                <Target className="w-3 h-3 mr-1" />
+                Localiser
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -986,16 +1054,12 @@ export default function AuditResults({ result, language, onNewAudit }: AuditResu
     }
   };
 
-
-
   // Calculer la couleur du score
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'green';
     if (score >= 60) return 'orange';
     return 'red';
   };
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center py-8">
