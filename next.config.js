@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ['playwright', '@sparticuz/chromium'],
   webpack: (config, { isServer }) => {
-    // Configuration basique pour Puppeteer côté serveur uniquement
+    // Configuration pour Playwright et Chromium côté serveur uniquement
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,

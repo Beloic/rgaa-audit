@@ -351,121 +351,150 @@ export async function OPTIONS(request: NextRequest) {
   });
 }
 
-// Fonction pour lancer l'analyse WAVE avec Puppeteer (intégrée)
+// Fonction pour lancer l'analyse WAVE avec Playwright optimisé pour Vercel
 async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
-  console.log(`🌊 Lancement de WAVE via le site web avec l'URL: ${url}`);
+  console.log(`🌊 Lancement de WAVE avec Playwright optimisé pour Vercel: ${url}`);
 
   try {
-    // Utiliser le nouveau module Vercel-compatible
-    const { analyzeWithWaveServerless } = await import('./vercel-puppeteer');
-    
-    const rawResults = await analyzeWithWaveServerless(url);
-    
-    // Convertir les résultats au format RGAA
-    const violations: RGAAViolation[] = rawResults.map((result, index) => ({
-      id: `wave-${index}`,
-      description: result.description,
-      impact: result.impact === 'critical' ? 'critical' : 
-              result.impact === 'serious' ? 'high' : 'medium',
-      help: result.help,
-      selector: result.selector,
-      context: result.context,
-      level: 'AA' as const,
-      recommendation: result.help
-    }));
-    
-    console.log(`🎉 Analyse WAVE terminée: ${violations.length} violations`);
-    return violations;
+    // Détecter l'environnement
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
     
     let browser;
-    let isConnectedToExisting = false;
     
-    // User agents aléatoires pour éviter la détection
-    const userAgents = [
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0'
-    ];
-    const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
-    
-    // Configuration simplifiée pour macOS avec gestion robuste des erreurs
-    console.log(`📱 Lancement d'une nouvelle instance Chrome pour WAVE...`);
-    
-    // Détecter l'environnement (local vs production)
-    const isProductionEnv = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-    const isMacOS = process.platform === 'darwin';
-    
-    try {
-      const launchConfig: any = {
-        headless: isProduction ? true : false, // Headless en production, visible en local
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-web-security',
-          '--allow-running-insecure-content',
-          '--no-first-run',
-          '--disable-default-apps',
-          '--disable-popup-blocking',
-          '--disable-blink-features=AutomationControlled',
-          '--exclude-switches=enable-automation',
-          '--user-agent=' + randomUserAgent,
-          // Arguments spécifiques pour la production/Vercel
-          ...(isProduction ? [
-            '--disable-gpu',
-            '--disable-dev-shm-usage',
-            '--disable-extensions',
-            '--no-zygote',
-            '--single-process'
-          ] : [])
-        ],
-        defaultViewport: null,
-        ignoreDefaultArgs: ['--enable-automation', '--enable-blink-features=AutomationControlled'],
-        timeout: 30000
-      };
-
-      // Ajouter le chemin explicite seulement sur macOS en local
-      if (isMacOS && !isProduction) {
-        launchConfig.executablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-      }
-
-      browser = await puppeteer.default.launch(launchConfig);
-      isConnectedToExisting = false;
-      console.log(`✅ Chrome lancé avec succès pour WAVE! (${isProduction ? 'production' : 'local'}, ${process.platform})`);
+    if (isProduction) {
+      // Configuration Vercel avec @sparticuz/chromium
+      const chromium = await import('@sparticuz/chromium');
+      const { chromium: playwright } = await import('playwright');
       
-    } catch (launchError) {
-      console.log(`⚠️ Échec du lancement, essai avec configuration minimale...`);
+      console.log('🚀 Lancement Playwright avec @sparticuz/chromium pour Vercel...');
       
-      // Fallback : configuration ultra-minimale
-      browser = await puppeteer.default.launch({
-        headless: true, // Forcer headless en fallback
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-web-security',
-          '--disable-dev-shm-usage'
-        ],
-        defaultViewport: null,
-        timeout: 30000
+      browser = await playwright.launch({
+        args: [...(chromium.args || []), '--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: await chromium.executablePath(),
+        headless: true,
       });
-      console.log(`✅ Chrome lancé en mode fallback pour WAVE!`);
+      
+    } else {
+      // Configuration locale avec Playwright natif
+      const { chromium } = await import('playwright');
+      
+      console.log('🚀 Lancement Playwright local...');
+      
+      browser = await chromium.launch({
+        headless: false,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'],
+      });
     }
 
-    const page = await browser.newPage();
-    
-    // Anti-détection simplifié pour éviter les erreurs
-    await page.evaluateOnNewDocument(() => {
-      // Masquer seulement les traces principales d'automation
-      Object.defineProperty(navigator, 'webdriver', {
-        get: () => undefined,
-        configurable: true
-      });
+    console.log(`✅ Playwright lancé avec succès (${isProduction ? 'production' : 'local'})`);
+
+    const context = await browser.newContext({
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      viewport: { width: 1920, height: 1080 },
+      extraHTTPHeaders: {
+        'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+      },
     });
+
+    const page = await context.newPage();
+
+    // Naviguer vers WAVE
+    console.log('📄 Navigation vers WAVE...');
+    await page.goto('https://wave.webaim.org/', { waitUntil: 'networkidle', timeout: 30000 });
+    console.log('✅ Site WAVE chargé');
+
+    // Saisir l'URL à analyser
+    console.log(`🔗 Saisie de l'URL: ${url}`);
+    await page.fill('input[name="url"], input#url, input[type="url"]', url);
     
-    // User agent personnalisé
-    await page.setUserAgent(randomUserAgent);
+    // Soumettre l'analyse
+    console.log('🚀 Lancement de l\'analyse...');
+    await page.click('input[type="submit"], button[type="submit"]');
+
+    // Attendre les résultats
+    console.log('⏳ Attente des résultats...');
+    try {
+      await page.waitForLoadState('networkidle', { timeout: 60000 });
+      await page.waitForSelector('.summary, #summary, [class*="summary"]', { timeout: 30000 });
+      console.log('✅ Résultats WAVE chargés');
+    } catch (timeoutError) {
+      console.log('⚠️ Timeout dépassé, récupération des données disponibles...');
+    }
+
+    // Extraire les résultats WAVE
+    const waveResults = await page.evaluate(() => {
+      const results = {
+        errors: [] as any[],
+        alerts: [] as any[],
+        features: [] as any[],
+        summary: { errors: 0, alerts: 0, features: 0 },
+        raw_data: {}
+      };
+
+      try {
+        const pageText = document.body.textContent || '';
+        
+        // Extraire les compteurs avec regex robuste
+        const errorMatch = pageText.match(/(\d+)\s*error[s]?/i);
+        const alertMatch = pageText.match(/(\d+)\s*alert[s]?/i);
+        const featureMatch = pageText.match(/(\d+)\s*feature[s]?/i);
+
+        const errorsCount = errorMatch ? parseInt(errorMatch[1]) : 0;
+        const alertsCount = alertMatch ? parseInt(alertMatch[1]) : 0;
+        const featuresCount = featureMatch ? parseInt(featureMatch[1]) : 0;
+
+        console.log(`WAVE trouvé: ${errorsCount} erreurs, ${alertsCount} alertes, ${featuresCount} fonctionnalités`);
+
+        // Créer des violations basées sur les compteurs WAVE
+        for (let i = 0; i < errorsCount; i++) {
+          results.errors.push({
+            type: 'error',
+            description: `Erreur d'accessibilité WAVE ${i + 1}`,
+            selector: `wave-error-${i + 1}`,
+            context: 'WAVE detection',
+            raw_text: `WAVE Error ${i + 1}`,
+            severity: 'high'
+          });
+        }
+
+        for (let i = 0; i < alertsCount; i++) {
+          results.alerts.push({
+            type: 'alert',
+            description: `Alerte d'accessibilité WAVE ${i + 1}`,
+            selector: `wave-alert-${i + 1}`,
+            context: 'WAVE detection',
+            raw_text: `WAVE Alert ${i + 1}`,
+            severity: 'medium'
+          });
+        }
+
+        results.summary = { errors: errorsCount, alerts: alertsCount, features: featuresCount };
+        return results;
+      } catch (e) {
+        console.error('Erreur extraction WAVE:', e);
+        return results;
+      }
+    });
+
+    console.log(`🎉 Analyse WAVE terminée: ${waveResults.summary.errors} erreurs, ${waveResults.summary.alerts} alertes`);
+
+    // Fermer le navigateur en production
+    if (isProduction) {
+      await browser.close();
+    }
+
+    // Convertir en format RGAA
+    const violations = parseWaveResults(JSON.stringify(waveResults));
+    console.log(`📊 ${violations.length} violations WAVE converties au format RGAA`);
+    
+    return violations;
+    
+  } catch (error) {
+    console.error('❌ Erreur WAVE:', error);
+    console.log('⚠️ WAVE a échoué, continuation avec les autres moteurs');
+    return [];
+  }
+}
     
     // Viewport aléatoire pour paraître naturel
     const viewports = [
@@ -933,12 +962,12 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
     console.log(`🌐 Le rapport WAVE reste ouvert dans Chrome pour consultation manuelle.`);
     
     // Convertir les résultats WAVE en format RGAA
-    const waveViolations = parseWaveResults(JSON.stringify(waveResults));
+    const violations = parseWaveResults(JSON.stringify(waveResults));
     
     // Laisser l'onglet/navigateur ouvert pour consultation manuelle
     console.log(`📋 Rapport WAVE disponible dans l'onglet Chrome ouvert pour consultation détaillée.`);
     
-    return waveViolations;
+    return violations;
     
   } catch (error) {
     console.error('❌ Erreur lors de l\'analyse WAVE:', error);
