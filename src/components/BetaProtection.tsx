@@ -1,11 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { Shield, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 interface BetaProtectionProps {
   children: React.ReactNode;
 }
+
+interface BetaAuthContextType {
+  logout: () => Promise<void>;
+  isAuthenticated: boolean | null;
+}
+
+const BetaAuthContext = createContext<BetaAuthContextType | null>(null);
+
+export const useBetaAuth = () => {
+  const context = useContext(BetaAuthContext);
+  if (!context) {
+    throw new Error('useBetaAuth must be used within BetaProtection');
+  }
+  return context;
+};
 
 export default function BetaProtection({ children }: BetaProtectionProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -59,6 +74,22 @@ export default function BetaProtection({ children }: BetaProtectionProps) {
     }
   };
 
+  const logout = async () => {
+    try {
+      const response = await fetch('/api/auth/beta/logout', {
+        method: 'POST'
+      });
+
+      if (response.ok) {
+        setIsAuthenticated(false);
+        setPassword('');
+        setError('');
+      }
+    } catch (error) {
+      console.error('Erreur de déconnexion:', error);
+    }
+  };
+
   // Affichage de chargement pendant la vérification
   if (isAuthenticated === null) {
     return (
@@ -76,9 +107,13 @@ export default function BetaProtection({ children }: BetaProtectionProps) {
     );
   }
 
-  // Si authentifié, afficher le contenu
+  // Si authentifié, afficher le contenu avec le contexte
   if (isAuthenticated) {
-    return <>{children}</>;
+    return (
+      <BetaAuthContext.Provider value={{ logout, isAuthenticated }}>
+        {children}
+      </BetaAuthContext.Provider>
+    );
   }
 
   // Sinon, afficher la page de connexion

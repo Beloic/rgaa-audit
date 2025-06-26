@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Shield } from 'lucide-react';
+import { useBetaAuth } from '@/components/BetaProtection';
+import { Shield, LogOut } from 'lucide-react';
+import { useState } from 'react';
 
 interface TopBarProps {
   activeSection?: 'home' | 'analyze' | 'manual-audit' | 'rgaa-reference';
@@ -14,6 +16,8 @@ interface TopBarProps {
 export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick }: TopBarProps) {
   const pathname = usePathname();
   const { language, setLanguage } = useLanguage();
+  const { logout } = useBetaAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -50,6 +54,17 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
       } else if (section === 'analyze') {
         window.location.href = '/?section=analyze';
       }
+    }
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Erreur de déconnexion:', error);
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -102,8 +117,9 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
             </Link>
           </div>
 
-          {/* Sélecteur de langue */}
+          {/* Actions utilisateur */}
           <div className="flex items-center space-x-4 flex-shrink-0">
+            {/* Sélecteur de langue */}
             <label htmlFor="language-select-topbar" className="sr-only">Choisir la langue</label>
             <div className="relative">
               <select 
@@ -120,6 +136,24 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                 <span className="text-gray-400 text-sm">▼</span>
               </div>
             </div>
+
+            {/* Bouton de déconnexion */}
+            <button 
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-red-600 focus:text-red-600 transition-colors rounded-lg hover:bg-red-50 focus:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Se déconnecter de la bêta"
+              title="Se déconnecter"
+            >
+              {isLoggingOut ? (
+                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <LogOut className="w-4 h-4" aria-hidden="true" />
+              )}
+              <span className="hidden sm:inline text-sm font-medium">
+                {isLoggingOut ? 'Déconnexion...' : 'Quitter'}
+              </span>
+            </button>
           </div>
 
           {/* Menu mobile */}
