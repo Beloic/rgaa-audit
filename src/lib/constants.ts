@@ -159,41 +159,4 @@ export const API_LIMITS = {
   TIMEOUT: 60000 // 60 secondes
 };
 
-export const TRANSLATIONS = {
-  fr: {
-    title: 'Audit d\'Accessibilité RGAA/WCAG',
-    subtitle: 'Analysez l\'accessibilité de votre site web selon les standards RGAA et WCAG',
-    urlPlaceholder: 'Entrez l\'URL de la page à analyser',
-    htmlPlaceholder: 'Ou collez votre code HTML ici...',
-    analyzeButton: 'Analyser l\'accessibilité',
-    analyzing: 'Analyse en cours...',
-    results: 'Résultats de l\'audit',
-    violations: 'Non-conformités détectées',
-    recommendations: 'Recommandations',
-    score: 'Score d\'accessibilité',
-    history: 'Historique des audits',
-    noViolations: 'Aucune non-conformité majeure détectée !',
-    error: 'Une erreur est survenue lors de l\'analyse',
-    invalidUrl: 'URL invalide',
-    tooLarge: 'Le contenu est trop volumineux',
-    rateLimited: 'Trop de requêtes, veuillez réessayer plus tard'
-  },
-  en: {
-    title: 'RGAA/WCAG Accessibility Audit',
-    subtitle: 'Analyze your website accessibility according to RGAA and WCAG standards',
-    urlPlaceholder: 'Enter the URL of the page to analyze',
-    htmlPlaceholder: 'Or paste your HTML code here...',
-    analyzeButton: 'Analyze accessibility',
-    analyzing: 'Analyzing...',
-    results: 'Audit results',
-    violations: 'Violations detected',
-    recommendations: 'Recommendations',
-    score: 'Accessibility score',
-    history: 'Audit history',
-    noViolations: 'No major violations detected!',
-    error: 'An error occurred during analysis',
-    invalidUrl: 'Invalid URL',
-    tooLarge: 'Content is too large',
-    rateLimited: 'Too many requests, please try again later'
-  }
-}; 
+// TRANSLATIONS supprimées - chaque composant gère ses propres traductions localement 

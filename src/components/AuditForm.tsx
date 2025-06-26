@@ -28,14 +28,7 @@ const translations = {
     waveDescription: 'Outil de référence pour l\'accessibilité web',
     axeDescription: 'Moteur d\'analyse automatisé performant',
     comparativeAnalysis: 'Analyse Comparative',
-    comparativeDescription: 'Analyse avec tous les moteurs pour comparaison',
-    // Waitlist translations
-    waitlistTitle: 'Rejoignez la liste d\'attente',
-    waitlistSubtitle: 'Notre plateforme d\'audit d\'accessibilité arrive bientôt ! Soyez parmi les premiers informés.',
-    emailPlaceholder: 'votre.email@exemple.com',
-    waitlistButton: 'Rejoindre la liste d\'attente',
-    emailError: 'Veuillez entrer une adresse email valide',
-    waitlistSuccess: 'Merci ! Vous avez été ajouté à notre liste d\'attente.'
+    comparativeDescription: 'Analyse avec tous les moteurs pour comparaison'
   },
   en: {
     title: 'Analyze your website',
@@ -52,14 +45,7 @@ const translations = {
     waveDescription: 'Reference tool for web accessibility',
     axeDescription: 'High-performance automated analysis engine',
     comparativeAnalysis: 'Comparative Analysis',
-    comparativeDescription: 'Analysis with all engines for comparison',
-    // Waitlist translations
-    waitlistTitle: 'Join the waitlist',
-    waitlistSubtitle: 'Our accessibility audit platform is coming soon! Be among the first to know.',
-    emailPlaceholder: 'your.email@example.com',
-    waitlistButton: 'Join waitlist',
-    emailError: 'Please enter a valid email address',
-    waitlistSuccess: 'Thank you! You have been added to our waitlist.'
+    comparativeDescription: 'Analysis with all engines for comparison'
   }
 };
 
@@ -68,10 +54,7 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const [selectedEngine, setSelectedEngine] = useState<'wave' | 'axe' | 'rgaa' | 'all'>('rgaa');
-  // Variables de la liste d'attente désactivées temporairement
-  // const [email, setEmail] = useState('');
-  // const [emailError, setEmailError] = useState('');
-  // const [isSubmitted, setIsSubmitted] = useState(false);
+
 
   const t = translations[language];
 
@@ -137,7 +120,7 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
   return (
     <div className="max-w-4xl mx-auto px-6">
       <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-8">
-        {/* Formulaire d'audit principal - liste d'attente désactivée temporairement */}
+        {/* Formulaire d'audit principal */}
         <>
           {/* Header */}
           <header className="text-center mb-8">

@@ -149,22 +149,7 @@ export default function HomePage() {
     }
   };
 
-  // Nouvelle fonction pour démarrer une nouvelle analyse sans effacer les résultats précédents
-  const handleStartNewAnalysis = () => {
-    // Réinitialiser seulement l'état de progression et les erreurs
-    setError(null);
-    setProgress({ step: 'idle', message: 'En attente...', progress: 0 });
-    
-    // Scroll vers le formulaire avec focus pour l'accessibilité
-    const formElement = document.getElementById('audit-form');
-    if (formElement) {
-      formElement.scrollIntoView({ behavior: 'smooth' });
-      const firstInput = formElement.querySelector('input, select, textarea') as HTMLElement;
-      if (firstInput) {
-        firstInput.focus();
-      }
-    }
-  };
+
 
   // Fonction pour gérer le clic sur "Analyser" depuis la TopBar
   const handleAnalyzeClick = () => {
@@ -217,7 +202,6 @@ export default function HomePage() {
           <Sidebar 
             activeSection={activeSection} 
             onSectionChange={setActiveSection}
-            hasAnalysis={!!auditResult || !!comparativeResult || isAnalyzing}
           />
         )}
 
