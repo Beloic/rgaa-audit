@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Shield, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
-export default function LoginPage() {
+// Composant pour le formulaire de connexion avec useSearchParams
+function LoginForm() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -43,6 +44,64 @@ export default function LoginPage() {
   };
 
   return (
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            Mot de passe de la bêta
+          </label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Entrez le mot de passe"
+              required
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="flex items-center space-x-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <span className="text-sm">{error}</span>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading || !password.trim()}
+          className="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
+        >
+          {isLoading ? (
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Vérification...</span>
+            </div>
+          ) : (
+            'Accéder à la bêta'
+          )}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+// Composant principal avec Suspense
+export default function LoginPage() {
+  return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-6">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
@@ -64,59 +123,18 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Formulaire de connexion */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Mot de passe de la bêta
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="Entrez le mot de passe"
-                  required
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
+        {/* Formulaire de connexion avec Suspense */}
+        <Suspense fallback={
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+            <div className="animate-pulse space-y-6">
+              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-12 bg-gray-200 rounded"></div>
+              <div className="h-12 bg-gray-200 rounded"></div>
             </div>
-
-            {error && (
-              <div className="flex items-center space-x-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{error}</span>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading || !password.trim()}
-              className="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
-            >
-              {isLoading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Vérification...</span>
-                </div>
-              ) : (
-                'Accéder à la bêta'
-              )}
-            </button>
-          </form>
-        </div>
+          </div>
+        }>
+          <LoginForm />
+        </Suspense>
 
         {/* Info supplémentaire */}
         <div className="text-center text-sm text-gray-600">
