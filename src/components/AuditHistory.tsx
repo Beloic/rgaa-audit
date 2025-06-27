@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Clock, ExternalLink, Trash2, RotateCcw, Search, Calendar, TrendingUp, AlertTriangle, Zap, Shield, Cpu, BarChart3 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Clock, ExternalLink, Trash2, RotateCcw, Search, Calendar, TrendingUp, AlertTriangle, Zap, Shield, Cpu, BarChart3, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { AuditResult, ComparativeResult, AuditRequest } from '@/types/audit';
 
@@ -75,6 +76,7 @@ const translations = {
 
 export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: AuditHistoryProps) {
   const { language } = useLanguage();
+  const router = useRouter();
   const t = translations[language];
   const [audits, setAudits] = useState<HistoricalAudit[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -290,6 +292,13 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
                       {t.resumeAudit}
                     </button>
                     <button
+                      onClick={() => router.push(`/audit-management/${audit.id}`)}
+                      className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-medium rounded-xl hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                    >
+                      <Target className="w-4 h-4 mr-2" />
+                      Gestion de l'audit
+                    </button>
+                    <button
                       onClick={() => handleNewAudit(audit.url)}
                       className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-medium rounded-xl hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                     >
@@ -314,8 +323,8 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
                         ? 'bg-gradient-to-br from-purple-50 to-purple-100'
                         : 'bg-gradient-to-br from-indigo-50 to-indigo-100'
                     }`}>
-                      <div className="text-center">
-                        <div className={`mb-1 ${
+                      <div className="flex flex-col items-center justify-center">
+                        <div className={`mb-1 flex justify-center ${
                           audit.engine === 'rgaa' ? 'text-green-600' :
                           audit.engine === 'wave' ? 'text-blue-600' :
                           audit.engine === 'axe' ? 'text-purple-600' :
@@ -323,7 +332,7 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
                         }`}>
                           {getEngineIcon(audit.engine, "w-8 h-8")}
                         </div>
-                        <div className={`text-xs font-bold ${
+                        <div className={`text-xs font-bold text-center ${
                           audit.engine === 'rgaa' ? 'text-green-600' :
                           audit.engine === 'wave' ? 'text-blue-600' :
                           audit.engine === 'axe' ? 'text-purple-600' :
@@ -377,7 +386,7 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
                 </div>
               </div>
 
-              {/* Pied avec action de suppression amélioré */}
+              {/* Pied avec actions amélioré */}
               <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-100">
                 <div className="flex items-center justify-between">
                   <div className="text-xs text-gray-500 flex items-center space-x-2">
@@ -385,13 +394,15 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
                     <span>•</span>
                     <span>{audit.engine.toUpperCase()}</span>
                   </div>
-                  <button
-                    onClick={() => setDeleteConfirm(audit.id)}
-                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 group"
-                  >
-                    <Trash2 className="w-3 h-3 mr-1 group-hover:animate-pulse" />
-                    {t.deleteAudit}
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setDeleteConfirm(audit.id)}
+                      className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 group"
+                    >
+                      <Trash2 className="w-3 h-3 mr-1 group-hover:animate-pulse" />
+                      {t.deleteAudit}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
