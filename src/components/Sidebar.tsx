@@ -1,6 +1,6 @@
 'use client';
 
-import { Monitor, FileCheck, BookOpen } from 'lucide-react';
+import { Monitor, FileCheck, BookOpen, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const translations = {
@@ -8,6 +8,7 @@ const translations = {
     intelligentAnalysis: 'Analyse intelligente',
     manualAudit: 'Audit manuel',
     rgaaReference: 'Référentiel RGAA',
+    auditHistory: 'Historique',
     versionAlpha: 'VERSION ALPHA',
     bugReport: 'Il est probable que vous rencontriez des bugs, merci de bien vouloir les remonter :',
     reportBug: 'Signaler un bug'
@@ -16,6 +17,7 @@ const translations = {
     intelligentAnalysis: 'Intelligent Analysis',
     manualAudit: 'Manual Audit',
     rgaaReference: 'RGAA Reference',
+    auditHistory: 'History',
     versionAlpha: 'ALPHA VERSION',
     bugReport: 'You may encounter bugs, please report them:',
     reportBug: 'Report a bug'
@@ -23,8 +25,8 @@ const translations = {
 };
 
 interface SidebarProps {
-  activeSection: 'analyze' | 'manual-audit' | 'rgaa-reference';
-  onSectionChange: (section: 'analyze' | 'manual-audit' | 'rgaa-reference') => void;
+  activeSection: 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history';
+  onSectionChange: (section: 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history') => void;
 }
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
@@ -48,6 +50,15 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         >
           <Monitor className="w-5 h-5" aria-hidden="true" />
           <span className="font-medium">{t.intelligentAnalysis}</span>
+        </button>
+
+        <button
+          onClick={() => onSectionChange('history')}
+          className={getButtonClasses('history')}
+          aria-current={activeSection === 'history' ? 'page' : undefined}
+        >
+          <Clock className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">{t.auditHistory}</span>
         </button>
         
         <button

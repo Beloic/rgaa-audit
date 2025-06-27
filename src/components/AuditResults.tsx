@@ -160,6 +160,8 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
   
   // État pour contrôler l'ouverture/fermeture de la section recommandation - FERMÉ PAR DÉFAUT
   const [isRecommendationOpen, setIsRecommendationOpen] = useState(false);
+  const [isLoadingPosition, setIsLoadingPosition] = useState(false);
+  const [violationWithPosition, setViolationWithPosition] = useState<RGAAViolation>(violation);
 
   // Fonction pour détecter et filtrer les sélecteurs CSS de l'interface WAVE
   const isWaveInterfaceSelector = (selector: string): boolean => {
@@ -483,9 +485,52 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
     }
   };
 
-  const handleShowPosition = (violation: RGAAViolation) => {
-    if (!violation.position) return;
+  const handleShowPosition = async (violation: RGAAViolation) => {
+    // Si la position est déjà disponible, l'afficher directement
+    if (violationWithPosition.position) {
+      showPositionModal(violationWithPosition);
+      return;
+    }
+
+    // Sinon, capturer la position via l'API
+    setIsLoadingPosition(true);
     
+    try {
+      // Récupérer l'URL depuis le contexte ou localStorage
+      const currentUrl = window.location.href.includes('localhost') 
+        ? sessionStorage.getItem('lastAnalyzedUrl') || ''
+        : window.location.href;
+
+      const response = await fetch('/api/capture-position', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: currentUrl,
+          violation: violation
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.position) {
+        const updatedViolation = { ...violation, position: data.position };
+        setViolationWithPosition(updatedViolation);
+        showPositionModal(updatedViolation);
+      } else {
+        // Afficher un message d'erreur
+        showPositionModal(null, data.message || 'Impossible de localiser cet élément');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la capture de position:', error);
+      showPositionModal(null, 'Erreur lors de la localisation de l\'élément');
+    } finally {
+      setIsLoadingPosition(false);
+    }
+  };
+
+  const showPositionModal = (violation: RGAAViolation | null, errorMessage?: string) => {
     // Créer un overlay pour montrer la position
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -512,17 +557,25 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
       text-align: center;
     `;
     
-    positionBox.innerHTML = `
-      <h3 style="margin: 0 0 10px 0; color: #1f2937;">Position de l'élément</h3>
-      <p style="margin: 0 0 15px 0; color: #6b7280; font-size: 14px;">${violation.description}</p>
-      <div style="background: #f3f4f6; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
-        <strong>Coordonnées:</strong><br>
-        X: ${violation.position.x}px, Y: ${violation.position.y}px<br>
-        Taille: ${violation.position.width}px × ${violation.position.height}px<br>
-        <code style="font-size: 12px; color: #6b7280;">${violation.position.selector}</code>
-      </div>
-      <p style="margin: 0; color: #6b7280; font-size: 12px;">Cliquez n'importe où pour fermer</p>
-    `;
+    if (violation?.position) {
+      positionBox.innerHTML = `
+        <h3 style="margin: 0 0 10px 0; color: #1f2937;">Position de l'élément</h3>
+        <p style="margin: 0 0 15px 0; color: #6b7280; font-size: 14px;">${violation.description}</p>
+        <div style="background: #f3f4f6; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+          <strong>Coordonnées:</strong><br>
+          X: ${violation.position.x}px, Y: ${violation.position.y}px<br>
+          Taille: ${violation.position.width}px × ${violation.position.height}px<br>
+          <code style="font-size: 12px; color: #6b7280;">${violation.position.selector}</code>
+        </div>
+        <p style="margin: 0; color: #6b7280; font-size: 12px;">Cliquez n'importe où pour fermer</p>
+      `;
+    } else {
+      positionBox.innerHTML = `
+        <h3 style="margin: 0 0 10px 0; color: #dc2626;">Localisation impossible</h3>
+        <p style="margin: 0 0 15px 0; color: #6b7280; font-size: 14px;">${errorMessage || 'Impossible de localiser cet élément sur la page'}</p>
+        <p style="margin: 0; color: #6b7280; font-size: 12px;">Cliquez pour fermer</p>
+      `;
+    }
     
     overlay.appendChild(positionBox);
     document.body.appendChild(overlay);
@@ -540,6 +593,7 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
   return (
     <div className="group border border-gray-200 rounded-xl bg-white overflow-hidden shadow-md">
       <div className="p-6">
+        {/* En-tête avec numéro, titre et badge */}
         <div className="flex items-start justify-between mb-5">
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-start mb-4">
@@ -551,84 +605,9 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
             <h3 className="text-lg font-semibold text-gray-900 mb-4 leading-tight break-words">
               {violation.description}
             </h3>
-            
-            <div className="text-sm text-gray-600 mb-4 bg-gray-50 px-4 py-2 rounded-lg border">
-              <span className="font-medium">Critère RGAA : </span>
-              <span className="font-mono break-words">{violation.criterion}</span>
-            </div>
-            
-            {/* Sélecteur CSS ou indication WAVE */}
-            {(() => {
-              // Vérifier si on vient de WAVE
-              const isFromWave = engine === 'wave';
-              
-              if (isFromWave) {
-                // Pour WAVE, afficher un simple texte informatif
-                return (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4 shadow-sm">
-                    <div className="flex items-center text-sm text-blue-700">
-                      <Code className="w-4 h-4 mr-2 flex-shrink-0" />
-                      <span className="font-medium">Voir dans WAVE</span>
-                    </div>
-                  </div>
-                );
-              } else {
-                // Pour les autres moteurs, utiliser la logique normale
-                const cleanSelector = getCleanSelector(violation.element || '');
-                return cleanSelector && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4 shadow-sm">
-                    <div className="flex items-center justify-between text-sm text-blue-700 mb-3 flex-wrap gap-2">
-                      <div className="flex items-center">
-                        <Code className="w-4 h-4 mr-2 flex-shrink-0" />
-                        <span className="font-medium">Sélecteur CSS :</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span
-                          id={`copy-selector-${index}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copySelector();
-                          }}
-                          className="flex items-center px-3 py-1 text-xs bg-blue-200 hover:bg-blue-300 text-blue-800 rounded-md transition-colors cursor-pointer shadow-sm whitespace-nowrap"
-                          title="Copier le sélecteur"
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              copySelector();
-                            }
-                          }}
-                        >
-                          <Copy className="w-3 h-3 mr-1" />
-                          Copier
-                        </span>
-                      </div>
-                    </div>
-                    <code className="text-sm text-blue-800 bg-white px-3 py-2 rounded-lg border border-blue-200 block break-all word-break-all overflow-wrap-anywhere">
-                      {cleanSelector}
-                    </code>
-                  </div>
-                );
-              }
-            })()}
-
-            {/* Extrait HTML */}
-            {violation.htmlSnippet && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4 shadow-sm">
-                <div className="flex items-center text-sm text-red-700 mb-3">
-                  <Code className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span className="font-medium">Code HTML problématique :</span>
-                </div>
-                <pre className="text-xs text-red-800 bg-white px-3 py-2 rounded-lg border border-red-200 overflow-x-auto whitespace-pre-wrap break-words">
-                  <code className="break-words word-break-all">{violation.htmlSnippet}</code>
-                </pre>
-              </div>
-            )}
           </div>
           
-          <div className="flex-shrink-0 ml-6 flex items-center gap-2">
+          <div className="flex-shrink-0 ml-6 flex items-center justify-center">
             <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold border shadow-sm whitespace-nowrap ${
               violation.level === 'A' ? 'bg-orange-100 text-orange-800 border-orange-300' :
               violation.level === 'AA' ? 'bg-blue-100 text-blue-800 border-blue-300' :
@@ -637,21 +616,86 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
             }`}>
               RGAA {violation.level}
             </span>
-            {violation.position && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleShowPosition(violation);
-                }}
-                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-indigo-100 text-indigo-800 border border-indigo-300 shadow-sm hover:bg-indigo-200 transition-colors whitespace-nowrap"
-                title="Voir la position de l'élément sur la page"
-              >
-                <Target className="w-3 h-3 mr-1" />
-                Localiser
-              </button>
-            )}
           </div>
         </div>
+
+        {/* Critère RGAA - pleine largeur */}
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 shadow-sm w-full">
+          <div className="text-sm text-gray-600">
+            <span className="font-medium">Critère RGAA : </span>
+            <span className="font-mono break-words">{violation.criterion}</span>
+          </div>
+        </div>
+
+        {/* Sélecteur CSS ou indication WAVE - pleine largeur */}
+        {(() => {
+          // Vérifier si on vient de WAVE
+          const isFromWave = engine === 'wave';
+          
+          if (isFromWave) {
+            // Pour WAVE, afficher un simple texte informatif
+            return (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 shadow-sm w-full">
+                <div className="flex items-center text-sm text-blue-700">
+                  <Code className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span className="font-medium">Voir dans WAVE</span>
+                </div>
+              </div>
+            );
+          } else {
+            // Pour les autres moteurs, utiliser la logique normale
+            const cleanSelector = getCleanSelector(violation.element || '');
+            return cleanSelector && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 shadow-sm w-full">
+                <div className="flex items-center justify-between text-sm text-blue-700 mb-3 flex-wrap gap-2">
+                  <div className="flex items-center">
+                    <Code className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="font-medium">Sélecteur CSS :</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span
+                      id={`copy-selector-${index}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        copySelector();
+                      }}
+                      className="flex items-center px-3 py-1 text-xs bg-blue-200 hover:bg-blue-300 text-blue-800 rounded-md transition-colors cursor-pointer shadow-sm whitespace-nowrap"
+                      title="Copier le sélecteur"
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          copySelector();
+                        }
+                      }}
+                    >
+                      <Copy className="w-3 h-3 mr-1" />
+                      Copier
+                    </span>
+                  </div>
+                </div>
+                <code className="text-sm text-blue-800 bg-white px-3 py-2 rounded-lg border border-blue-200 block break-all word-break-all overflow-wrap-anywhere w-full">
+                  {cleanSelector}
+                </code>
+              </div>
+            );
+          }
+        })()}
+
+        {/* Extrait HTML - pleine largeur */}
+        {violation.htmlSnippet && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 shadow-sm w-full">
+            <div className="flex items-center text-sm text-red-700 mb-3">
+              <Code className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="font-medium">Code HTML problématique :</span>
+            </div>
+            <pre className="text-xs text-red-800 bg-white px-3 py-2 rounded-lg border border-red-200 overflow-x-auto whitespace-pre-wrap break-words w-full">
+              <code className="break-words word-break-all">{violation.htmlSnippet}</code>
+            </pre>
+          </div>
+        )}
       </div>
       
       {/* Section recommandation collapsible */}
@@ -1167,7 +1211,7 @@ export default function AuditResults({ result, language, onNewAudit }: AuditResu
       {/* Niveau d'accessibilité et Répartition par niveau RGAA côte à côte */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Niveau d'accessibilité */}
-        <div className="flex justify-center lg:justify-start">
+        <div className="flex justify-center">
           <AccessibilityLevelCard result={result} language={language} />
         </div>
 

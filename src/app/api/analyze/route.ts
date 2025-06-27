@@ -400,6 +400,7 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
           args: chromium.default.args,
           executablePath: await chromium.default.executablePath(chromiumPack),
           headless: true,
+          protocolTimeout: 300000, // 5 minutes pour éviter les timeouts
           defaultViewport: { width: 1920, height: 1080 }
         };
       } else {
@@ -407,6 +408,7 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
         console.log(`🏠 Configuration locale pour développement (mode visible)...`);
         launchConfig = {
           headless: false, // TOUJOURS visible en local pour WAVE
+          protocolTimeout: 300000, // 5 minutes au lieu du défaut (30 secondes)
           args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -421,7 +423,7 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
           ],
           defaultViewport: null,
           ignoreDefaultArgs: ['--enable-automation', '--enable-blink-features=AutomationControlled'],
-          timeout: 30000
+          timeout: 60000 // Augmenté à 60 secondes
         };
 
         // Ajouter le chemin explicite sur macOS
@@ -440,6 +442,7 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
       // Fallback : configuration ultra-minimale
       browser = await puppeteer.default.launch({
         headless: true,
+        protocolTimeout: 300000, // 5 minutes même en fallback
         args: isProduction ? chromium.default.args : [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -448,12 +451,16 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
         ],
         executablePath: isProduction ? await chromium.default.executablePath(chromiumPack) : undefined,
         defaultViewport: null,
-        timeout: 30000
+        timeout: 60000 // Augmenté à 60 secondes
       });
       console.log(`✅ Chrome lancé en mode fallback pour WAVE!`);
     }
 
     const page = await browser.newPage();
+    
+    // Configurer des timeouts plus longs pour éviter les erreurs de protocole
+    await page.setDefaultTimeout(120000); // 2 minutes pour les sélecteurs
+    await page.setDefaultNavigationTimeout(120000); // 2 minutes pour la navigation
     
     // Anti-détection simplifié pour éviter les erreurs
     await page.evaluateOnNewDocument(() => {
@@ -933,10 +940,7 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
     console.log(`🌐 Le rapport WAVE reste ouvert dans Chrome pour consultation manuelle.`);
     
     // Convertir les résultats WAVE en format RGAA
-    let violations = parseWaveResults(JSON.stringify(waveResults));
-    
-    // Capturer les positions des éléments avec violations
-    violations = await captureViolationPositions(page, violations);
+    const violations = parseWaveResults(JSON.stringify(waveResults));
     
     // Laisser l'onglet/navigateur ouvert pour consultation manuelle
     if (!isProduction) {

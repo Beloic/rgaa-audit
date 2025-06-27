@@ -8,6 +8,7 @@ import TopBar from '@/components/TopBar';
 import Sidebar from '@/components/Sidebar';
 import ManualAuditPage from '@/components/ManualAuditPage';
 import RGAAReference from '@/components/RGAAReference';
+import AuditHistory, { saveAuditToHistory } from '@/components/AuditHistory';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Shield, Zap, Target, Users, AlertTriangle } from 'lucide-react';
@@ -25,17 +26,76 @@ export default function HomePage() {
     message: 'En attente...',
     progress: 0
   });
-  const [activeSection, setActiveSection] = useState<'home' | 'analyze' | 'manual-audit' | 'rgaa-reference'>('home');
+  const [activeSection, setActiveSection] = useState<'home' | 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history'>('home');
 
   // Détecter les paramètres URL pour changer de section automatiquement
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const section = urlParams.get('section');
     
-    if (section && ['analyze', 'manual-audit', 'rgaa-reference'].includes(section)) {
-      setActiveSection(section as 'analyze' | 'manual-audit' | 'rgaa-reference');
+    if (section && ['analyze', 'manual-audit', 'rgaa-reference', 'history'].includes(section)) {
+      setActiveSection(section as 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history');
     }
   }, []);
+
+  // Fonctions de gestion de l'historique
+  const handleResumeAudit = (auditData: { result: AuditResult | ComparativeResult; engine: 'wave' | 'axe' | 'rgaa' | 'all' }) => {
+    // Distinguer entre résultat normal et comparatif
+    if (auditData.engine === 'all') {
+      setComparativeResult(auditData.result as ComparativeResult);
+      setAuditResult(null);
+    } else {
+      setAuditResult(auditData.result as AuditResult);
+      setComparativeResult(null);
+    }
+    
+    setError(null);
+    setProgress({ step: 'complete', message: 'Audit repris avec succès !', progress: 100 });
+    setActiveSection('analyze');
+    
+    // Scroll vers les résultats
+    setTimeout(() => {
+      const resultsElement = document.getElementById('audit-results');
+      if (resultsElement) {
+        resultsElement.scrollIntoView({ behavior: 'smooth' });
+        resultsElement.focus();
+      }
+    }, 500);
+  };
+
+  const handleNewAuditFromHistory = async (request: AuditRequest) => {
+    setActiveSection('analyze');
+    // Attendre que le composant soit monté puis lancer l'audit
+    setTimeout(() => {
+      handleAuditStart(request);
+    }, 100);
+  };
+
+  // Fonction pour gérer les changements de section de la sidebar
+  const handleSidebarSectionChange = (section: 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history') => {
+    setActiveSection(section);
+    
+    // Réinitialiser les résultats si on revient sur analyser et qu'il n'y a pas d'analyse en cours
+    if (section === 'analyze' && !isAnalyzing) {
+      setAuditResult(null);
+      setComparativeResult(null);
+      setError(null);
+      setProgress({ step: 'idle', message: 'En attente...', progress: 0 });
+    }
+  };
+
+  // Fonction pour la TopBar (sans history)
+  const handleTopBarSectionChange = (section: 'home' | 'analyze' | 'manual-audit' | 'rgaa-reference') => {
+    setActiveSection(section);
+    
+    // Réinitialiser les résultats si on revient sur analyser et qu'il n'y a pas d'analyse en cours
+    if (section === 'analyze' && !isAnalyzing) {
+      setAuditResult(null);
+      setComparativeResult(null);
+      setError(null);
+      setProgress({ step: 'idle', message: 'En attente...', progress: 0 });
+    }
+  };
 
   const handleAuditStart = async (request: AuditRequest) => {
     setIsAnalyzing(true);
@@ -98,8 +158,12 @@ export default function HomePage() {
       // Distinguer entre résultat normal et comparatif
       if (request.engine === 'all') {
         setComparativeResult(result as ComparativeResult);
+        // Sauvegarder dans l'historique
+        saveAuditToHistory(result as ComparativeResult, 'all');
       } else {
         setAuditResult(result as AuditResult);
+        // Sauvegarder dans l'historique
+        saveAuditToHistory(result as AuditResult, request.engine || 'rgaa');
       }
       
       setIsAnalyzing(false);
@@ -151,8 +215,6 @@ export default function HomePage() {
     }
   };
 
-
-
   // Fonction pour gérer le clic sur "Analyser" depuis la TopBar
   const handleAnalyzeClick = () => {
     setActiveSection('analyze');
@@ -194,21 +256,21 @@ export default function HomePage() {
 
         {/* Topbar Navigation */}
         <TopBar 
-          activeSection={activeSection} 
-          onSectionChange={setActiveSection}
+          activeSection={activeSection === 'history' ? 'home' : activeSection} 
+          onSectionChange={handleTopBarSectionChange}
           onAnalyzeClick={handleAnalyzeClick}
         />
 
-        {/* Sidebar Navigation - Masquée sur la page d'accueil */}
+        {/* Sidebar - seulement sur les pages autres que home */}
         {activeSection !== 'home' && (
           <Sidebar 
             activeSection={activeSection} 
-            onSectionChange={setActiveSection}
+            onSectionChange={handleSidebarSectionChange}
           />
         )}
 
         {/* Main Content */}
-        <main id="main-content" className={`relative z-10 ${activeSection !== 'home' ? 'ml-64' : ''}`}>
+        <main id="main-content" className={`${activeSection !== 'home' ? 'ml-64' : ''} relative z-10`}>
           
           {/* Page d'accueil */}
           {activeSection === 'home' && (
@@ -273,22 +335,24 @@ export default function HomePage() {
           {/* Page Analyser */}
           {activeSection === 'analyze' && (
             <>
-              {/* Formulaire d'audit - toujours visible */}
-              <section id="audit-form" className={`px-6 ${!auditResult && !comparativeResult ? 'min-h-[calc(100vh-4rem)] flex items-center justify-center' : 'pt-8'}`} aria-labelledby="audit-form-heading">
-                <div className="w-full max-w-4xl mx-auto">
-                  <h2 id="audit-form-heading" className="sr-only">Formulaire d'audit d'accessibilité</h2>
-                  <AuditForm
-                    onAuditStart={handleAuditStart}
-                    progress={progress}
-                    isAnalyzing={isAnalyzing}
-                    analysisError={error}
-                  />
-                </div>
-              </section>
+              {/* Formulaire d'audit - visible seulement quand il n'y a pas de résultats */}
+              {!auditResult && !comparativeResult && (
+                <section id="audit-form" className="px-6 min-h-[calc(100vh-4rem)] flex items-center justify-center" aria-labelledby="audit-form-heading">
+                  <div className="w-full max-w-4xl mx-auto">
+                    <h2 id="audit-form-heading" className="sr-only">Formulaire d'audit d'accessibilité</h2>
+                    <AuditForm
+                      onAuditStart={handleAuditStart}
+                      progress={progress}
+                      isAnalyzing={isAnalyzing}
+                      analysisError={error}
+                    />
+                  </div>
+                </section>
+              )}
 
               {/* Résultats d'audit - si disponibles */}
               {auditResult && (
-                <section id="audit-results" className="mt-8 px-6 max-w-6xl mx-auto">
+                <section id="audit-results" className="px-6 max-w-6xl mx-auto pt-8">
                   <AuditResults 
                     result={auditResult} 
                     language={language}
@@ -299,7 +363,7 @@ export default function HomePage() {
 
               {/* Résultats comparatifs - si disponibles */}
               {comparativeResult && (
-                <section id="audit-results" className="mt-8 px-6 max-w-7xl mx-auto">
+                <section id="audit-results" className="px-6 max-w-7xl mx-auto pt-8">
                   <ComparativeTable 
                     result={comparativeResult} 
                     language={language}
@@ -308,13 +372,22 @@ export default function HomePage() {
                 </section>
               )}
 
-
             </>
           )}
 
           {/* Page Audit Manuel */}
           {activeSection === 'manual-audit' && (
             <ManualAuditPage />
+          )}
+
+          {/* Page Historique */}
+          {activeSection === 'history' && (
+            <div className="min-h-screen">
+              <AuditHistory 
+                onResumeAudit={handleResumeAudit}
+                onNewAuditFromHistory={handleNewAuditFromHistory}
+              />
+            </div>
           )}
 
           {/* Page Référentiel RGAA */}

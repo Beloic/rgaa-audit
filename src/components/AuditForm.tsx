@@ -72,6 +72,10 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
       setError(t.urlError);
       return;
     }
+    
+    // Stocker l'URL dans sessionStorage pour la fonctionnalité de localisation
+    sessionStorage.setItem('lastAnalyzedUrl', url.trim());
+    
     onAuditStart({ url: url.trim(), language, engine: selectedEngine });
   };
 
