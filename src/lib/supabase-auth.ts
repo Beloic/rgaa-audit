@@ -199,12 +199,4 @@ export const saveUser = async (user: UserType): Promise<void> => {
     console.error('Erreur lors de la sauvegarde de l\'utilisateur:', error);
     throw new Error('Impossible de sauvegarder l\'utilisateur');
   }
-};
-
-// Fonction pour créer la table users dans Supabase (à exécuter une fois)
-export const createUsersTable = async () => {
-  const { error } = await supabase.rpc('create_users_table_if_not_exists');
-  if (error) {
-    console.error('Erreur lors de la création de la table:', error);
-  }
 }; 
