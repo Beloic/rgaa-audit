@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import ClientLayout from '@/components/ClientLayout';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -22,9 +23,11 @@ export default function RootLayout({
       <head></head>
       <body className="antialiased">
         <LanguageProvider>
-          <ClientLayout>
-            {children}
-          </ClientLayout>
+          <AuthProvider>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
+          </AuthProvider>
         </LanguageProvider>
         <Analytics />
       </body>

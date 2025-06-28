@@ -6,17 +6,19 @@ import AuditResults from '@/components/AuditResults';
 import ComparativeTable from '@/components/ComparativeTable';
 import TopBar from '@/components/TopBar';
 import Sidebar from '@/components/Sidebar';
-import ManualAuditPage from '@/components/ManualAuditPage';
 import RGAAReference from '@/components/RGAAReference';
 import AuditHistory, { saveAuditToHistory } from '@/components/AuditHistory';
+import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Shield, Zap, Target, Users, AlertTriangle } from 'lucide-react';
 import Footer from '@/components/Footer';
 import type { AuditRequest, AuditResult, ComparativeResult, AnalysisProgress } from '@/types/audit';
 
 export default function HomePage() {
   const { language } = useLanguage();
+  const { user, updateUser } = useAuth();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
   const [comparativeResult, setComparativeResult] = useState<ComparativeResult | null>(null);
@@ -26,15 +28,15 @@ export default function HomePage() {
     message: 'En attente...',
     progress: 0
   });
-  const [activeSection, setActiveSection] = useState<'home' | 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history'>('home');
+  const [activeSection, setActiveSection] = useState<'home' | 'analyze' | 'rgaa-reference' | 'history'>('home');
 
   // Détecter les paramètres URL pour changer de section automatiquement
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const section = urlParams.get('section');
     
-    if (section && ['analyze', 'manual-audit', 'rgaa-reference', 'history'].includes(section)) {
-      setActiveSection(section as 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history');
+    if (section && ['analyze', 'rgaa-reference', 'history'].includes(section)) {
+      setActiveSection(section as 'analyze' | 'rgaa-reference' | 'history');
     }
   }, []);
 
@@ -72,7 +74,7 @@ export default function HomePage() {
   };
 
   // Fonction pour gérer les changements de section de la sidebar
-  const handleSidebarSectionChange = (section: 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history') => {
+  const handleSidebarSectionChange = (section: 'analyze' | 'rgaa-reference' | 'history') => {
     setActiveSection(section);
     
     // Réinitialiser les résultats si on revient sur analyser et qu'il n'y a pas d'analyse en cours
@@ -85,7 +87,7 @@ export default function HomePage() {
   };
 
   // Fonction pour la TopBar (sans history)
-  const handleTopBarSectionChange = (section: 'home' | 'analyze' | 'manual-audit' | 'rgaa-reference') => {
+  const handleTopBarSectionChange = (section: 'home' | 'analyze' | 'rgaa-reference') => {
     setActiveSection(section);
     
     // Réinitialiser les résultats si on revient sur analyser et qu'il n'y a pas d'analyse en cours
@@ -136,7 +138,10 @@ export default function HomePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify({
+          ...request,
+          userData: user // Envoyer les données utilisateur pour le comptage
+        }),
       });
 
       if (!response.ok) {
@@ -145,6 +150,12 @@ export default function HomePage() {
       }
 
       const result = await response.json();
+      
+      // Mettre à jour les données utilisateur si elles ont été modifiées
+      if (result.updatedUserData && updateUser) {
+        updateUser(result.updatedUserData);
+        console.log('✅ Données utilisateur mises à jour après audit');
+      }
       
       // Nettoyer l'intervalle de progression
       clearInterval(progressInterval);
@@ -261,6 +272,13 @@ export default function HomePage() {
           onAnalyzeClick={handleAnalyzeClick}
         />
 
+        {/* Banner de vérification d'email */}
+        <div className={`${activeSection !== 'home' ? 'ml-64' : ''} relative z-10`}>
+          <div className="px-6 pt-4">
+            <EmailVerificationBanner />
+          </div>
+        </div>
+
         {/* Sidebar - seulement sur les pages autres que home */}
         {activeSection !== 'home' && (
           <Sidebar 
@@ -375,9 +393,9 @@ export default function HomePage() {
             </>
           )}
 
-          {/* Page Audit Manuel */}
-          {activeSection === 'manual-audit' && (
-            <ManualAuditPage />
+          {/* Page Référentiel RGAA */}
+          {activeSection === 'rgaa-reference' && (
+            <RGAAReference />
           )}
 
           {/* Page Historique */}
@@ -388,11 +406,6 @@ export default function HomePage() {
                 onNewAuditFromHistory={handleNewAuditFromHistory}
               />
             </div>
-          )}
-
-          {/* Page Référentiel RGAA */}
-          {activeSection === 'rgaa-reference' && (
-            <RGAAReference />
           )}
 
         </main>

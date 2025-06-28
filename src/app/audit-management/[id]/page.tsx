@@ -6,7 +6,7 @@ import {
   ArrowLeft, Save, Plus, Edit3, Trash2, Tag, Calendar, 
   Clock, CheckCircle, Circle, AlertCircle, Target, 
   BarChart3, FileText, Kanban, Settings,
-  MessageSquare, Flag, User, Archive, Image, Upload, X, Palette
+  MessageSquare, Flag, User, Archive, Image, Upload, X, Palette, Lightbulb
 } from 'lucide-react';
 import {
   DndContext,
@@ -26,6 +26,12 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { AuditResult, ComparativeResult, RGAAViolation } from '@/types/audit';
+import ManualAuditPage from '@/components/ManualAuditPage';
+
+// Interface étendue pour les violations avec source
+interface ExtendedRGAAViolation extends RGAAViolation {
+  source?: 'manual' | 'automatic';
+}
 
 interface AuditNote {
   id: string;
@@ -37,7 +43,7 @@ interface AuditNote {
 
 interface KanbanCard {
   id: string;
-  violation: RGAAViolation;
+  violation: ExtendedRGAAViolation;
   status: 'todo' | 'inprogress' | 'validated' | 'postponed';
   assignee?: string;
   priority: 'low' | 'medium' | 'high' | 'critical';
@@ -122,6 +128,156 @@ const statusConfig = {
     textColor: 'text-orange-700'
   }
 };
+
+// Composant pour ajouter manuellement des violations
+interface ManualViolationFormProps {
+  onAddViolation: (violation: ExtendedRGAAViolation) => void;
+}
+
+function ManualViolationForm({ onAddViolation }: ManualViolationFormProps) {
+  const [criterion, setCriterion] = useState('');
+  const [description, setDescription] = useState('');
+  const [element, setElement] = useState('');
+  const [htmlSnippet, setHtmlSnippet] = useState('');
+  const [impact, setImpact] = useState<'moderate' | 'serious' | 'critical'>('moderate');
+  const [level, setLevel] = useState<'A' | 'AA' | 'AAA'>('AA');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!criterion.trim() || !description.trim()) {
+      return;
+    }
+
+    const violation: ExtendedRGAAViolation = {
+      criterion: criterion.trim(),
+      description: description.trim(),
+      level,
+      impact,
+      recommendation: '', // Ajout d'une valeur par défaut
+      source: 'manual',
+      ...(element.trim() && { element: element.trim() }),
+      ...(htmlSnippet.trim() && { htmlSnippet: htmlSnippet.trim() })
+    };
+
+    onAddViolation(violation);
+    
+    // Reset form
+    setCriterion('');
+    setDescription('');
+    setElement('');
+    setHtmlSnippet('');
+    setImpact('moderate');
+    setLevel('AA');
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="criterion" className="block text-sm font-medium text-gray-700 mb-1">
+            Critère RGAA *
+          </label>
+          <input
+            type="text"
+            id="criterion"
+            value={criterion}
+            onChange={(e) => setCriterion(e.target.value)}
+            placeholder="Ex: 1.1, 3.2, 11.1..."
+            required
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
+            Niveau
+          </label>
+          <select
+            id="level"
+            value={level}
+            onChange={(e) => setLevel(e.target.value as 'A' | 'AA' | 'AAA')}
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="A">A</option>
+            <option value="AA">AA</option>
+            <option value="AAA">AAA</option>
+          </select>
+        </div>
+      </div>
+      
+      <div>
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+          Description de la violation *
+        </label>
+        <textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Décrivez précisément la violation constatée..."
+          required
+          rows={3}
+          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      
+      <div>
+        <label htmlFor="impact" className="block text-sm font-medium text-gray-700 mb-1">
+          Impact
+        </label>
+        <select
+          id="impact"
+          value={impact}
+          onChange={(e) => setImpact(e.target.value as 'moderate' | 'serious' | 'critical')}
+          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="moderate">Modéré</option>
+          <option value="serious">Sérieux</option>
+          <option value="critical">Critique</option>
+        </select>
+      </div>
+      
+      <div>
+        <label htmlFor="element" className="block text-sm font-medium text-gray-700 mb-1">
+          Sélecteur CSS (optionnel)
+        </label>
+        <input
+          type="text"
+          id="element"
+          value={element}
+          onChange={(e) => setElement(e.target.value)}
+          placeholder="Ex: .header img, #main-nav a..."
+          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      
+      <div>
+        <label htmlFor="htmlSnippet" className="block text-sm font-medium text-gray-700 mb-1">
+          Code HTML concerné (optionnel)
+        </label>
+        <textarea
+          id="htmlSnippet"
+          value={htmlSnippet}
+          onChange={(e) => setHtmlSnippet(e.target.value)}
+          placeholder="<img src='...' /> ou autre code HTML..."
+          rows={2}
+          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={!criterion.trim() || !description.trim()}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Ajouter la violation
+        </button>
+      </div>
+    </form>
+  );
+}
 
 // Composant pour zone de drop vide
 function EmptyDropZone({ status, isOver }: { status: string; isOver: boolean }) {
@@ -305,7 +461,7 @@ export default function AuditManagementPage() {
   
   const [auditData, setAuditData] = useState<AuditResult | ComparativeResult | null>(null);
   const [management, setManagement] = useState<AuditManagement | null>(null);
-  const [activeTab, setActiveTab] = useState<'kanban' | 'notes' | 'dashboard'>('kanban');
+  const [activeTab, setActiveTab] = useState<'kanban' | 'notes' | 'dashboard' | 'manual' | 'guide'>('kanban');
   const [isLoading, setIsLoading] = useState(true);
   const [newNoteContent, setNewNoteContent] = useState('');
   const [newNoteColor, setNewNoteColor] = useState<AuditNote['color']>(undefined);
@@ -851,7 +1007,9 @@ export default function AuditManagementPage() {
               {[
                 { id: 'kanban', label: 'Tableau Kanban', icon: Kanban },
                 { id: 'notes', label: 'Notes', icon: FileText },
-                { id: 'dashboard', label: 'Dashboard', icon: BarChart3 }
+                { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+                { id: 'manual', label: 'Audit manuel', icon: User },
+                { id: 'guide', label: 'Guide d\'audit manuel', icon: Lightbulb }
               ].map(tab => {
                 const Icon = tab.icon;
                 return (
@@ -1258,6 +1416,133 @@ export default function AuditManagementPage() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'manual' && (
+          <div className="space-y-6">
+            {/* En-tête de l'audit manuel */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Audit manuel</h3>
+                  <p className="text-sm text-gray-600">
+                    Vérifiez manuellement chaque critère RGAA pour ce site web. 
+                    Utilisez cette section pour ajouter des violations personnalisées ou vérifier des aspects non couverts par l'analyse automatique.
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4 text-sm">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {(management?.kanbanCards || []).filter(card => card.violation.source === 'manual' && card.status === 'validated').length}
+                    </div>
+                    <div className="text-gray-500">Conformes</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600">
+                      {(management?.kanbanCards || []).filter(card => card.violation.source === 'manual' && card.status !== 'validated').length}
+                    </div>
+                    <div className="text-gray-500">Non conformes</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Formulaire d'ajout de violation manuelle */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h4 className="text-lg font-medium text-gray-900 mb-4">Ajouter une violation manuelle</h4>
+              <ManualViolationForm 
+                onAddViolation={(violation) => {
+                  if (!management) return;
+                  
+                  const newCard: KanbanCard = {
+                    id: `manual-${Date.now()}-${Math.random()}`,
+                    violation: {
+                      ...violation,
+                      source: 'manual'
+                    },
+                    status: 'todo',
+                    priority: violation.impact === 'critical' ? 'critical' : 
+                             violation.impact === 'serious' ? 'high' : 
+                             violation.impact === 'moderate' ? 'medium' : 'low',
+                    notes: '',
+                    updatedAt: new Date().toISOString()
+                  };
+                  
+                  const updatedManagement = {
+                    ...management,
+                    kanbanCards: [...management.kanbanCards, newCard]
+                  };
+                  
+                  saveManagement(updatedManagement);
+                }}
+              />
+            </div>
+
+            {/* Liste des violations manuelles */}
+            <div className="bg-white rounded-lg border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <h4 className="text-lg font-medium text-gray-900">Violations ajoutées manuellement</h4>
+              </div>
+              <div className="p-6">
+                {(management?.kanbanCards || [])
+                  .filter(card => card.violation.source === 'manual')
+                  .length === 0 ? (
+                  <div className="text-center py-8">
+                    <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune violation manuelle</h3>
+                    <p className="text-gray-500">Ajoutez des violations personnalisées avec le formulaire ci-dessus.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {(management?.kanbanCards || [])
+                      .filter(card => card.violation.source === 'manual')
+                      .map(card => (
+                        <div key={card.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <span className="font-medium text-gray-900">
+                                  Critère {card.violation.criterion}
+                                </span>
+                                <span className={`px-2 py-1 rounded-full text-xs border ${priorityColors[card.priority]}`}>
+                                  {card.priority}
+                                </span>
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  card.status === 'validated' ? 'bg-green-100 text-green-800' :
+                                  card.status === 'inprogress' ? 'bg-blue-100 text-blue-800' :
+                                  card.status === 'postponed' ? 'bg-orange-100 text-orange-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {statusConfig[card.status].title}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-2">{card.violation.description}</p>
+                              {card.violation.element && (
+                                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                                  {card.violation.element}
+                                </code>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => setSelectedCard(card)}
+                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                              Modifier
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'guide' && (
+          <div className="h-full">
+            <ManualAuditPage />
           </div>
         )}
       </main>

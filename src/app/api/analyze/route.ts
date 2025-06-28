@@ -1,8 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getUserByEmail, saveUser } from '@/lib/fileDatabase';
 
 // Configuration pour Vercel Pro - durée maximale pour les analyses complexes
 export const maxDuration = 300; // 5 minutes
 import type { AuditResult, RGAAViolation, EngineResult, ComparativeResult } from '@/types/audit';
+
+// Types pour les plans de tarification
+interface PlanLimits {
+  auditsPerMonth: number | 'unlimited';
+  teamMembers: number | 'unlimited';
+  storage: number | 'unlimited';
+  apiAccess: boolean;
+  prioritySupport: boolean;
+  customReports: boolean;
+  whiteLabel: boolean;
+}
+
+// Configuration des plans
+const PLAN_CONFIGS: Record<string, PlanLimits> = {
+  free: {
+    auditsPerMonth: 2,
+    teamMembers: 1,
+    storage: 1,
+    apiAccess: false,
+    prioritySupport: false,
+    customReports: false,
+    whiteLabel: false
+  },
+  pro: {
+    auditsPerMonth: 50,
+    teamMembers: 5,
+    storage: 10,
+    apiAccess: true,
+    prioritySupport: true,
+    customReports: true,
+    whiteLabel: false
+  },
+  enterprise: {
+    auditsPerMonth: 'unlimited',
+    teamMembers: 'unlimited',
+    storage: 'unlimited',
+    apiAccess: true,
+    prioritySupport: true,
+    customReports: true,
+    whiteLabel: true
+  }
+};
+
+// Fonction pour récupérer les limites d'un plan
+function getPlanLimits(planId: string): PlanLimits {
+  return PLAN_CONFIGS[planId] || PLAN_CONFIGS.free;
+}
 
 interface WaveResults {
   errors: Array<{
@@ -34,7 +82,7 @@ export async function POST(request: NextRequest) {
   try {
     console.log('🚀 Début de l\'analyse complète...');
 
-    const { url, engine = 'wave' } = await request.json();
+    const { url, engine = 'wave', userData } = await request.json();
     
     if (!url) {
       return NextResponse.json(
@@ -48,6 +96,39 @@ export async function POST(request: NextRequest) {
           }
         }
       );
+    }
+
+    // Vérifier les limites d'audit si un utilisateur est fourni (sauf pour les utilisateurs bêta)
+    if (userData) {
+      const { subscription, usage } = userData;
+      
+      // Les utilisateurs bêta ont un accès illimité
+      const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
+      
+      if (!isBetaUser) {
+        // Récupérer les limites du plan
+        const planLimits = getPlanLimits(subscription?.plan || 'free');
+        
+        // Vérifier si l'utilisateur peut effectuer un audit
+        if (planLimits.auditsPerMonth !== 'unlimited' && 
+            usage.auditsThisMonth >= planLimits.auditsPerMonth) {
+          return NextResponse.json(
+            { error: 'Limite d\'audits atteinte pour ce mois. Passez à un plan supérieur pour continuer.' },
+            { 
+              status: 403,
+              headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+              }
+            }
+          );
+        }
+        
+        console.log(`👤 Audit pour utilisateur ${userData.email} - ${usage.auditsThisMonth + 1}/${planLimits.auditsPerMonth} audits ce mois`);
+      } else {
+        console.log(`👤 Audit pour utilisateur bêta ${userData.email} - Accès illimité ✅`);
+      }
     }
 
     // Valider l'URL
@@ -70,7 +151,46 @@ export async function POST(request: NextRequest) {
     // Si engine='all', lancer l'analyse comparative avec tous les moteurs
     if (engine === 'all') {
       const comparativeResult = await runComparativeAnalysis(url);
-      return NextResponse.json(comparativeResult, {
+      
+      // Incrémenter le compteur d'audits pour l'analyse comparative (sauf pour les utilisateurs bêta)
+      let updatedUserData = null;
+      if (userData) {
+        const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
+        
+        if (!isBetaUser) {
+          updatedUserData = {
+            ...userData,
+            usage: {
+              ...userData.usage,
+              auditsThisMonth: userData.usage.auditsThisMonth + 1,
+              auditsTotal: userData.usage.auditsTotal + 1,
+              lastAuditDate: new Date().toISOString()
+            }
+          };
+          
+          // Sauvegarder dans la base de données si en mode API
+          const USE_API = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_USE_API === 'true';
+          if (USE_API) {
+            try {
+              saveUser(updatedUserData);
+              console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
+            } catch (error) {
+              console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
+            }
+          }
+          
+          console.log(`✅ Audit comparatif comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsThisMonth}/${getPlanLimits(userData.subscription?.plan || 'free').auditsPerMonth}`);
+        } else {
+          // Pour les utilisateurs bêta, on ne change pas les données d'usage
+          updatedUserData = userData;
+          console.log(`✅ Audit comparatif pour utilisateur bêta ${userData.email} - Non comptabilisé (accès illimité)`);
+        }
+      }
+      
+      return NextResponse.json({ 
+        ...comparativeResult, 
+        updatedUserData 
+      }, {
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -111,7 +231,45 @@ export async function POST(request: NextRequest) {
       waveReportUrl: engine === 'wave' ? `https://wave.webaim.org/report#/${encodeURIComponent(url)}` : undefined
     };
 
-    return NextResponse.json(result, {
+    // Incrémenter le compteur d'audits si un utilisateur est fourni (sauf pour les utilisateurs bêta)
+    let updatedUserData = null;
+    if (userData) {
+      const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
+      
+      if (!isBetaUser) {
+        updatedUserData = {
+          ...userData,
+          usage: {
+            ...userData.usage,
+            auditsThisMonth: userData.usage.auditsThisMonth + 1,
+            auditsTotal: userData.usage.auditsTotal + 1,
+            lastAuditDate: new Date().toISOString()
+          }
+        };
+        
+        // Sauvegarder dans la base de données si en mode API
+        const USE_API = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_USE_API === 'true';
+        if (USE_API) {
+          try {
+            saveUser(updatedUserData);
+            console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
+          } catch (error) {
+            console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
+          }
+        }
+        
+        console.log(`✅ Audit comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsThisMonth}/${getPlanLimits(userData.subscription?.plan || 'free').auditsPerMonth}`);
+      } else {
+        // Pour les utilisateurs bêta, on ne change pas les données d'usage
+        updatedUserData = userData;
+        console.log(`✅ Audit pour utilisateur bêta ${userData.email} - Non comptabilisé (accès illimité)`);
+      }
+    }
+
+    return NextResponse.json({ 
+      ...result, 
+      updatedUserData 
+    }, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',

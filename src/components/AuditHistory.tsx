@@ -283,26 +283,26 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2 ml-4 opacity-90 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center space-x-2 ml-4 transition-opacity">
                     <button
                       onClick={() => handleResumeAudit(audit)}
-                      className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                      className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
                     >
-                      <RotateCcw className="w-4 h-4 mr-2" />
+                      <RotateCcw className="w-4 h-4 mr-1.5" />
                       {t.resumeAudit}
                     </button>
                     <button
                       onClick={() => router.push(`/audit-management/${audit.id}`)}
-                      className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-medium rounded-xl hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                      className="inline-flex items-center px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 transition-colors"
                     >
-                      <Target className="w-4 h-4 mr-2" />
-                      Gestion de l'audit
+                      <Target className="w-4 h-4 mr-1.5" />
+                      Gestion
                     </button>
                     <button
                       onClick={() => handleNewAudit(audit.url)}
-                      className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-medium rounded-xl hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                      className="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-colors"
                     >
-                      <TrendingUp className="w-4 h-4 mr-2" />
+                      <TrendingUp className="w-4 h-4 mr-1.5" />
                       {t.newAudit}
                     </button>
                   </div>

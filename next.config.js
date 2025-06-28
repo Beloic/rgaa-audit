@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { isServer }) => {
-    // Configuration basique pour Puppeteer côté serveur uniquement
+    // Configuration étendue pour gérer les modules Node.js côté client
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -9,7 +9,27 @@ const nextConfig = {
         net: false,
         tls: false,
         child_process: false,
+        dns: false,
+        path: false,
+        os: false,
+        stream: false,
+        crypto: false,
+        buffer: false,
+        util: false,
+        url: false,
+        querystring: false,
+        http: false,
+        https: false,
+        zlib: false,
       };
+      
+      // Exclure les packages problématiques côté client
+      config.externals = config.externals || [];
+      config.externals.push({
+        '@nodelib/fs.scandir': 'commonjs @nodelib/fs.scandir',
+        '@nodelib/fs.stat': 'commonjs @nodelib/fs.stat',
+        '@nodelib/fs.walk': 'commonjs @nodelib/fs.walk',
+      });
     }
 
     return config;

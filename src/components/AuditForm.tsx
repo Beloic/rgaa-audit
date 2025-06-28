@@ -331,9 +331,6 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800 mb-2">
-                      {language === 'fr' ? 'Erreur lors de l\'analyse' : 'Analysis Error'}
-                    </h3>
                     <p className="text-sm text-red-700 whitespace-pre-line">
                       {analysisError}
                     </p>

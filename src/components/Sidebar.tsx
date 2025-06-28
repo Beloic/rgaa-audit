@@ -6,7 +6,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const translations = {
   fr: {
     intelligentAnalysis: 'Analyse intelligente',
-    manualAudit: 'Audit manuel',
     rgaaReference: 'Référentiel RGAA',
     auditHistory: 'Historique',
     versionAlpha: 'VERSION ALPHA',
@@ -15,7 +14,6 @@ const translations = {
   },
   en: {
     intelligentAnalysis: 'Intelligent Analysis',
-    manualAudit: 'Manual Audit',
     rgaaReference: 'RGAA Reference',
     auditHistory: 'History',
     versionAlpha: 'ALPHA VERSION',
@@ -25,8 +23,8 @@ const translations = {
 };
 
 interface SidebarProps {
-  activeSection: 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history';
-  onSectionChange: (section: 'analyze' | 'manual-audit' | 'rgaa-reference' | 'history') => void;
+  activeSection: 'analyze' | 'rgaa-reference' | 'history';
+  onSectionChange: (section: 'analyze' | 'rgaa-reference' | 'history') => void;
 }
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
@@ -59,15 +57,6 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         >
           <Clock className="w-5 h-5" aria-hidden="true" />
           <span className="font-medium">{t.auditHistory}</span>
-        </button>
-        
-        <button
-          onClick={() => onSectionChange('manual-audit')}
-          className={getButtonClasses('manual-audit')}
-          aria-current={activeSection === 'manual-audit' ? 'page' : undefined}
-        >
-          <FileCheck className="w-5 h-5" aria-hidden="true" />
-          <span className="font-medium">{t.manualAudit}</span>
         </button>
         
         <button
