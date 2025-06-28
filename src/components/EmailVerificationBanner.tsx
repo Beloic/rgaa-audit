@@ -56,14 +56,10 @@ export default function EmailVerificationBanner() {
     <div className="bg-blue-50 border-l-4 border-blue-400 py-3 px-4 mb-6">
       <div className="flex items-center justify-center space-x-4">
         <div className="flex items-center space-x-3">
+          <Mail className="h-4 w-4 text-blue-400 flex-shrink-0" />
           <div className="text-sm text-blue-800 text-center">
-            <span className="font-medium">Vérifiez votre email :</span>
-            <span className="ml-1 text-blue-700">
-              Un email de confirmation a été envoyé à <strong>{user.email}</strong>
-            </span>
-            <div className="mt-1 text-xs text-blue-600">
-              Pensez à vérifier vos spams si vous ne le trouvez pas
-            </div>
+            <span className="font-medium">Un email de confirmation a été envoyé à <strong>{user.email}</strong></span>
+            <span className="ml-1 text-blue-700">(vérifier vos spams)</span>
             {message && (
               <span className="ml-2 text-xs text-blue-600 inline-flex items-center">
                 <CheckCircle className="w-3 h-3 mr-1" />
