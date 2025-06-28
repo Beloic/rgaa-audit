@@ -54,13 +54,12 @@ export default function UsageIndicator({ compact = false }: UsageIndicatorProps)
             </span>
           </div>
           {remainingAudits <= 2 && (
-            <Link
-              href="/pricing"
+            <button
               className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors"
             >
               <Crown className="w-3 h-3 mr-1" />
               Upgrade
-            </Link>
+            </button>
           )}
         </div>
         

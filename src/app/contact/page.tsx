@@ -297,8 +297,7 @@ export default function ContactPage() {
                 Quel est le délai de réponse pour le support ?
               </h3>
               <p className="text-gray-600">
-                Nous nous engageons à répondre sous 24h pour tous les plans. 
-                Le plan Pro bénéficie d'un support prioritaire, et le plan Enterprise d'un support dédié.
+                Nous nous engageons à répondre sous 24h pour toutes les demandes.
               </p>
             </div>
 

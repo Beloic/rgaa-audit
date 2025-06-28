@@ -126,13 +126,6 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
               >
                 Quiz
               </Link>
-              <Link 
-                href="/pricing"
-                className={getLinkClasses('/pricing')}
-                aria-current={isActive('/pricing') ? 'page' : undefined}
-              >
-                Tarifs
-              </Link>
             </div>
 
             {/* Actions utilisateur */}
