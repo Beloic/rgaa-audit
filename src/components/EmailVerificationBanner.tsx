@@ -62,6 +62,9 @@ export default function EmailVerificationBanner() {
             <span className="ml-1 text-blue-700">
               Un email de confirmation a été envoyé à <strong>{user.email}</strong>
             </span>
+            <div className="mt-1 text-xs text-blue-600">
+              Pensez à vérifier vos spams si vous ne le trouvez pas
+            </div>
             {message && (
               <span className="ml-2 text-xs text-blue-600 inline-flex items-center">
                 <CheckCircle className="w-3 h-3 mr-1" />
