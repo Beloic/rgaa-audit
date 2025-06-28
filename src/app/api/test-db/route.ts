@@ -15,12 +15,11 @@ export async function GET() {
     let errorMessage = '';
     
     try {
-      const { PrismaClient } = await import('@prisma/client');
+      const { prisma } = await import('@/lib/database-simple');
       prismaImportOk = true;
       console.log('✅ Import Prisma OK');
       
       // Test 3: Connexion Prisma
-      const prisma = new PrismaClient();
       await prisma.$connect();
       prismaConnectionOk = true;
       console.log('✅ Connexion Prisma OK');
