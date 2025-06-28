@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, saveUser } from '@/lib/database-vercel';
+import { getUserByEmail, saveUser } from '@/lib/supabase-auth';
 
 // Configuration pour Vercel Pro - durée maximale pour les analyses complexes
 export const maxDuration = 300; // 5 minutes
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
           const USE_API = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_USE_API === 'true';
           if (USE_API) {
             try {
-              saveUser(updatedUserData);
+              await saveUser(updatedUserData);
               console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
             } catch (error) {
               console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
