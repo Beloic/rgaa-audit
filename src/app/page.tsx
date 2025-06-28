@@ -309,8 +309,6 @@ export default function HomePage() {
                   </h1>
                   <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
                     Cette version alpha utilise les moteurs les plus performants pour aider les professionnels à réaliser leurs audits. Cet outil n'a pas vocation à remplacer l'expertise humaine.
-                    <br /><br />
-                    Nous travaillons actuellement sur le projet qui n'est pas toujours disponible.
                   </p>
                 </header>
               </div>
