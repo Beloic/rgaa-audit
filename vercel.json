@@ -14,7 +14,7 @@
   },
   "build": {
     "env": {
-      "PRISMA_GENERATE_DATAPROXY": "true"
+      "NODE_ENV": "production"
     }
   }
 } 

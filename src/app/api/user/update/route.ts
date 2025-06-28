@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, saveUser } from '@/lib/fileDatabase';
+import { getUserByEmail, saveUser } from '@/lib/supabase-auth';
 import { isValidEmail } from '@/lib/auth';
 import type { User } from '@/types/user';
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Récupérer l'utilisateur existant
-    const existingUser = getUserByEmail(email);
+    const existingUser = await getUserByEmail(email);
     if (!existingUser) {
       return NextResponse.json(
         { error: 'Utilisateur non trouvé' },
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Sauvegarder
-    saveUser(updatedUser);
+    await saveUser(updatedUser);
 
     // Retourner l'utilisateur mis à jour (sans le mot de passe)
     const { password: _, ...userWithoutPassword } = updatedUser;

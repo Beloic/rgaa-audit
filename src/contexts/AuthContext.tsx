@@ -4,8 +4,8 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import type { User, PricingPlan } from '@/types/user';
 
 // Configuration pour choisir entre API et localStorage
-// En production, on force l'utilisation de l'API avec la vraie base de données
-const USE_API = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_USE_API === 'true';
+// On utilise maintenant toujours l'API Supabase
+const USE_API = true;
 
 // Fonctions utilitaires pour la gestion des mots de passe (localStorage uniquement)
 const hashPassword = async (password: string): Promise<string> => {

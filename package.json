@@ -4,13 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate",
-    "db:push": "prisma db push",
-    "db:studio": "prisma studio",
-    "db:reset": "prisma db push --force-reset"
+    "supabase:check": "node scripts/init-supabase.js",
+    "supabase:init": "node scripts/init-supabase.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, saveUser, verifyPassword } from '@/lib/database-vercel';
+import { getUserByEmail, saveUser, verifyPassword } from '@/lib/supabase-auth';
 import { isValidEmail } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
