@@ -198,8 +198,8 @@ export default function HomePage() {
       // Gestion spécifique de l'erreur de vérification d'email
       if (errorMessage.includes('Veuillez vérifier votre adresse email')) {
         errorMessage = language === 'fr' 
-          ? `📧 Veuillez vérifier votre adresse email avant de pouvoir effectuer des analyses. Consultez votre boîte mail pour le lien de confirmation.`
-          : `📧 Please verify your email address before performing analyses. Check your inbox for the confirmation link.`;
+          ? `Veuillez vérifier votre adresse email avant de pouvoir effectuer des analyses. Consultez votre boîte mail pour le lien de confirmation.`
+          : `Please verify your email address before performing analyses. Check your inbox for the confirmation link.`;
       }
       // Améliorer le message pour les erreurs de rate limiting
       else if (errorMessage.includes('quota') || errorMessage.includes('limit')) {

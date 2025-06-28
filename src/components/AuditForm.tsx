@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Globe, Zap, Search, Cpu, Shield, BarChart3, Mail } from 'lucide-react';
+import { Globe, Zap, Search, Cpu, Shield, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { AuditRequest, AnalysisProgress } from '@/types/audit';
 
@@ -54,7 +54,6 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const [selectedEngine, setSelectedEngine] = useState<'wave' | 'axe' | 'rgaa' | 'all'>('rgaa');
-  const [isResendingEmail, setIsResendingEmail] = useState(false);
 
   const t = translations[language];
 
@@ -78,77 +77,6 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
     
     onAuditStart({ url: url.trim(), language, engine: selectedEngine });
   };
-
-  // Fonction pour renvoyer l'email de vérification
-  const handleResendVerificationEmail = async () => {
-    setIsResendingEmail(true);
-    try {
-      const response = await fetch('/api/auth/resend-verification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        // Afficher un message de succès temporaire
-        const successMessage = language === 'fr' 
-          ? 'Email de vérification renvoyé avec succès !'
-          : 'Verification email sent successfully!';
-        setError(successMessage);
-        setTimeout(() => setError(''), 5000);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Erreur lors du renvoi de l\'email');
-      }
-    } catch (error) {
-      setError('Erreur lors du renvoi de l\'email');
-    } finally {
-      setIsResendingEmail(false);
-    }
-  };
-
-  // Fonction de liste d'attente désactivée temporairement
-  // const handleWaitlistSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setEmailError('');
-
-  //   if (!email.trim()) {
-  //     setEmailError(t.emailError);
-  //     return;
-  //   }
-
-  //   // Validation email simple
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   if (!emailRegex.test(email.trim())) {
-  //     setEmailError(t.emailError);
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await fetch('/api/waitlist', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         email: email.trim(),
-  //         language: language
-  //       }),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       setIsSubmitted(true);
-  //     } else {
-  //       setEmailError(data.error || t.emailError);
-  //     }
-  //   } catch (error) {
-  //     console.error('Erreur lors de l\'inscription:', error);
-  //     setEmailError(language === 'fr' ? 'Erreur lors de l\'inscription' : 'Subscription error');
-  //   }
-  // };
 
   return (
     <div className="max-w-4xl mx-auto px-6">
@@ -359,32 +287,10 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <div className="ml-3 flex-1">
-                    <p className="text-sm text-red-700 whitespace-pre-line mb-3">
+                  <div className="ml-3">
+                    <p className="text-sm text-red-700 whitespace-pre-line">
                       {analysisError}
                     </p>
-                    
-                    {/* Bouton de renvoi d'email si l'erreur est liée à la vérification d'email */}
-                    {analysisError.includes('Veuillez vérifier votre adresse email') && (
-                      <button
-                        type="button"
-                        onClick={handleResendVerificationEmail}
-                        disabled={isResendingEmail}
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        {isResendingEmail ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                            {language === 'fr' ? 'Envoi...' : 'Sending...'}
-                          </>
-                        ) : (
-                          <>
-                            <Mail className="w-4 h-4 mr-2" />
-                            {language === 'fr' ? 'Renvoyer l\'email de vérification' : 'Resend verification email'}
-                          </>
-                        )}
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
