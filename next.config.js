@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
   webpack: (config, { isServer }) => {
+    // Configuration des alias de chemin pour résoudre les imports @/*
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+    };
+
     // Configuration étendue pour gérer les modules Node.js côté client
     if (!isServer) {
       config.resolve.fallback = {
