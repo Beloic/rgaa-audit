@@ -49,13 +49,35 @@ export async function POST(request: NextRequest) {
       emailVerificationToken: verificationToken
     });
 
+    // Envoyer automatiquement l'email de vérification
+    try {
+      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/send-verification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          token: verificationToken
+        })
+      });
+
+      if (emailResponse.ok) {
+        console.log('✅ Email de vérification envoyé automatiquement à:', email);
+      } else {
+        console.log('⚠️ Échec de l\'envoi automatique de l\'email de vérification');
+      }
+    } catch (emailError) {
+      console.log('⚠️ Erreur lors de l\'envoi automatique de l\'email:', emailError);
+    }
+
     // Retourner l'utilisateur (sans le mot de passe)
     const { password: _, ...userWithoutPassword } = newUser;
 
     return NextResponse.json({
       success: true,
       user: userWithoutPassword,
-      message: 'Compte créé avec succès'
+      message: 'Compte créé avec succès. Un email de vérification a été envoyé.'
     });
 
   } catch (error) {
