@@ -26,16 +26,16 @@ export default function BetaProtection({ children }: BetaProtectionProps) {
   const { logout: authLogout, isAuthenticated } = useAuth();
 
   // ACCÈS LIBRE - Laisser passer tout le monde (connecté ou non)
-  const mockLogout = async () => {
+    const mockLogout = async () => {
     if (isAuthenticated) {
-      await authLogout();
+    await authLogout();
     }
   };
 
-  return (
+    return (
     <BetaAuthContext.Provider value={{ logout: mockLogout, isAuthenticated }}>
-      {children}
-    </BetaAuthContext.Provider>
-  );
+        {children}
+      </BetaAuthContext.Provider>
+    );
 
 } 

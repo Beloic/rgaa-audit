@@ -45,3 +45,5 @@ next-env.d.ts
 data.json
 users.json
 audits.json
+
+/src/generated/prisma

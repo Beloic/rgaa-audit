@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Inscription Debug</title>
+</head>
+<body>
+    <h1>Test d'inscription</h1>
+    <button onclick="testInscription()">Tester l'inscription</button>
+    <div id="result"></div>
+
+    <script>
+        async function testInscription() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Test en cours...';
+            
+            try {
+                const response = await fetch('http://localhost:3015/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: 'debug@test.com', 
+                        password: 'password123',
+                        name: 'Debug User'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div style="color: green;">✅ Succès: ${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div style="color: red;">❌ Erreur API: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: red;">❌ Erreur réseau: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html> 

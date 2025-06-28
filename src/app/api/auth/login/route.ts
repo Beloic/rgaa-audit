@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, saveUser } from '@/lib/fileDatabase';
-import { verifyPassword, isValidEmail } from '@/lib/auth';
+import { getUserByEmail, saveUser, verifyPassword } from '@/lib/database';
+import { isValidEmail } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Récupérer l'utilisateur
-    const user = getUserByEmail(email);
+    const user = await getUserByEmail(email);
     if (!user) {
       return NextResponse.json(
         { error: 'Aucun compte trouvé avec cette adresse email' },
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       ...user,
       lastLoginAt: new Date().toISOString()
     };
-    saveUser(updatedUser);
+    await saveUser(updatedUser);
 
     // Retourner l'utilisateur (sans le mot de passe)
     const { password: _, ...userWithoutPassword } = updatedUser;

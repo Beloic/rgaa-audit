@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, saveUser } from '@/lib/fileDatabase';
-import { hashPassword, generateVerificationToken, isValidEmail, isValidPassword } from '@/lib/auth';
+import { getUserByEmail, createUser } from '@/lib/database';
+import { generateVerificationToken, isValidEmail, isValidPassword } from '@/lib/auth';
 import type { User } from '@/types/user';
 
 export async function POST(request: NextRequest) {
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier si l'utilisateur existe déjà
-    const existingUser = getUserByEmail(email);
+    const existingUser = await getUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
         { error: 'Un compte existe déjà avec cette adresse email' },
@@ -38,51 +38,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hasher le mot de passe
-    const hashedPassword = await hashPassword(password);
-    
     // Générer un token de vérification
     const verificationToken = generateVerificationToken();
     
     // Créer le nouvel utilisateur
-    const newUser: User = {
-      id: 'user-' + Date.now(),
+    const newUser = await createUser({
       email,
       name,
-      password: hashedPassword,
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-      emailVerified: false,
-      emailVerificationToken: verificationToken,
-      emailVerificationSentAt: new Date().toISOString(),
-      betaAccess: {
-        granted: false,
-        grantedAt: undefined,
-        hasQuit: false
-      },
-      subscription: {
-        plan: 'free',
-        status: 'trial',
-        startDate: new Date().toISOString(),
-        trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString() // 14 jours
-      },
-      usage: {
-        auditsThisMonth: 0,
-        auditsTotal: 0,
-        teamMembers: 1,
-        storageUsed: 0
-      },
-      settings: {
-        defaultLanguage: 'fr',
-        emailNotifications: true,
-        weeklyReports: false,
-        theme: 'system',
-        timezone: 'Europe/Paris'
-      }
-    };
-
-    // Sauvegarder l'utilisateur
-    saveUser(newUser);
+      password,
+      emailVerificationToken: verificationToken
+    });
 
     // Retourner l'utilisateur (sans le mot de passe)
     const { password: _, ...userWithoutPassword } = newUser;
