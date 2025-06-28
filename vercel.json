@@ -11,5 +11,10 @@
   },
   "env": {
     "NEXT_PUBLIC_APP_URL": "https://rgaa-audit.vercel.app"
+  },
+  "build": {
+    "env": {
+      "PRISMA_GENERATE_DATAPROXY": "true"
+    }
   }
 } 
