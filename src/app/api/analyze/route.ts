@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, saveUser } from '@/lib/database';
+import { getUserByEmail, saveUser } from '@/lib/database-simple';
 
 // Configuration pour Vercel Pro - durée maximale pour les analyses complexes
 export const maxDuration = 300; // 5 minutes
