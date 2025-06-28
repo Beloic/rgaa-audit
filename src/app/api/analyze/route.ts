@@ -102,10 +102,28 @@ export async function POST(request: NextRequest) {
     if (userData) {
       const { subscription, usage } = userData;
       
-      // Les utilisateurs bêta ont un accès illimité
+      // Vérifier que l'email est vérifié (sauf pour les utilisateurs bêta)
       const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
       
       if (!isBetaUser) {
+        // Vérifier la vérification d'email
+        if (!userData.emailVerified) {
+          return NextResponse.json(
+            { 
+              error: 'Veuillez vérifier votre adresse email avant de pouvoir effectuer des analyses. Consultez votre boîte mail pour le lien de confirmation.',
+              requiresEmailVerification: true
+            },
+            { 
+              status: 403,
+              headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+              }
+            }
+          );
+        }
+        
         // Récupérer les limites du plan
         const planLimits = getPlanLimits(subscription?.plan || 'free');
         

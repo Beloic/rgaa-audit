@@ -195,8 +195,14 @@ export default function HomePage() {
       clearInterval(progressInterval);
       let errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
       
+      // Gestion spécifique de l'erreur de vérification d'email
+      if (errorMessage.includes('Veuillez vérifier votre adresse email')) {
+        errorMessage = language === 'fr' 
+          ? `📧 Veuillez vérifier votre adresse email avant de pouvoir effectuer des analyses. Consultez votre boîte mail pour le lien de confirmation.`
+          : `📧 Please verify your email address before performing analyses. Check your inbox for the confirmation link.`;
+      }
       // Améliorer le message pour les erreurs de rate limiting
-      if (errorMessage.includes('quota') || errorMessage.includes('limit')) {
+      else if (errorMessage.includes('quota') || errorMessage.includes('limit')) {
         errorMessage = language === 'fr' 
           ? `⏰ Limite d'analyse atteinte. L'outil gratuit a des limitations pour maintenir le service accessible à tous.`
           : `⏰ Analysis limit reached. The free tool has limitations to keep the service accessible to everyone.`;
