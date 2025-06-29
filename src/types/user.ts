@@ -33,6 +33,7 @@ export interface UserSubscription {
 
 export interface UserUsage {
   auditsThisMonth: number;
+  auditsToday?: number;
   auditsTotal: number;
   lastAuditDate?: string;
   teamMembers: number;
@@ -56,6 +57,7 @@ export interface PricingPlan {
   description: string;
   features: string[];
   limits: {
+    auditsPerDay: number | 'unlimited';
     auditsPerMonth: number | 'unlimited';
     teamMembers: number | 'unlimited';
     storage: number | 'unlimited'; // en GB

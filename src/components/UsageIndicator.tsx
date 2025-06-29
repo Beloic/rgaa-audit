@@ -64,16 +64,16 @@ export default function UsageIndicator({ compact = false }: UsageIndicatorProps)
         </div>
         
         {/* Mini barre de progression */}
-        {plan.limits.auditsPerMonth !== 'unlimited' && (
+        {plan.limits.auditsPerDay !== 'unlimited' && (
           <div>
             <div className="flex justify-between text-xs text-gray-500 mb-1">
-              <span>{user.usage.auditsThisMonth} / {plan.limits.auditsPerMonth}</span>
+              <span>{user.usage.auditsToday || 0} / {plan.limits.auditsPerDay}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-1">
               <div 
                 className={`h-1 rounded-full transition-all duration-300 ${getIndicatorColor()}`}
                 style={{ 
-                  width: `${Math.min(100, (user.usage.auditsThisMonth / (plan.limits.auditsPerMonth as number)) * 100)}%` 
+                  width: `${Math.min(100, ((user.usage.auditsToday || 0) / (plan.limits.auditsPerDay as number)) * 100)}%` 
                 }}
               />
             </div>
@@ -110,26 +110,26 @@ export default function UsageIndicator({ compact = false }: UsageIndicatorProps)
             
             <p className={`text-sm ${getTextColor()}`}>
               {remainingAudits === 0 ? (
-                'Limite d\'audits atteinte ce mois-ci'
-              ) : plan.limits.auditsPerMonth === 'unlimited' ? (
+                'Limite d\'audits atteinte aujourd\'hui'
+              ) : plan.limits.auditsPerDay === 'unlimited' ? (
                 'Audits illimités'
               ) : (
-                `${remainingAudits} audit${remainingAudits > 1 ? 's' : ''} restant${remainingAudits > 1 ? 's' : ''} ce mois`
+                `${remainingAudits} audit${remainingAudits > 1 ? 's' : ''} restant${remainingAudits > 1 ? 's' : ''} aujourd'hui`
               )}
             </p>
 
             {/* Barre de progression */}
-            {plan.limits.auditsPerMonth !== 'unlimited' && (
+            {plan.limits.auditsPerDay !== 'unlimited' && (
               <div className="mt-2">
                 <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>{user.usage.auditsThisMonth} utilisés</span>
-                  <span>{plan.limits.auditsPerMonth} total</span>
+                  <span>{user.usage.auditsToday || 0} utilisés</span>
+                  <span>{plan.limits.auditsPerDay} total</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5">
                   <div 
                     className={`h-1.5 rounded-full transition-all duration-300 ${getIndicatorColor()}`}
                     style={{ 
-                      width: `${Math.min(100, (user.usage.auditsThisMonth / (plan.limits.auditsPerMonth as number)) * 100)}%` 
+                      width: `${Math.min(100, ((user.usage.auditsToday || 0) / (plan.limits.auditsPerDay as number)) * 100)}%` 
                     }}
                   />
                 </div>
@@ -156,7 +156,7 @@ export default function UsageIndicator({ compact = false }: UsageIndicatorProps)
       {remainingAudits === 0 && (
         <div className="mt-3 pt-3 border-t border-red-200">
           <p className="text-xs text-red-600">
-            💡 Passez au plan Pro pour 50 audits/mois ou Enterprise pour un accès illimité.
+            💡 Passez au plan Pro pour des audits illimités par jour ou Enterprise pour un accès illimité.
           </p>
         </div>
       )}
@@ -164,7 +164,7 @@ export default function UsageIndicator({ compact = false }: UsageIndicatorProps)
       {remainingAudits <= 2 && remainingAudits > 0 && plan.id === 'free' && (
         <div className="mt-3 pt-3 border-t border-orange-200">
           <p className="text-xs text-orange-600">
-            💡 Plus que {remainingAudits} audit{remainingAudits > 1 ? 's' : ''} ! 
+            💡 Plus que {remainingAudits} audit{remainingAudits > 1 ? 's' : ''} aujourd'hui ! 
             Passez au Pro pour continuer sans limite.
           </p>
         </div>

@@ -150,14 +150,15 @@ const PRICING_PLANS: PricingPlan[] = [
     interval: 'month',
     description: 'Parfait pour découvrir l\'audit d\'accessibilité',
     features: [
-      '5 audits par mois',
+      '3 audits par jour',
       'Analyse RGAA, WAVE et Axe',
       'Rapports de base',
       'Support communautaire',
       'Historique 30 jours'
     ],
     limits: {
-      auditsPerMonth: 2,
+      auditsPerDay: 3,
+      auditsPerMonth: 'unlimited',
       teamMembers: 1,
       storage: 1,
       apiAccess: false,
@@ -174,6 +175,7 @@ const PRICING_PLANS: PricingPlan[] = [
     interval: 'month',
     description: 'Idéal pour les professionnels et petites équipes',
     features: [
+      'Audits illimités par jour',
       '50 audits par mois',
       'Gestion d\'équipe (5 membres)',
       'Rapports PDF personnalisés',
@@ -183,6 +185,7 @@ const PRICING_PLANS: PricingPlan[] = [
       'Intégrations CI/CD'
     ],
     limits: {
+      auditsPerDay: 'unlimited',
       auditsPerMonth: 50,
       teamMembers: 5,
       storage: 10,
@@ -211,6 +214,7 @@ const PRICING_PLANS: PricingPlan[] = [
       'Conformité SOC2/GDPR'
     ],
     limits: {
+      auditsPerDay: 'unlimited',
       auditsPerMonth: 'unlimited',
       teamMembers: 'unlimited',
       storage: 'unlimited',
@@ -456,26 +460,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!user) return true; // Accès libre sans connexion
 
     const plan = getCurrentPlan();
-    const currentUsage = user.usage.auditsThisMonth;
+    const currentUsage = user.usage.auditsToday || 0;
 
-    if (plan.limits.auditsPerMonth === 'unlimited') {
+    if (plan.limits.auditsPerDay === 'unlimited') {
       return true;
     }
 
-    return currentUsage < (plan.limits.auditsPerMonth as number);
+    return currentUsage < (plan.limits.auditsPerDay as number);
   };
 
   const getRemainingAudits = (): number => {
     if (!user) return 999999; // Illimité si pas connecté
 
     const plan = getCurrentPlan();
-    const currentUsage = user.usage.auditsThisMonth;
+    const currentUsage = user.usage.auditsToday || 0;
 
-    if (plan.limits.auditsPerMonth === 'unlimited') {
+    if (plan.limits.auditsPerDay === 'unlimited') {
       return 999999;
     }
 
-    return Math.max(0, (plan.limits.auditsPerMonth as number) - currentUsage);
+    return Math.max(0, (plan.limits.auditsPerDay as number) - currentUsage);
   };
 
   const isFeatureAvailable = (feature: string): boolean => {

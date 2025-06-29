@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
     console.log('🚀 Début de l\'analyse complète...');
 
     const { url, engine = 'wave', userData } = await request.json();
+    let updatedUserData = null;
     
     if (!url) {
       return NextResponse.json(
@@ -138,6 +139,21 @@ export async function POST(request: NextRequest) {
           
           // Si c'est un nouveau jour, réinitialiser le compteur quotidien
           const auditsToday = lastAuditDate === today ? (userData.usage.auditsToday || 0) + 1 : 1;
+          
+          // Vérifier si la limite quotidienne est dépassée
+          if (auditsToday > planLimits.auditsPerDay) {
+            return NextResponse.json(
+              { error: `Limite d'audits quotidienne atteinte (${planLimits.auditsPerDay}/jour). Passez à un plan supérieur pour continuer.` },
+              { 
+                status: 403,
+                headers: {
+                  'Access-Control-Allow-Origin': '*',
+                  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                }
+              }
+            );
+          }
           
           updatedUserData = {
             ...userData,
@@ -208,15 +224,20 @@ export async function POST(request: NextRequest) {
       const comparativeResult = await runComparativeAnalysis(url);
       
       // Incrémenter le compteur d'audits pour l'analyse comparative (sauf pour les utilisateurs bêta)
-      let updatedUserData = null;
       if (userData) {
         const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
         
         if (!isBetaUser) {
+          // Calculer le nombre d'audits aujourd'hui
+          const today = new Date().toISOString().split('T')[0];
+          const lastAuditDate = userData.usage.lastAuditDate ? new Date(userData.usage.lastAuditDate).toISOString().split('T')[0] : null;
+          const auditsToday = lastAuditDate === today ? (userData.usage.auditsToday || 0) + 1 : 1;
+          
           updatedUserData = {
             ...userData,
             usage: {
               ...userData.usage,
+              auditsToday,
               auditsThisMonth: userData.usage.auditsThisMonth + 1,
               auditsTotal: userData.usage.auditsTotal + 1,
               lastAuditDate: new Date().toISOString()
@@ -287,7 +308,6 @@ export async function POST(request: NextRequest) {
     };
 
     // Incrémenter le compteur d'audits si un utilisateur est fourni (sauf pour les utilisateurs bêta)
-    let updatedUserData = null;
     if (userData) {
       const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
       

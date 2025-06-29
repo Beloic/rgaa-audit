@@ -39,7 +39,9 @@ interface SupabaseUser {
   subscription_trial_ends_at?: string;
   subscription_ends_at?: string;
   audits_this_month: number;
+  audits_today: number;
   audits_total: number;
+  last_audit_date?: string;
   team_members: number;
   storage_used: number;
   default_language: string;
@@ -74,7 +76,9 @@ const supabaseUserToUser = (supabaseUser: SupabaseUser): UserType => ({
   },
   usage: {
     auditsThisMonth: supabaseUser.audits_this_month,
+    auditsToday: supabaseUser.audits_today,
     auditsTotal: supabaseUser.audits_total,
+    lastAuditDate: supabaseUser.last_audit_date,
     teamMembers: supabaseUser.team_members,
     storageUsed: supabaseUser.storage_used
   },
@@ -133,7 +137,9 @@ export const createUser = async (userData: {
       subscription_status: 'trial',
       subscription_start_date: new Date().toISOString(),
       audits_this_month: 0,
+      audits_today: 0,
       audits_total: 0,
+      last_audit_date: null,
       team_members: 1,
       storage_used: 0,
       default_language: 'fr',
@@ -177,7 +183,9 @@ export const saveUser = async (user: UserType): Promise<void> => {
       subscription_trial_ends_at: user.subscription?.trialEndsAt,
       subscription_ends_at: user.subscription?.endDate,
       audits_this_month: user.usage?.auditsThisMonth || 0,
+      audits_today: user.usage?.auditsToday || 0,
       audits_total: user.usage?.auditsTotal || 0,
+      last_audit_date: user.usage?.lastAuditDate,
       team_members: user.usage?.teamMembers || 1,
       storage_used: user.usage?.storageUsed || 0,
       default_language: user.settings?.defaultLanguage || 'fr',
