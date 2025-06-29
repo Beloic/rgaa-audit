@@ -70,6 +70,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           <span className="font-medium">{t.auditHistory}</span>
         </button>
         
+        {/*
         <button
           onClick={() => onSectionChange('rgaa-reference')}
           className={getButtonClasses('rgaa-reference')}
@@ -78,6 +79,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           <BookOpen className="w-5 h-5" aria-hidden="true" />
           <span className="font-medium">{t.rgaaReference}</span>
         </button>
+        */}
       </nav>
       
       {/* Section Alpha en bas */}

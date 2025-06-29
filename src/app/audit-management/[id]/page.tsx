@@ -7,7 +7,7 @@ import {
   Clock, CheckCircle, Circle, AlertCircle, Target, 
   BarChart3, FileText, Kanban, Settings,
   MessageSquare, Flag, User, Archive, Image, Upload, X, Palette, Lightbulb,
-  Filter, Search, Download, Share2, Eye, EyeOff, Star, StarOff, AlertTriangle, Info, HelpCircle, Zap, Shield, Cpu, BarChart
+  Filter, Search, Download, Share2, Eye, EyeOff, Star, StarOff, AlertTriangle, Info, HelpCircle, Zap, Shield, Cpu, BarChart, BookOpen
 } from 'lucide-react';
 import {
   DndContext,
@@ -32,6 +32,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import TopBar from '@/components/TopBar';
 import Sidebar from '@/components/Sidebar';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
+import RGAAReference from '@/components/RGAAReference';
 
 // Interface étendue pour les violations avec source
 interface ExtendedRGAAViolation extends RGAAViolation {
@@ -467,7 +468,7 @@ export default function AuditManagementPage() {
   // États pour la gestion des données
   const [auditData, setAuditData] = useState<AuditResult | ComparativeResult | null>(null);
   const [management, setManagement] = useState<AuditManagement | null>(null);
-  const [activeTab, setActiveTab] = useState<'kanban' | 'notes' | 'dashboard' | 'manual' | 'guide'>('kanban');
+  const [activeTab, setActiveTab] = useState<'kanban' | 'notes' | 'dashboard' | 'manual' | 'guide' | 'rgaa'>('kanban');
   const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -981,7 +982,8 @@ export default function AuditManagementPage() {
                   { id: 'notes', label: 'Notes', icon: FileText },
                   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                   { id: 'manual', label: 'Audit manuel', icon: User },
-                  { id: 'guide', label: 'Guide d\'audit manuel', icon: Lightbulb }
+                  { id: 'guide', label: 'Guide d\'audit manuel', icon: Lightbulb },
+                  { id: 'rgaa', label: 'Référentiel RGAA', icon: BookOpen }
                 ].map(tab => {
                   const Icon = tab.icon;
                   return (
@@ -1463,6 +1465,10 @@ export default function AuditManagementPage() {
             <div className="h-full">
               <ManualAuditPage />
             </div>
+          )}
+
+          {activeTab === 'rgaa' && (
+            <RGAAReference />
           )}
         </div>
       </main>
