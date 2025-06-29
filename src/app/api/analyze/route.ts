@@ -7,6 +7,7 @@ import type { AuditResult, RGAAViolation, EngineResult, ComparativeResult } from
 
 // Types pour les plans de tarification
 interface PlanLimits {
+  auditsPerDay: number | 'unlimited';
   auditsPerMonth: number | 'unlimited';
   teamMembers: number | 'unlimited';
   storage: number | 'unlimited';
@@ -19,7 +20,8 @@ interface PlanLimits {
 // Configuration des plans
 const PLAN_CONFIGS: Record<string, PlanLimits> = {
   free: {
-    auditsPerMonth: 3,
+    auditsPerDay: 3,
+    auditsPerMonth: 'unlimited',
     teamMembers: 1,
     storage: 1,
     apiAccess: false,
@@ -28,6 +30,7 @@ const PLAN_CONFIGS: Record<string, PlanLimits> = {
     whiteLabel: false
   },
   pro: {
+    auditsPerDay: 'unlimited',
     auditsPerMonth: 50,
     teamMembers: 5,
     storage: 10,
@@ -37,6 +40,7 @@ const PLAN_CONFIGS: Record<string, PlanLimits> = {
     whiteLabel: false
   },
   enterprise: {
+    auditsPerDay: 'unlimited',
     auditsPerMonth: 'unlimited',
     teamMembers: 'unlimited',
     storage: 'unlimited',
@@ -127,7 +131,40 @@ export async function POST(request: NextRequest) {
         // Récupérer les limites du plan
         const planLimits = getPlanLimits(subscription?.plan || 'free');
         
-        // Vérifier si l'utilisateur peut effectuer un audit
+        // Vérifier la limite quotidienne
+        if (planLimits.auditsPerDay !== 'unlimited') {
+          const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+          const lastAuditDate = userData.usage.lastAuditDate ? new Date(userData.usage.lastAuditDate).toISOString().split('T')[0] : null;
+          
+          // Si c'est un nouveau jour, réinitialiser le compteur quotidien
+          const auditsToday = lastAuditDate === today ? (userData.usage.auditsToday || 0) + 1 : 1;
+          
+          updatedUserData = {
+            ...userData,
+            usage: {
+              ...userData.usage,
+              auditsToday,
+              auditsThisMonth: userData.usage.auditsThisMonth + 1,
+              auditsTotal: userData.usage.auditsTotal + 1,
+              lastAuditDate: new Date().toISOString()
+            }
+          };
+          
+          // Sauvegarder dans la base de données si en mode API
+          const USE_API = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_USE_API === 'true';
+          if (USE_API) {
+            try {
+              await saveUser(updatedUserData);
+              console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
+            } catch (error) {
+              console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
+            }
+          }
+          
+          console.log(`✅ Audit comparatif comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsThisMonth}/${getPlanLimits(userData.subscription?.plan || 'free').auditsPerMonth}`);
+        }
+        
+        // Vérifier la limite mensuelle (si applicable)
         if (planLimits.auditsPerMonth !== 'unlimited' && 
             usage.auditsThisMonth >= planLimits.auditsPerMonth) {
           return NextResponse.json(
@@ -143,7 +180,7 @@ export async function POST(request: NextRequest) {
           );
         }
         
-        console.log(`👤 Audit pour utilisateur ${userData.email} - ${usage.auditsThisMonth + 1}/${planLimits.auditsPerMonth} audits ce mois`);
+        console.log(`👤 Audit pour utilisateur ${userData.email} - ${(userData.usage.auditsToday || 0) + 1}/${planLimits.auditsPerDay} audits aujourd'hui`);
       } else {
         console.log(`👤 Audit pour utilisateur bêta ${userData.email} - Accès illimité ✅`);
       }
