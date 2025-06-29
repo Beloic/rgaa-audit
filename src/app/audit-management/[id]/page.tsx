@@ -6,7 +6,8 @@ import {
   ArrowLeft, Save, Plus, Edit3, Trash2, Tag, Calendar, 
   Clock, CheckCircle, Circle, AlertCircle, Target, 
   BarChart3, FileText, Kanban, Settings,
-  MessageSquare, Flag, User, Archive, Image, Upload, X, Palette, Lightbulb
+  MessageSquare, Flag, User, Archive, Image, Upload, X, Palette, Lightbulb,
+  Filter, Search, Download, Share2, Eye, EyeOff, Star, StarOff, AlertTriangle, Info, HelpCircle, Zap, Shield, Cpu, BarChart
 } from 'lucide-react';
 import {
   DndContext,
@@ -27,6 +28,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import type { AuditResult, ComparativeResult, RGAAViolation } from '@/types/audit';
 import ManualAuditPage from '@/components/ManualAuditPage';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Interface étendue pour les violations avec source
 interface ExtendedRGAAViolation extends RGAAViolation {
@@ -454,8 +456,9 @@ function DroppableColumn({
 }
 
 export default function AuditManagementPage() {
-  const params = useParams();
   const router = useRouter();
+  const params = useParams();
+  const { user } = useAuth();
   const auditId = params.id as string;
   const modalRef = useRef<HTMLDivElement>(null);
   
@@ -470,6 +473,7 @@ export default function AuditManagementPage() {
   const [editNoteColor, setEditNoteColor] = useState<AuditNote['color']>(undefined);
   const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [newManualViolation, setNewManualViolation] = useState<ExtendedRGAAViolation | null>(null);
 
   // Configuration du drag and drop
   const sensors = useSensors(
@@ -484,9 +488,18 @@ export default function AuditManagementPage() {
   useEffect(() => {
     const loadAuditData = () => {
       try {
+        // Déterminer la clé de l'historique selon l'utilisateur connecté
+        const historyKey = user ? `rgaa-audit-history-${user.email}` : 'rgaa-audit-history';
+        
         // Charger l'audit depuis l'historique (nouveau format)
-        let history = JSON.parse(localStorage.getItem('rgaa-audit-history') || '[]');
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let audit = history.find((a: any) => a.id === auditId);
+        
+        // Si pas trouvé et utilisateur connecté, essayer l'historique global (fallback)
+        if (!audit && user) {
+          history = JSON.parse(localStorage.getItem('rgaa-audit-history') || '[]');
+          audit = history.find((a: any) => a.id === auditId);
+        }
         
         // Si pas trouvé, essayer l'ancien format
         if (!audit) {
@@ -496,6 +509,7 @@ export default function AuditManagementPage() {
         
         if (!audit) {
           console.log('Audit non trouvé avec l\'ID:', auditId);
+          console.log('Historique recherché dans:', historyKey);
           router.push('/');
           return;
         }
@@ -561,7 +575,7 @@ export default function AuditManagementPage() {
     };
 
     loadAuditData();
-  }, [auditId, router]);
+  }, [auditId, router, user]);
 
   // Sauvegarder les modifications
   const saveManagement = (updatedManagement: AuditManagement) => {
