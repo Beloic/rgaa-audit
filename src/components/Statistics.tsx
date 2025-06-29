@@ -44,7 +44,6 @@ const translations = {
     engineBreakdown: 'Répartition par moteur',
     monthlyTrends: 'Tendances mensuelles',
     topViolations: 'Violations les plus fréquentes',
-    errorTypesByCriterion: 'Types d\'erreur par critère',
     performanceMetrics: 'Métriques de performance',
     noData: 'Aucune donnée disponible',
     startAuditing: 'Commencez par effectuer des audits pour voir vos statistiques',
@@ -82,7 +81,6 @@ const translations = {
     engineBreakdown: 'Engine breakdown',
     monthlyTrends: 'Monthly trends',
     topViolations: 'Most frequent violations',
-    errorTypesByCriterion: 'Error types by criterion',
     performanceMetrics: 'Performance metrics',
     noData: 'No data available',
     startAuditing: 'Start by performing audits to see your statistics',
@@ -175,7 +173,6 @@ export default function Statistics({}: StatisticsProps) {
         complianceRate: 0,
         engineBreakdown: {},
         topViolations: [],
-        errorTypesByCriterion: [],
         monthlyData: []
       };
     }
@@ -208,35 +205,6 @@ export default function Statistics({}: StatisticsProps) {
       .slice(0, 10)
       .map(([criterion, count]) => ({ criterion, count }));
 
-    // Types d'erreur par critère
-    const errorTypesByCriterion: Record<string, Record<string, number>> = {};
-    filteredAudits.forEach(audit => {
-      if ('violations' in audit.result) {
-        audit.result.violations.forEach(violation => {
-          const criterion = violation.criterion || 'unknown';
-          const impact = violation.impact || 'unknown';
-          
-          if (!errorTypesByCriterion[criterion]) {
-            errorTypesByCriterion[criterion] = {};
-          }
-          
-          errorTypesByCriterion[criterion][impact] = (errorTypesByCriterion[criterion][impact] || 0) + 1;
-        });
-      }
-    });
-
-    const errorTypesArray = Object.entries(errorTypesByCriterion)
-      .map(([criterion, impacts]) => ({
-        criterion,
-        impacts: Object.entries(impacts).map(([impact, count]) => ({ impact, count }))
-      }))
-      .sort((a, b) => {
-        const totalA = a.impacts.reduce((sum, imp) => sum + imp.count, 0);
-        const totalB = b.impacts.reduce((sum, imp) => sum + imp.count, 0);
-        return totalB - totalA;
-      })
-      .slice(0, 15); // Top 15 critères
-
     // Données mensuelles pour les graphiques
     const monthlyData = filteredAudits.reduce((acc, audit) => {
       const date = new Date(audit.timestamp);
@@ -267,7 +235,6 @@ export default function Statistics({}: StatisticsProps) {
       complianceRate,
       engineBreakdown,
       topViolations,
-      errorTypesByCriterion: errorTypesArray,
       monthlyData: monthlyDataArray
     };
   };
@@ -483,54 +450,6 @@ export default function Statistics({}: StatisticsProps) {
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Graphique des types d'erreur par critère */}
-      <div className="mt-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-          <BarChart className="w-5 h-5 mr-2 text-purple-600" />
-          {t.errorTypesByCriterion}
-        </h3>
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {stats.errorTypesByCriterion.map((criterionData) => {
-            const totalViolations = criterionData.impacts.reduce((sum, imp) => sum + imp.count, 0);
-            const maxCount = Math.max(...criterionData.impacts.map(imp => imp.count));
-            
-            return (
-              <div key={criterionData.criterion} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-semibold text-gray-900">Critère {criterionData.criterion}</h4>
-                  <span className="text-sm text-gray-500">{totalViolations} {t.violations}</span>
-                </div>
-                
-                <div className="space-y-3">
-                  {criterionData.impacts.map((impact) => {
-                    const percentage = Math.round((impact.count / totalViolations) * 100);
-                    const barHeight = maxCount > 0 ? (impact.count / maxCount) * 100 : 0;
-                    
-                    return (
-                      <div key={impact.impact} className="flex items-end space-x-2">
-                        <div className="flex-1">
-                          <div className="text-xs text-gray-600 mb-1">{getImpactName(impact.impact)}</div>
-                          <div className="relative bg-gray-200 rounded-t h-20">
-                            <div 
-                              className={`${getImpactColor(impact.impact)} rounded-t transition-all duration-300 min-h-[4px]`}
-                              style={{ height: `${barHeight}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <div className="text-xs font-medium text-gray-900 text-center min-w-[40px]">
-                          <div>{impact.count}</div>
-                          <div className="text-gray-500">({percentage}%)</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
         </div>
       </div>
 

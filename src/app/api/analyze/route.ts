@@ -19,7 +19,7 @@ interface PlanLimits {
 // Configuration des plans
 const PLAN_CONFIGS: Record<string, PlanLimits> = {
   free: {
-    auditsPerMonth: 2,
+    auditsPerMonth: 3,
     teamMembers: 1,
     storage: 1,
     apiAccess: false,
