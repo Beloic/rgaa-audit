@@ -1,10 +1,11 @@
 'use client';
 
-import { Monitor, FileCheck, BookOpen, Clock } from 'lucide-react';
+import { Monitor, FileCheck, BookOpen, Clock, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const translations = {
   fr: {
+    statistics: 'Statistiques',
     intelligentAnalysis: 'Analyse intelligente',
     rgaaReference: 'Référentiel RGAA',
     auditHistory: 'Gestion des audits',
@@ -13,6 +14,7 @@ const translations = {
     reportBug: 'Signaler un bug'
   },
   en: {
+    statistics: 'Statistics',
     intelligentAnalysis: 'Intelligent Analysis',
     rgaaReference: 'RGAA Reference',
     auditHistory: 'History',
@@ -23,8 +25,8 @@ const translations = {
 };
 
 interface SidebarProps {
-  activeSection: 'analyze' | 'rgaa-reference' | 'history';
-  onSectionChange: (section: 'analyze' | 'rgaa-reference' | 'history') => void;
+  activeSection: 'statistics' | 'analyze' | 'rgaa-reference' | 'history';
+  onSectionChange: (section: 'statistics' | 'analyze' | 'rgaa-reference' | 'history') => void;
 }
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
@@ -41,6 +43,15 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   return (
     <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 flex flex-col">
       <nav className="p-4 space-y-2 flex-1" aria-label="Navigation secondaire">
+        <button
+          onClick={() => onSectionChange('statistics')}
+          className={getButtonClasses('statistics')}
+          aria-current={activeSection === 'statistics' ? 'page' : undefined}
+        >
+          <BarChart3 className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">{t.statistics}</span>
+        </button>
+
         <button
           onClick={() => onSectionChange('analyze')}
           className={getButtonClasses('analyze')}
