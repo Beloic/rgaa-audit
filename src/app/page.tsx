@@ -170,11 +170,11 @@ export default function HomePage() {
       if (request.engine === 'all') {
         setComparativeResult(result as ComparativeResult);
         // Sauvegarder dans l'historique
-        saveAuditToHistory(result as ComparativeResult, 'all');
+        saveAuditToHistory(result as ComparativeResult, 'all', user?.email);
       } else {
         setAuditResult(result as AuditResult);
         // Sauvegarder dans l'historique
-        saveAuditToHistory(result as AuditResult, request.engine || 'rgaa');
+        saveAuditToHistory(result as AuditResult, request.engine || 'rgaa', user?.email);
       }
       
       setIsAnalyzing(false);

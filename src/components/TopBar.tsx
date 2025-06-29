@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Shield, LogOut, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AuthModal from '@/components/AuthModal';
 
 interface TopBarProps {
@@ -22,6 +22,21 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Écouter les événements d'ouverture de la modal d'authentification
+  useEffect(() => {
+    const handleOpenAuthModal = (event: CustomEvent) => {
+      const { tab } = event.detail;
+      setAuthModalTab(tab);
+      setIsAuthModalOpen(true);
+    };
+
+    window.addEventListener('openAuthModal', handleOpenAuthModal as EventListener);
+    
+    return () => {
+      window.removeEventListener('openAuthModal', handleOpenAuthModal as EventListener);
+    };
+  }, []);
 
   const isActive = (path: string) => {
     if (path === '/') {

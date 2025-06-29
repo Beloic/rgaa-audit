@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { Globe, Zap, Search, Cpu, Shield, BarChart3 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Globe, Zap, Search, Cpu, Shield, BarChart3, UserPlus, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import type { AuditRequest, AnalysisProgress } from '@/types/audit';
 
 interface AuditFormProps {
@@ -28,7 +29,13 @@ const translations = {
     waveDescription: 'Outil de référence pour l\'accessibilité web',
     axeDescription: 'Moteur d\'analyse automatisé performant',
     comparativeAnalysis: 'Analyse Comparative',
-    comparativeDescription: 'Analyse avec tous les moteurs pour comparaison'
+    comparativeDescription: 'Analyse avec tous les moteurs pour comparaison',
+    freeAuditUsed: 'Vous avez utilisé votre audit gratuit',
+    signupRequired: 'Inscrivez-vous gratuitement pour continuer',
+    signupDescription: 'Créez votre compte pour accéder à des audits illimités et sauvegarder votre historique',
+    signupButton: 'S\'inscrire gratuitement',
+    loginButton: 'Se connecter',
+    orText: 'ou'
   },
   en: {
     title: 'Analyze your website',
@@ -45,21 +52,43 @@ const translations = {
     waveDescription: 'Reference tool for web accessibility',
     axeDescription: 'High-performance automated analysis engine',
     comparativeAnalysis: 'Comparative Analysis',
-    comparativeDescription: 'Analysis with all engines for comparison'
+    comparativeDescription: 'Analysis with all engines for comparison',
+    freeAuditUsed: 'You have used your free audit',
+    signupRequired: 'Sign up for free to continue',
+    signupDescription: 'Create your account to access unlimited audits and save your history',
+    signupButton: 'Sign up for free',
+    loginButton: 'Log in',
+    orText: 'or'
   }
 };
 
 export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysisError }: AuditFormProps) {
   const { language } = useLanguage();
+  const { user } = useAuth();
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const [selectedEngine, setSelectedEngine] = useState<'wave' | 'axe' | 'rgaa' | 'all'>('rgaa');
+  const [hasUsedFreeAudit, setHasUsedFreeAudit] = useState(false);
 
   const t = translations[language];
+
+  // Vérifier si l'utilisateur non connecté a déjà effectué un audit
+  useEffect(() => {
+    if (!user) {
+      const freeAuditUsed = localStorage.getItem('rgaa-free-audit-used');
+      setHasUsedFreeAudit(!!freeAuditUsed);
+    }
+  }, [user]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Vérifier si l'utilisateur non connecté a déjà utilisé son audit gratuit
+    if (!user && hasUsedFreeAudit) {
+      setError('Vous devez vous inscrire pour effectuer plus d\'audits');
+      return;
+    }
 
     if (!url.trim()) {
       setError(t.urlError);
@@ -75,8 +104,59 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
     // Stocker l'URL dans sessionStorage pour la fonctionnalité de localisation
     sessionStorage.setItem('lastAnalyzedUrl', url.trim());
     
+    // Marquer que l'utilisateur non connecté a utilisé son audit gratuit
+    if (!user) {
+      localStorage.setItem('rgaa-free-audit-used', 'true');
+      setHasUsedFreeAudit(true);
+    }
+    
     onAuditStart({ url: url.trim(), language, engine: selectedEngine });
   };
+
+  // Si l'utilisateur non connecté a déjà utilisé son audit gratuit, afficher le message d'inscription
+  if (!user && hasUsedFreeAudit) {
+    return (
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-8 h-8 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">{t.freeAuditUsed}</h2>
+            <p className="text-gray-600 text-lg mb-2">{t.signupRequired}</p>
+            <p className="text-gray-500 mb-8">{t.signupDescription}</p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => {
+                  // Ouvrir la modal d'inscription
+                  const event = new CustomEvent('openAuthModal', { detail: { tab: 'register' } });
+                  window.dispatchEvent(event);
+                }}
+                className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              >
+                <UserPlus className="w-5 h-5 mr-2" />
+                {t.signupButton}
+              </button>
+              
+              <span className="text-gray-400 self-center">{t.orText}</span>
+              
+              <button
+                onClick={() => {
+                  // Ouvrir la modal de connexion
+                  const event = new CustomEvent('openAuthModal', { detail: { tab: 'login' } });
+                  window.dispatchEvent(event);
+                }}
+                className="inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+              >
+                {t.loginButton}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-6">
@@ -87,6 +167,7 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
           <header className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-3">{t.title}</h2>
             <p className="text-gray-600 text-lg">{t.subtitle}</p>
+            
             <p className="text-gray-500 text-sm mt-2">
               Version Alpha - vos retours sont les bienvenus : 
               <a 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Clock, ExternalLink, Trash2, RotateCcw, Search, Calendar, TrendingUp, AlertTriangle, Zap, Shield, Cpu, BarChart3, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { AuditResult, ComparativeResult, AuditRequest } from '@/types/audit';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HistoricalAudit {
   id: string;
@@ -23,7 +24,7 @@ interface AuditHistoryProps {
 
 const translations = {
   fr: {
-    title: 'Historique des audits',
+    title: 'Gestion des audits',
     subtitle: 'Retrouvez et reprenez vos analyses précédentes',
     empty: 'Aucun audit dans l\'historique',
     emptyDescription: 'Commencez par analyser un site web pour voir l\'historique apparaître ici.',
@@ -76,6 +77,7 @@ const translations = {
 
 export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: AuditHistoryProps) {
   const { language } = useLanguage();
+  const { user } = useAuth();
   const router = useRouter();
   const t = translations[language];
   const [audits, setAudits] = useState<HistoricalAudit[]>([]);
@@ -83,29 +85,41 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [clearAllConfirm, setClearAllConfirm] = useState(false);
 
-  // Charger l'historique depuis localStorage
+  // Charger l'historique depuis localStorage (spécifique à l'utilisateur)
   useEffect(() => {
     const loadHistory = () => {
       try {
-        const stored = localStorage.getItem('rgaa-audit-history');
+        if (!user) {
+          setAudits([]);
+          return;
+        }
+        
+        const historyKey = `rgaa-audit-history-${user.email}`;
+        const stored = localStorage.getItem(historyKey);
         if (stored) {
           const parsed: HistoricalAudit[] = JSON.parse(stored);
           // Trier par date décroissante (plus récent en premier)
           parsed.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
           setAudits(parsed);
+        } else {
+          setAudits([]);
         }
       } catch (error) {
         console.error('Erreur lors du chargement de l\'historique:', error);
+        setAudits([]);
       }
     };
 
     loadHistory();
-  }, []);
+  }, [user]); // Recharger quand l'utilisateur change
 
-  // Sauvegarder l'historique dans localStorage
+  // Sauvegarder l'historique dans localStorage (spécifique à l'utilisateur)
   const saveHistory = (newAudits: HistoricalAudit[]) => {
     try {
-      localStorage.setItem('rgaa-audit-history', JSON.stringify(newAudits));
+      if (!user) return;
+      
+      const historyKey = `rgaa-audit-history-${user.email}`;
+      localStorage.setItem(historyKey, JSON.stringify(newAudits));
       setAudits(newAudits);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde de l\'historique:', error);
@@ -286,24 +300,24 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
                   <div className="flex items-center space-x-2 ml-4 transition-opacity">
                     <button
                       onClick={() => handleResumeAudit(audit)}
-                      className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
+                      className="inline-flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <RotateCcw className="w-4 h-4 mr-1.5" />
-                      {t.resumeAudit}
+                      <RotateCcw className="w-5 h-5" />
+                      <span className="font-medium">{t.resumeAudit}</span>
                     </button>
                     <button
                       onClick={() => router.push(`/audit-management/${audit.id}`)}
-                      className="inline-flex items-center px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 transition-colors"
+                      className="inline-flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <Target className="w-4 h-4 mr-1.5" />
-                      Gestion
+                      <Target className="w-5 h-5" />
+                      <span className="font-medium">Gestion</span>
                     </button>
                     <button
                       onClick={() => handleNewAudit(audit.url)}
-                      className="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-colors"
+                      className="inline-flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <TrendingUp className="w-4 h-4 mr-1.5" />
-                      {t.newAudit}
+                      <TrendingUp className="w-5 h-5" />
+                      <span className="font-medium">{t.newAudit}</span>
                     </button>
                   </div>
                 </div>
@@ -426,6 +440,15 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
                 {t.title}
               </h1>
               <p className="text-gray-600 text-lg">{t.subtitle}</p>
+              
+              {/* Message si utilisateur non connecté */}
+              {!user && (
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-yellow-800 text-sm">
+                    <strong>Note :</strong> Vous n'êtes pas connecté. L'historique des audits est temporaire et sera perdu si vous fermez votre navigateur.
+                  </p>
+                </div>
+              )}
               
               {/* Statistiques rapides */}
               {audits.length > 0 && (
@@ -600,9 +623,11 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
 }
 
 // Fonction utilitaire pour sauvegarder un audit dans l'historique
-export const saveAuditToHistory = (result: AuditResult | ComparativeResult, engine: 'wave' | 'axe' | 'rgaa' | 'all') => {
+export const saveAuditToHistory = (result: AuditResult | ComparativeResult, engine: 'wave' | 'axe' | 'rgaa' | 'all', userEmail?: string) => {
   try {
-    const stored = localStorage.getItem('rgaa-audit-history');
+    // Si pas d'utilisateur connecté, utiliser l'ancien système global (fallback)
+    const historyKey = userEmail ? `rgaa-audit-history-${userEmail}` : 'rgaa-audit-history';
+    const stored = localStorage.getItem(historyKey);
     let audits: HistoricalAudit[] = stored ? JSON.parse(stored) : [];
 
     // Déterminer le score correct selon le type de résultat
@@ -646,7 +671,8 @@ export const saveAuditToHistory = (result: AuditResult | ComparativeResult, engi
       engine,
       score,
       totalViolations,
-      resultType: 'summary' in result ? 'comparative' : 'simple'
+      resultType: 'summary' in result ? 'comparative' : 'simple',
+      userEmail: userEmail || 'utilisateur non connecté'
     });
 
     // Ajouter en premier (plus récent)
@@ -657,7 +683,7 @@ export const saveAuditToHistory = (result: AuditResult | ComparativeResult, engi
       audits = audits.slice(0, 50);
     }
 
-    localStorage.setItem('rgaa-audit-history', JSON.stringify(audits));
+    localStorage.setItem(historyKey, JSON.stringify(audits));
   } catch (error) {
     console.error('Erreur lors de la sauvegarde de l\'audit dans l\'historique:', error);
   }

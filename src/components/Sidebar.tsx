@@ -7,7 +7,7 @@ const translations = {
   fr: {
     intelligentAnalysis: 'Analyse intelligente',
     rgaaReference: 'Référentiel RGAA',
-    auditHistory: 'Historique',
+    auditHistory: 'Gestion des audits',
     versionAlpha: 'VERSION ALPHA',
     bugReport: 'Il est probable que vous rencontriez des bugs, merci de bien vouloir les remonter :',
     reportBug: 'Signaler un bug'
