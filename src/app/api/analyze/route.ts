@@ -300,7 +300,6 @@ async function runComparativeAnalysis(url: string): Promise<ComparativeResult> {
   console.log('🔄 Lancement de l\'analyse comparative avec tous les moteurs...');
   
   const engines: ('wave' | 'axe' | 'rgaa')[] = ['rgaa', 'axe', 'wave'];
-  const engineResults: EngineResult[] = [];
   
   // Lancer les analyses en parallèle pour gagner du temps
   const analysisPromises = engines.map(async (engineName) => {
@@ -324,45 +323,37 @@ async function runComparativeAnalysis(url: string): Promise<ComparativeResult> {
           throw new Error(`Moteur inconnu: ${engineName}`);
       }
       
-      const analysisTime = Date.now() - startTime;
+      const endTime = Date.now();
+      const duration = endTime - startTime;
       
-      // Calculer les métriques pour ce moteur
-      const totalViolations = violations.length;
-      const score = engineName === 'axe' 
-        ? calculateScoreFromAxe(violations)
-        : engineName === 'rgaa'
-        ? calculateScoreFromRGAA(violations)
-        : calculateScoreFromWave(violations);
-      const impactGroups = groupByImpact(violations);
-      const levelGroups = groupByLevel(violations);
-      const summary = generateSummary(violations, engineName);
-    
-    const result: AuditResult = {
-        url,
-        timestamp: new Date(),
-        totalViolations,
-      score,
-        violations,
-        summary,
-        violationsByImpact: impactGroups,
-        violationsByLevel: levelGroups,
-        engine: engineName,
-        // URL du rapport WAVE web pour consultation visuelle
-        waveReportUrl: engineName === 'wave' ? `https://wave.webaim.org/report#/${encodeURIComponent(url)}` : undefined
-      };
-      
-      console.log(`✅ ${engineName.toUpperCase()} terminé: ${violations.length} violations, score: ${score}/100, temps: ${analysisTime}ms`);
+      console.log(`✅ ${engineName.toUpperCase()} terminé en ${duration}ms avec ${violations.length} violations`);
       
       return {
         engine: engineName,
-        result,
-        analysisTime,
+        result: {
+          url,
+          timestamp: new Date(),
+          totalViolations: violations.length,
+          score: engineName === 'wave' 
+            ? calculateScoreFromWave(violations)
+            : engineName === 'axe'
+            ? calculateScoreFromAxe(violations)
+            : calculateScoreFromRGAA(violations),
+          violations,
+          summary: generateSummary(violations, engineName),
+          violationsByImpact: groupByImpact(violations),
+          violationsByLevel: groupByLevel(violations),
+          engine: engineName,
+          waveReportUrl: engineName === 'wave' ? `https://wave.webaim.org/report#/${encodeURIComponent(url)}` : undefined
+        },
+        analysisTime: duration,
         success: true
-      };
-    
-  } catch (error) {
-      const analysisTime = Date.now() - startTime;
-      console.error(`❌ Erreur ${engineName.toUpperCase()}:`, error);
+      } as EngineResult;
+      
+    } catch (error) {
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      console.error(`❌ Erreur ${engineName.toUpperCase()} après ${duration}ms:`, error);
       
       return {
         engine: engineName,
@@ -372,67 +363,92 @@ async function runComparativeAnalysis(url: string): Promise<ComparativeResult> {
           totalViolations: 0,
           score: 0,
           violations: [],
-          summary: `Erreur lors de l'analyse ${engineName.toUpperCase()}`,
+          summary: `Erreur lors de l'analyse: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
           violationsByImpact: { low: 0, medium: 0, high: 0, critical: 0 },
           violationsByLevel: { A: 0, AA: 0, AAA: 0 },
-          engine: engineName
+          engine: engineName,
+          waveReportUrl: undefined
         },
-        analysisTime,
+        analysisTime: duration,
         success: false,
         error: error instanceof Error ? error.message : 'Erreur inconnue'
-      };
+      } as EngineResult;
     }
   });
   
-  // Attendre que toutes les analyses se terminent
-  const results = await Promise.all(analysisPromises);
+  // Attendre que toutes les analyses se terminent (avec timeout global)
+  const results = await Promise.allSettled(analysisPromises);
   
-  // Analyser les résultats pour créer le rapport comparatif
-  const successfulResults = results.filter(r => r.success);
-  const allViolations = successfulResults.flatMap(r => r.result.violations);
+  // Convertir les résultats
+  const engineResults: EngineResult[] = results.map((result, index) => {
+    if (result.status === 'fulfilled') {
+      return result.value;
+    } else {
+      return {
+        engine: engines[index],
+        result: {
+          url,
+          timestamp: new Date(),
+          totalViolations: 0,
+          score: 0,
+          violations: [],
+          summary: `Erreur lors de l'analyse: ${result.reason?.message || 'Erreur inconnue'}`,
+          violationsByImpact: { low: 0, medium: 0, high: 0, critical: 0 },
+          violationsByLevel: { A: 0, AA: 0, AAA: 0 },
+          engine: engines[index],
+          waveReportUrl: undefined
+        },
+        analysisTime: 0,
+        success: false
+      } as EngineResult;
+    }
+  });
   
-  // Identifier les violations communes et spécifiques
+  console.log(`🎉 Analyse comparative terminée! Résultats:`, engineResults.map(r => `${r.engine}: ${r.result.totalViolations} violations (${r.analysisTime}ms)`));
+  
+  // Analyser les résultats
+  const successfulResults = engineResults.filter(r => r.success);
+  const totalViolations = successfulResults.reduce((sum, r) => sum + r.result.totalViolations, 0);
+  
+  // Trouver les violations communes
   const commonViolations = findCommonViolations(successfulResults);
-  const engineSpecificViolations = {
-    wave: results.find(r => r.engine === 'wave')?.result.violations || [],
-    axe: results.find(r => r.engine === 'axe')?.result.violations || [],
-    rgaa: results.find(r => r.engine === 'rgaa')?.result.violations || []
-  };
+  const uniqueViolations = removeDuplicateViolations(commonViolations);
   
-  // Calculer les métriques du résumé
-  const scores = successfulResults.map(r => r.result.score);
-  const bestScore = Math.max(...scores);
-  const worstScore = Math.min(...scores);
-  const averageScore = scores.reduce((a, b) => a + b, 0) / scores.length;
-  
-  // Déterminer le moteur le plus fiable (celui qui trouve le plus de violations communes)
-  const mostReliableEngine = determineMostReliableEngine(successfulResults, commonViolations);
+  // Déterminer le moteur le plus fiable
+  const mostReliableEngine = determineMostReliableEngine(successfulResults, uniqueViolations);
   
   // Calculer le niveau de consensus
-  const consensusLevel = calculateConsensusLevel(successfulResults, commonViolations);
+  const consensusLevel = calculateConsensusLevel(successfulResults, uniqueViolations);
   
-  const comparativeResult: ComparativeResult = {
-    url,
-    timestamp: new Date(),
-    engines: results,
-    totalUniqueViolations: removeDuplicateViolations(allViolations).length,
-    commonViolations,
-    engineSpecificViolations,
-    summary: {
-      bestScore,
-      worstScore,
-      averageScore: Math.round(averageScore),
-      mostReliableEngine,
-      consensusLevel
-    }
+  // Calculer les scores
+  const scores = successfulResults.map(result => ({
+    engine: result.engine,
+    score: result.result.score
+  }));
+  
+  const bestScore = Math.max(...scores.map(s => s.score));
+  const worstScore = Math.min(...scores.map(s => s.score));
+  const averageScore = scores.reduce((sum, s) => sum + s.score, 0) / scores.length;
+  
+  // Générer le résumé
+  const summary = {
+    bestScore: Math.round(bestScore),
+    worstScore: Math.round(worstScore),
+    averageScore: Math.round(averageScore),
+    mostReliableEngine,
+    consensusLevel
   };
   
-  console.log('🎉 Analyse comparative terminée!');
-  console.log(`📊 Résumé: ${successfulResults.length}/${engines.length} moteurs réussis`);
-  console.log(`🔍 Violations: ${comparativeResult.totalUniqueViolations} uniques, ${commonViolations.length} communes`);
-  console.log(`📈 Scores: ${worstScore}-${bestScore} (moyenne: ${Math.round(averageScore)})`);
-  
-  return comparativeResult;
+  return {
+    url,
+    timestamp: new Date(),
+    engineResults,
+    summary,
+    totalUniqueViolations: uniqueViolations.length,
+    violations: uniqueViolations,
+    violationsByImpact: groupByImpact(uniqueViolations),
+    violationsByLevel: groupByLevel(uniqueViolations)
+  };
 }
 
 // Fonctions utilitaires pour l'analyse comparative
@@ -1190,11 +1206,11 @@ async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
     let errorDetails = '';
 
     try {
-      // Naviguer vers l'URL cible avec timeout plus long
+      // Naviguer vers l'URL cible avec timeout optimisé
       console.log(`📄 Navigation vers: ${url}`);
       const response = await page.goto(url, { 
-        waitUntil: 'networkidle0',
-        timeout: 45000 // Timeout plus long
+        waitUntil: 'domcontentloaded', // Plus rapide que networkidle0
+        timeout: 30000 // Réduit de 45000ms à 30000ms
       });
 
       finalUrl = page.url();
@@ -1213,7 +1229,7 @@ async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
       console.log(`✅ Page chargée avec succès (${response.status()})`);
 
              // Attendre que la page soit entièrement rendue
-       await new Promise(resolve => setTimeout(resolve, 2000));
+       await new Promise(resolve => setTimeout(resolve, 1000)); // Réduit de 2000ms à 1000ms
 
       // Vérifier si la page contient du contenu analysable
       const bodyContent = await page.evaluate(() => {
@@ -1238,7 +1254,7 @@ async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
         console.log(`✅ Axe Core injecté avec succès`);
         
                  // Attendre un peu pour s'assurer qu'Axe est prêt
-         await new Promise(resolve => setTimeout(resolve, 1000));
+         await new Promise(resolve => setTimeout(resolve, 500)); // Réduit de 1000ms à 500ms
 
       } catch (injectError) {
         console.log(`⚠️ Échec injection CDN, essai avec version locale...`);
@@ -1307,7 +1323,7 @@ async function launchAxeAnalysis(url: string): Promise<RGAAViolation[]> {
         new Promise((resolve) => {
           setTimeout(() => {
             resolve({ violations: [], error: 'Timeout de l\'analyse Axe', timeout: true });
-          }, 30000); // Timeout de 30 secondes
+          }, 20000); // Réduit de 30000ms à 20000ms
         })
       ]);
 
@@ -1747,7 +1763,7 @@ async function launchRGAAAnalysis(url: string): Promise<RGAAViolation[]> {
       console.log(`📏 Contenu de la page: ${bodyHTML.length} caractères`);
 
       // Attendre que la page soit entièrement rendue
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Réduit de 2000ms à 1000ms
 
               // Injection et exécution du moteur RGAA
       console.log(`🔍 Injection du moteur RGAA et lancement de l'analyse...`);
