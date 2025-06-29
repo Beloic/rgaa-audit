@@ -198,7 +198,7 @@ export const saveUser = async (user: UserType): Promise<void> => {
     const { error } = await supabase
       .from('users')
       .update(updateData)
-      .eq('id', user.id);
+      .eq('email', user.email);
 
     if (error) {
       throw new Error(`Erreur Supabase: ${error.message}`);

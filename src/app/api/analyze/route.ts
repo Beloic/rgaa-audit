@@ -103,11 +103,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier les limites d'audit si un utilisateur est fourni (sauf pour les utilisateurs bêta)
+    // Vérifier et incrémenter le compteur d'audits AVANT l'analyse (sauf pour les utilisateurs bêta)
     if (userData) {
-      const { subscription, usage } = userData;
-      
-      // Vérifier que l'email est vérifié (sauf pour les utilisateurs bêta)
       const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
       
       if (!isBetaUser) {
@@ -130,7 +127,7 @@ export async function POST(request: NextRequest) {
         }
         
         // Récupérer les limites du plan
-        const planLimits = getPlanLimits(subscription?.plan || 'free');
+        const planLimits = getPlanLimits(userData.subscription?.plan || 'free');
         
         // Vérifier la limite quotidienne
         if (planLimits.auditsPerDay !== 'unlimited') {
@@ -155,6 +152,7 @@ export async function POST(request: NextRequest) {
             );
           }
           
+          // Mettre à jour les données utilisateur AVANT l'analyse
           updatedUserData = {
             ...userData,
             usage: {
@@ -166,38 +164,38 @@ export async function POST(request: NextRequest) {
             }
           };
           
-          // Sauvegarder dans la base de données si en mode API
-          const USE_API = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_USE_API === 'true';
-          if (USE_API) {
-            try {
-              await saveUser(updatedUserData);
-              console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
-            } catch (error) {
-              console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
-            }
+          // Sauvegarder dans la base de données TOUJOURS
+          try {
+            await saveUser(updatedUserData);
+            console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
+          } catch (error) {
+            console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
           }
           
           console.log(`✅ Audit comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsToday}/${planLimits.auditsPerDay} audits aujourd'hui`);
-        }
-        
-        // Vérifier la limite mensuelle (si applicable)
-        if (planLimits.auditsPerMonth !== 'unlimited' && 
-            usage.auditsThisMonth >= planLimits.auditsPerMonth) {
-          return NextResponse.json(
-            { error: 'Limite d\'audits atteinte pour ce mois. Passez à un plan supérieur pour continuer.' },
-            { 
-              status: 403,
-              headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-              }
+        } else {
+          // Plan illimité - juste incrémenter les compteurs
+          updatedUserData = {
+            ...userData,
+            usage: {
+              ...userData.usage,
+              auditsThisMonth: userData.usage.auditsThisMonth + 1,
+              auditsTotal: userData.usage.auditsTotal + 1,
+              lastAuditDate: new Date().toISOString()
             }
-          );
+          };
+          
+          // Sauvegarder dans la base de données
+          try {
+            await saveUser(updatedUserData);
+            console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
+          } catch (error) {
+            console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
+          }
         }
-        
-        console.log(`👤 Audit pour utilisateur ${userData.email} - ${(userData.usage.auditsToday || 0) + 1}/${planLimits.auditsPerDay} audits aujourd'hui`);
       } else {
+        // Pour les utilisateurs bêta, on ne change pas les données d'usage
+        updatedUserData = userData;
         console.log(`👤 Audit pour utilisateur bêta ${userData.email} - Accès illimité ✅`);
       }
     }
@@ -222,46 +220,6 @@ export async function POST(request: NextRequest) {
     // Si engine='all', lancer l'analyse comparative avec tous les moteurs
     if (engine === 'all') {
       const comparativeResult = await runComparativeAnalysis(url);
-      
-      // Incrémenter le compteur d'audits pour l'analyse comparative (sauf pour les utilisateurs bêta)
-      if (userData) {
-        const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
-        
-        if (!isBetaUser) {
-          // Calculer le nombre d'audits aujourd'hui
-          const today = new Date().toISOString().split('T')[0];
-          const lastAuditDate = userData.usage.lastAuditDate ? new Date(userData.usage.lastAuditDate).toISOString().split('T')[0] : null;
-          const auditsToday = lastAuditDate === today ? (userData.usage.auditsToday || 0) + 1 : 1;
-          
-          updatedUserData = {
-            ...userData,
-            usage: {
-              ...userData.usage,
-              auditsToday,
-              auditsThisMonth: userData.usage.auditsThisMonth + 1,
-              auditsTotal: userData.usage.auditsTotal + 1,
-              lastAuditDate: new Date().toISOString()
-            }
-          };
-          
-          // Sauvegarder dans la base de données si en mode API
-          const USE_API = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_USE_API === 'true';
-          if (USE_API) {
-            try {
-              await saveUser(updatedUserData);
-              console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
-            } catch (error) {
-              console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
-            }
-          }
-          
-          console.log(`✅ Audit comparatif comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsThisMonth}/${getPlanLimits(userData.subscription?.plan || 'free').auditsPerMonth}`);
-        } else {
-          // Pour les utilisateurs bêta, on ne change pas les données d'usage
-          updatedUserData = userData;
-          console.log(`✅ Audit comparatif pour utilisateur bêta ${userData.email} - Non comptabilisé (accès illimité)`);
-        }
-      }
       
       return NextResponse.json({ 
         ...comparativeResult, 
@@ -306,40 +264,6 @@ export async function POST(request: NextRequest) {
       // URL du rapport WAVE web pour consultation visuelle
       waveReportUrl: engine === 'wave' ? `https://wave.webaim.org/report#/${encodeURIComponent(url)}` : undefined
     };
-
-    // Incrémenter le compteur d'audits si un utilisateur est fourni (sauf pour les utilisateurs bêta)
-    if (userData) {
-      const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
-      
-      if (!isBetaUser) {
-        updatedUserData = {
-          ...userData,
-          usage: {
-            ...userData.usage,
-            auditsThisMonth: userData.usage.auditsThisMonth + 1,
-            auditsTotal: userData.usage.auditsTotal + 1,
-            lastAuditDate: new Date().toISOString()
-          }
-        };
-        
-        // Sauvegarder dans la base de données si en mode API
-        const USE_API = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_USE_API === 'true';
-        if (USE_API) {
-          try {
-            saveUser(updatedUserData);
-            console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
-          } catch (error) {
-            console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
-          }
-        }
-        
-        console.log(`✅ Audit comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsThisMonth}/${getPlanLimits(userData.subscription?.plan || 'free').auditsPerMonth}`);
-      } else {
-        // Pour les utilisateurs bêta, on ne change pas les données d'usage
-        updatedUserData = userData;
-        console.log(`✅ Audit pour utilisateur bêta ${userData.email} - Non comptabilisé (accès illimité)`);
-      }
-    }
 
     return NextResponse.json({ 
       ...result, 
