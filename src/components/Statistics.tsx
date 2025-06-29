@@ -309,7 +309,7 @@ export default function Statistics({}: StatisticsProps) {
 
   if (!user) {
     return (
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Connexion requise</h2>
@@ -321,7 +321,7 @@ export default function Statistics({}: StatisticsProps) {
 
   if (filteredAudits.length === 0) {
     return (
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{t.noData}</h2>
