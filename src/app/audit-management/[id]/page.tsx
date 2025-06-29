@@ -1007,37 +1007,7 @@ export default function AuditManagementPage() {
         {/* Contenu principal */}
         <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Statistiques rapides */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Target className="h-8 w-8 text-gray-400" />
-                </div>
-                <div className="ml-4">
-                  <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
-                  <div className="text-sm text-gray-500">Total violations</div>
-                </div>
-              </div>
-            </div>
-
-            {Object.entries(statusConfig).map(([status, config]) => {
-              const Icon = config.icon;
-              const count = stats[status as keyof typeof stats];
-              return (
-                <div key={status} className="bg-white rounded-lg border border-gray-200 p-4">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <Icon className={`h-8 w-8 ${config.textColor.replace('text-', 'text-')}`} />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-2xl font-bold text-gray-900">{count}</div>
-                      <div className="text-sm text-gray-500">{config.title}</div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {/* Bloc supprimé : synthèse des violations */}
 
           {/* Contenu des onglets */}
           {activeTab === 'kanban' && (
