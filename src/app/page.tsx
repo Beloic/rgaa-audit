@@ -91,7 +91,7 @@ export default function HomePage() {
       setAuditResult(null);
       setComparativeResult(null);
       setError(null);
-      setProgress({ step: 'idle', message: 'En attente...', progress: 0 });
+      setProgress({ step: 'idle', message: language === 'fr' ? 'En attente...' : 'Waiting...', progress: 0 });
     }
   };
 
@@ -104,7 +104,7 @@ export default function HomePage() {
       setAuditResult(null);
       setComparativeResult(null);
       setError(null);
-      setProgress({ step: 'idle', message: 'En attente...', progress: 0 });
+      setProgress({ step: 'idle', message: language === 'fr' ? 'En attente...' : 'Waiting...', progress: 0 });
     }
   };
 
@@ -202,7 +202,7 @@ export default function HomePage() {
 
     } catch (err) {
       clearInterval(progressInterval);
-      let errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
+      let errorMessage = err instanceof Error ? err.message : (language === 'fr' ? 'Une erreur est survenue' : 'An error occurred');
       
       // Gestion spécifique de l'erreur de vérification d'email
       if (errorMessage.includes('Veuillez vérifier votre adresse email')) {
@@ -228,7 +228,7 @@ export default function HomePage() {
     setAuditResult(null);
     setComparativeResult(null);
     setError(null);
-    setProgress({ step: 'idle', message: 'En attente...', progress: 0 });
+    setProgress({ step: 'idle', message: language === 'fr' ? 'En attente...' : 'Waiting...', progress: 0 });
     
     // Scroll vers le formulaire avec focus pour l'accessibilité
     const formElement = document.getElementById('audit-form');
@@ -249,7 +249,7 @@ export default function HomePage() {
       setAuditResult(null);
       setComparativeResult(null);
       setError(null);
-      setProgress({ step: 'idle', message: 'En attente...', progress: 0 });
+      setProgress({ step: 'idle', message: language === 'fr' ? 'En attente...' : 'Waiting...', progress: 0 });
     }
   };
 
@@ -313,11 +313,16 @@ export default function HomePage() {
                 {/* Hero Content */}
                 <header className="text-center px-6 py-20 max-w-4xl mx-auto">
                   <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-                    <span className="text-gray-900">Audit d'accessibilité </span>
+                    <span className="text-gray-900">
+                      {language === 'fr' ? 'Audit d\'accessibilité' : 'Accessibility Audit'}
+                    </span>
                     <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">RGAA</span>
                   </h1>
                   <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
-                    Cette version alpha utilise les moteurs les plus performants pour aider les professionnels à réaliser leurs audits. Cet outil n'a pas vocation à remplacer l'expertise humaine.
+                    {language === 'fr' 
+                      ? "Cette version alpha utilise les moteurs les plus performants pour aider les professionnels à réaliser leurs audits. Cet outil n'a pas vocation à remplacer l'expertise humaine."
+                      : "This alpha version uses the most powerful engines to help professionals conduct their audits. This tool is not intended to replace human expertise."
+                    }
                   </p>
                 </header>
               </div>
