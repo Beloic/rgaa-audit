@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
             }
           }
           
-          console.log(`✅ Audit comparatif comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsThisMonth}/${getPlanLimits(userData.subscription?.plan || 'free').auditsPerMonth}`);
+          console.log(`✅ Audit comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsToday}/${planLimits.auditsPerDay} audits aujourd'hui`);
         }
         
         // Vérifier la limite mensuelle (si applicable)
