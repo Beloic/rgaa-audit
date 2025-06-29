@@ -25,6 +25,8 @@ const translations = {
     'home.title': 'Testez l\'accessibilité RGAA de votre site',
     'home.subtitle': 'Moteur d\'analyse WAVE & RGAA',
     'home.description': 'Analysez instantanément l\'accessibilité de votre site web avec notre outil gratuit basé sur WAVE et les critères RGAA français.',
+    'home.mainTitle': 'Audit d\'accessibilité ',
+    'home.mainDescription': 'Cette version alpha utilise les moteurs les plus performants pour aider les professionnels à réaliser leurs audits. Cet outil n\'a pas vocation à remplacer l\'expertise humaine.',
     
     // Formulaire
     'form.url.placeholder': 'https://votre-site.com',
@@ -176,6 +178,10 @@ const translations = {
     'footer.legal': 'Mentions légales',
     'footer.accessibility': 'Accessibilité',
     'footer.sitemap': 'Plan du site',
+
+    // Messages d'interface
+    'ui.waiting': 'En attente...',
+    'ui.errorOccurred': 'Une erreur est survenue',
   },
   en: {
     // Navigation
@@ -188,6 +194,8 @@ const translations = {
     'home.title': 'Test your website\'s RGAA accessibility',
     'home.subtitle': 'WAVE & RGAA Analysis Engine',
     'home.description': 'Instantly analyze your website\'s accessibility with our free tool based on WAVE and French RGAA criteria.',
+    'home.mainTitle': 'Accessibility Audit',
+    'home.mainDescription': 'This alpha version uses the most powerful engines to help professionals perform their audits. This tool is not intended to replace human expertise.',
     
     // Formulaire
     'form.url.placeholder': 'https://your-site.com',
@@ -339,6 +347,10 @@ const translations = {
     'footer.legal': 'Legal notice',
     'footer.accessibility': 'Accessibility',
     'footer.sitemap': 'Sitemap',
+
+    // Messages d'interface
+    'ui.waiting': 'Waiting...',
+    'ui.errorOccurred': 'An error occurred',
   }
 };
 
