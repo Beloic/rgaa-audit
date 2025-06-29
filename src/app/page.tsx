@@ -38,8 +38,24 @@ export default function HomePage() {
     
     if (section && ['statistics', 'analyze', 'rgaa-reference', 'history'].includes(section)) {
       setActiveSection(section as 'statistics' | 'analyze' | 'rgaa-reference' | 'history');
+    } else if (window.location.pathname === '/' && !section) {
+      // Si on est sur la page d'accueil sans paramètre, rester sur home
+      setActiveSection('home');
     }
   }, []);
+
+  // Mettre à jour l'URL quand la section change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (activeSection === 'home') {
+        url.searchParams.delete('section');
+      } else {
+        url.searchParams.set('section', activeSection);
+      }
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [activeSection]);
 
   // Fonctions de gestion de l'historique
   const handleResumeAudit = (auditData: { result: AuditResult | ComparativeResult; engine: 'wave' | 'axe' | 'rgaa' | 'all' }) => {
@@ -64,14 +80,6 @@ export default function HomePage() {
         resultsElement.focus();
       }
     }, 500);
-  };
-
-  const handleNewAuditFromHistory = async (request: AuditRequest) => {
-    setActiveSection('analyze');
-    // Attendre que le composant soit monté puis lancer l'audit
-    setTimeout(() => {
-      handleAuditStart(request);
-    }, 100);
   };
 
   // Fonction pour gérer les changements de section de la sidebar
@@ -415,7 +423,6 @@ export default function HomePage() {
             <div className="min-h-screen">
               <AuditHistory 
                 onResumeAudit={handleResumeAudit}
-                onNewAuditFromHistory={handleNewAuditFromHistory}
               />
             </div>
           )}

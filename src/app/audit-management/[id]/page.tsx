@@ -29,6 +29,9 @@ import { CSS } from '@dnd-kit/utilities';
 import type { AuditResult, ComparativeResult, RGAAViolation } from '@/types/audit';
 import ManualAuditPage from '@/components/ManualAuditPage';
 import { useAuth } from '@/contexts/AuthContext';
+import TopBar from '@/components/TopBar';
+import Sidebar from '@/components/Sidebar';
+import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 
 // Interface étendue pour les violations avec source
 interface ExtendedRGAAViolation extends RGAAViolation {
@@ -456,26 +459,28 @@ function DroppableColumn({
 }
 
 export default function AuditManagementPage() {
-  const router = useRouter();
   const params = useParams();
+  const router = useRouter();
   const { user } = useAuth();
   const auditId = params.id as string;
-  const modalRef = useRef<HTMLDivElement>(null);
   
+  // États pour la gestion des données
   const [auditData, setAuditData] = useState<AuditResult | ComparativeResult | null>(null);
   const [management, setManagement] = useState<AuditManagement | null>(null);
   const [activeTab, setActiveTab] = useState<'kanban' | 'notes' | 'dashboard' | 'manual' | 'guide'>('kanban');
+  const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // États pour les notes
   const [newNoteContent, setNewNoteContent] = useState('');
-  const [newNoteColor, setNewNoteColor] = useState<AuditNote['color']>(undefined);
+  const [newNoteColor, setNewNoteColor] = useState<AuditNote['color']>();
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [editNoteContent, setEditNoteContent] = useState('');
-  const [editNoteColor, setEditNoteColor] = useState<AuditNote['color']>(undefined);
-  const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [newManualViolation, setNewManualViolation] = useState<ExtendedRGAAViolation | null>(null);
+  const [editNoteColor, setEditNoteColor] = useState<AuditNote['color']>();
 
-  // Configuration du drag and drop
+  // États pour le drag & drop
+  const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -484,443 +489,328 @@ export default function AuditManagementPage() {
     })
   );
 
-  // Charger les données de l'audit depuis le localStorage
+  // États pour les violations manuelles
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [manualViolations, setManualViolations] = useState<ExtendedRGAAViolation[]>([]);
+
+  // États pour les cartes
+  const [editingCard, setEditingCard] = useState<string | null>(null);
+  const [editCardTitle, setEditCardTitle] = useState('');
+  const [editCardDescription, setEditCardDescription] = useState('');
+  const [editCardColor, setEditCardColor] = useState<KanbanCard['colorTag']>();
+  const [uploadingScreenshot, setUploadingScreenshot] = useState<string | null>(null);
+
+  // Référence pour les modales
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Charger les données d'audit et de gestion
   useEffect(() => {
     const loadAuditData = () => {
       try {
-        // Déterminer la clé de l'historique selon l'utilisateur connecté
-        const historyKey = user ? `rgaa-audit-history-${user.email}` : 'rgaa-audit-history';
-        
-        // Charger l'audit depuis l'historique (nouveau format)
-        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
-        let audit = history.find((a: any) => a.id === auditId);
-        
-        // Si pas trouvé et utilisateur connecté, essayer l'historique global (fallback)
-        if (!audit && user) {
-          history = JSON.parse(localStorage.getItem('rgaa-audit-history') || '[]');
-          audit = history.find((a: any) => a.id === auditId);
-        }
-        
-        // Si pas trouvé, essayer l'ancien format
-        if (!audit) {
-          history = JSON.parse(localStorage.getItem('auditHistory') || '[]');
-          audit = history.find((a: any) => a.id === auditId);
-        }
-        
-        if (!audit) {
-          console.log('Audit non trouvé avec l\'ID:', auditId);
-          console.log('Historique recherché dans:', historyKey);
-          router.push('/');
+        if (!user) {
+          setError('Utilisateur non connecté');
+          setIsLoading(false);
           return;
         }
-        
-        console.log('Audit trouvé:', audit);
-        setAuditData(audit.result);
 
-        // Charger ou initialiser les données de gestion
-        const managementKey = `audit-management-${auditId}`;
-        const existingManagement = localStorage.getItem(managementKey);
+        // Charger l'historique des audits
+        const historyKey = `rgaa-audit-history-${user.email}`;
+        const stored = localStorage.getItem(historyKey);
         
-        if (existingManagement) {
-          setManagement(JSON.parse(existingManagement));
-        } else {
-          // Initialiser les cartes Kanban avec les violations
-          let violations: RGAAViolation[] = [];
+        if (stored) {
+          const audits: any[] = JSON.parse(stored);
+          const audit = audits.find(a => a.id === auditId);
           
-          // Essayer différents formats de violations
-          if ('violations' in audit.result) {
-            violations = audit.result.violations;
-          } else if ('engines' in audit.result) {
-            // Format comparatif - prendre toutes les violations de tous les moteurs
-            Object.values(audit.result.engines).forEach((engine: any) => {
-              if (engine.violations) {
-                violations = violations.concat(engine.violations);
-              }
-            });
+          if (audit) {
+            setAuditData(audit.result);
+            
+            // Charger ou créer les données de gestion
+            const managementKey = `audit-management-${auditId}-${user.email}`;
+            const storedManagement = localStorage.getItem(managementKey);
+            
+            if (storedManagement) {
+              setManagement(JSON.parse(storedManagement));
+            } else {
+              // Créer de nouvelles données de gestion
+              const newManagement: AuditManagement = {
+                auditId,
+                notes: [],
+                kanbanCards: audit.result.violations?.map((violation: RGAAViolation, index: number) => ({
+                  id: `card-${index}`,
+                  violation: { ...violation, source: 'automatic' as const },
+                  status: 'todo' as const,
+                  priority: violation.impact === 'critical' ? 'critical' : 
+                           violation.impact === 'serious' ? 'high' : 
+                           violation.impact === 'moderate' ? 'medium' : 'low',
+                  notes: '',
+                  updatedAt: new Date().toISOString(),
+                  customTitle: `Critère ${violation.criterion}`,
+                  customDescription: violation.description
+                })) || [],
+                settings: {
+                  assignees: [],
+                  tags: []
+                },
+                lastUpdated: new Date().toISOString()
+              };
+              
+              setManagement(newManagement);
+              localStorage.setItem(managementKey, JSON.stringify(newManagement));
+            }
+          } else {
+            setError('Audit non trouvé');
           }
-          
-          console.log('Violations trouvées:', violations.length);
-          
-          const initialCards: KanbanCard[] = violations.map((violation: RGAAViolation, index: number) => ({
-            id: `${violation.criterion || index}-${Date.now()}-${Math.random()}`,
-            violation,
-            status: 'todo',
-            priority: violation.impact === 'critical' ? 'critical' : 
-                     violation.impact === 'high' ? 'high' : 
-                     violation.impact === 'medium' ? 'medium' : 'low',
-            notes: '',
-            updatedAt: new Date().toISOString()
-          }));
-
-          const initialManagement: AuditManagement = {
-            auditId,
-            notes: [],
-            kanbanCards: initialCards,
-            settings: {
-              assignees: [],
-              tags: []
-            },
-            lastUpdated: new Date().toISOString()
-          };
-          
-          setManagement(initialManagement);
-          localStorage.setItem(managementKey, JSON.stringify(initialManagement));
+        } else {
+          setError('Aucun historique d\'audit trouvé');
         }
-        
-        setIsLoading(false);
       } catch (error) {
-        console.error('Erreur lors du chargement:', error);
-        router.push('/');
+        console.error('Erreur lors du chargement des données:', error);
+        setError('Erreur lors du chargement des données');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadAuditData();
-  }, [auditId, router, user]);
+  }, [auditId, user]);
 
-  // Sauvegarder les modifications
+  // Sauvegarder les données de gestion
   const saveManagement = (updatedManagement: AuditManagement) => {
-    const managementKey = `audit-management-${auditId}`;
-    updatedManagement.lastUpdated = new Date().toISOString();
-    localStorage.setItem(managementKey, JSON.stringify(updatedManagement));
-    setManagement(updatedManagement);
+    try {
+      if (!user) return;
+      
+      const managementKey = `audit-management-${auditId}-${user.email}`;
+      localStorage.setItem(managementKey, JSON.stringify(updatedManagement));
+      setManagement(updatedManagement);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+    }
   };
 
-  // Ajouter une note
+  // Fonctions pour les notes
   const addNote = () => {
-    if (!newNoteContent.trim() || !management) return;
-
+    if (!management || !newNoteContent.trim()) return;
+    
     const newNote: AuditNote = {
-      id: Date.now().toString(),
-      content: newNoteContent,
+      id: `note-${Date.now()}`,
+      content: newNoteContent.trim(),
       timestamp: new Date().toISOString(),
       tags: [],
       color: newNoteColor
     };
-
+    
     const updatedManagement = {
       ...management,
-      notes: [newNote, ...management.notes]
+      notes: [...management.notes, newNote],
+      lastUpdated: new Date().toISOString()
     };
-
+    
     saveManagement(updatedManagement);
     setNewNoteContent('');
     setNewNoteColor(undefined);
   };
 
-  // Supprimer une note
   const deleteNote = (noteId: string) => {
     if (!management) return;
-
+    
     const updatedManagement = {
       ...management,
-      notes: management.notes.filter(note => note.id !== noteId)
+      notes: management.notes.filter(note => note.id !== noteId),
+      lastUpdated: new Date().toISOString()
     };
-
+    
     saveManagement(updatedManagement);
   };
 
-  // Commencer l'édition d'une note
   const startEditNote = (note: AuditNote) => {
     setEditingNote(note.id);
     setEditNoteContent(note.content);
-    setEditNoteColor(note.color);
   };
 
-  // Annuler l'édition d'une note
   const cancelEditNote = () => {
     setEditingNote(null);
     setEditNoteContent('');
-    setEditNoteColor(undefined);
   };
 
-  // Sauvegarder l'édition d'une note
   const saveEditNote = (noteId: string) => {
-    if (!editNoteContent.trim() || !management) return;
-
+    if (!management || !editNoteContent.trim()) return;
+    
     const updatedManagement = {
       ...management,
-      notes: management.notes.map(note =>
-        note.id === noteId
-          ? { ...note, content: editNoteContent, color: editNoteColor }
+      notes: management.notes.map(note => 
+        note.id === noteId 
+          ? { ...note, content: editNoteContent.trim() }
           : note
-      )
+      ),
+      lastUpdated: new Date().toISOString()
     };
-
+    
     saveManagement(updatedManagement);
-    cancelEditNote();
+    setEditingNote(null);
+    setEditNoteContent('');
   };
 
-  // Modifier la couleur d'une note (pour modification rapide)
   const updateNoteColor = (noteId: string, color: AuditNote['color']) => {
     if (!management) return;
-
+    
     const updatedManagement = {
       ...management,
-      notes: management.notes.map(note =>
-        note.id === noteId
+      notes: management.notes.map(note => 
+        note.id === noteId 
           ? { ...note, color }
           : note
-      )
+      ),
+      lastUpdated: new Date().toISOString()
     };
-
+    
     saveManagement(updatedManagement);
   };
 
-  // Déplacer une carte Kanban
+  // Fonctions pour les cartes Kanban
   const moveCard = (cardId: string, newStatus: KanbanCard['status']) => {
-    if (!management || !management.kanbanCards || !Array.isArray(management.kanbanCards)) return;
-
+    if (!management) return;
+    
     const updatedManagement = {
       ...management,
-      kanbanCards: management.kanbanCards.map(card =>
+      kanbanCards: management.kanbanCards.map(card => 
         card.id === cardId 
           ? { ...card, status: newStatus, updatedAt: new Date().toISOString() }
           : card
-      )
+      ),
+      lastUpdated: new Date().toISOString()
     };
-
+    
     saveManagement(updatedManagement);
   };
 
-  // Gestionnaires de drag and drop
+  // Gestion du drag & drop
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const cardId = active.id as string;
+      const newStatus = over.id as KanbanCard['status'];
+      moveCard(cardId, newStatus);
+    }
+    
     setActiveId(null);
-
-    if (!over || !management || !management.kanbanCards || !Array.isArray(management.kanbanCards)) return;
-
-    const activeCard = management.kanbanCards.find(card => card.id === active.id);
-    const overCard = management.kanbanCards.find(card => card.id === over.id);
-    
-    if (!activeCard) return;
-
-    const overId = over.id as string;
-    console.log('Drag end - overId:', overId, 'activeCard:', activeCard.id); // Debug
-
-    // Cas 1: Déplacement vers une autre carte (réordonnancement)
-    if (overCard && activeCard.id !== overCard.id) {
-      const activeIndex = management.kanbanCards.findIndex(card => card.id === activeCard.id);
-      const overIndex = management.kanbanCards.findIndex(card => card.id === overCard.id);
-      
-      // Vérifier que les cartes sont dans la même colonne pour le réordonnancement
-      if (activeCard.status === overCard.status) {
-        console.log('Reordering cards within same column:', activeCard.status); // Debug
-        
-        // Créer un nouveau tableau avec les cartes réordonnées
-        const newCards = [...management.kanbanCards];
-        
-        // Supprimer la carte active de sa position actuelle
-        const [movedCard] = newCards.splice(activeIndex, 1);
-        
-        // L'insérer à la nouvelle position
-        newCards.splice(overIndex, 0, movedCard);
-        
-        const updatedManagement = {
-          ...management,
-          kanbanCards: newCards
-        };
-        
-        saveManagement(updatedManagement);
-        return;
-      }
-      // Si les cartes ne sont pas dans la même colonne, traiter comme un changement de statut
-      else {
-        console.log('Moving card to different column via card drop:', overCard.status); // Debug
-        moveCard(activeCard.id, overCard.status);
-        return;
-      }
-    }
-
-    // Cas 2: Déplacement vers une colonne ou zone vide (changement de statut)
-    const validStatuses = ['todo', 'inprogress', 'validated', 'postponed'];
-    
-    // Vérifier si c'est une zone vide (format: "empty-status")
-    let targetStatus = overId;
-    if (overId.startsWith('empty-')) {
-      targetStatus = overId.replace('empty-', '');
-    }
-    
-    if (validStatuses.includes(targetStatus)) {
-      const newStatus = targetStatus as KanbanCard['status'];
-      
-      if (activeCard.status !== newStatus) {
-        console.log('Moving card from', activeCard.status, 'to', newStatus); // Debug
-        moveCard(activeCard.id, newStatus);
-      }
-    }
   };
 
-  // Fermeture du modal par clic extérieur
+  // Gestion des clics en dehors des modales
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Ne fermer que si on clique vraiment en dehors du modal
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        // Vérifier que ce n'est pas un élément d'interaction dans le modal
-        const target = event.target as Element;
-        if (!target.closest('.modal-content') && !target.closest('input') && !target.closest('textarea') && !target.closest('button')) {
-          setSelectedCard(null);
-        }
+      const target = event.target as HTMLElement;
+      if (!target.closest('.modal-content') && !target.closest('.card-actions')) {
+        setSelectedCard(null);
+        setEditingCard(null);
       }
     };
 
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setSelectedCard(null);
+        setEditingCard(null);
       }
     };
 
-    if (selectedCard) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscapeKey);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [selectedCard]);
+  }, []);
 
-  // Modifier la priorité d'une carte
+  // Fonctions pour la personnalisation des cartes
   const updateCardPriority = (cardId: string, priority: KanbanCard['priority']) => {
-    if (!management || !management.kanbanCards || !Array.isArray(management.kanbanCards)) return;
-
+    if (!management) return;
+    
     const updatedManagement = {
       ...management,
-      kanbanCards: management.kanbanCards.map(card =>
+      kanbanCards: management.kanbanCards.map(card => 
         card.id === cardId 
           ? { ...card, priority, updatedAt: new Date().toISOString() }
           : card
-      )
+      ),
+      lastUpdated: new Date().toISOString()
     };
-
-    saveManagement(updatedManagement);
     
-    // Mettre à jour selectedCard si c'est la carte modifiée
-    if (selectedCard && selectedCard.id === cardId) {
-      setSelectedCard({ ...selectedCard, priority, updatedAt: new Date().toISOString() });
-    }
+    saveManagement(updatedManagement);
   };
 
-  // Mettre à jour le titre personnalisé d'une carte
   const updateCardTitle = (cardId: string, customTitle: string) => {
-    if (!management || !management.kanbanCards || !Array.isArray(management.kanbanCards)) return;
-
-    const updatedCard = { 
-      ...selectedCard!, 
-      customTitle: customTitle.trim() || undefined, 
-      updatedAt: new Date().toISOString() 
-    };
-
+    if (!management) return;
+    
     const updatedManagement = {
       ...management,
-      kanbanCards: management.kanbanCards.map(card =>
-        card.id === cardId ? updatedCard : card
-      )
+      kanbanCards: management.kanbanCards.map(card => 
+        card.id === cardId 
+          ? { ...card, customTitle, updatedAt: new Date().toISOString() }
+          : card
+      ),
+      lastUpdated: new Date().toISOString()
     };
-
-    saveManagement(updatedManagement);
     
-    // Mettre à jour selectedCard immédiatement
-    if (selectedCard && selectedCard.id === cardId) {
-      setSelectedCard(updatedCard);
-    }
+    saveManagement(updatedManagement);
   };
 
-  // Mettre à jour la description personnalisée d'une carte
   const updateCardDescription = (cardId: string, customDescription: string) => {
-    if (!management || !management.kanbanCards || !Array.isArray(management.kanbanCards)) return;
-
-    const updatedCard = { 
-      ...selectedCard!, 
-      customDescription: customDescription.trim() || undefined, 
-      updatedAt: new Date().toISOString() 
-    };
-
+    if (!management) return;
+    
     const updatedManagement = {
       ...management,
-      kanbanCards: management.kanbanCards.map(card =>
-        card.id === cardId ? updatedCard : card
-      )
+      kanbanCards: management.kanbanCards.map(card => 
+        card.id === cardId 
+          ? { ...card, customDescription, updatedAt: new Date().toISOString() }
+          : card
+      ),
+      lastUpdated: new Date().toISOString()
     };
-
-    saveManagement(updatedManagement);
     
-    // Mettre à jour selectedCard immédiatement
-    if (selectedCard && selectedCard.id === cardId) {
-      setSelectedCard(updatedCard);
-    }
+    saveManagement(updatedManagement);
   };
 
-  // Mettre à jour la pastille de couleur d'une carte
   const updateCardColor = (cardId: string, colorTag: KanbanCard['colorTag']) => {
-    if (!management || !management.kanbanCards || !Array.isArray(management.kanbanCards)) return;
-
-    const updatedCard = { 
-      ...selectedCard!, 
-      colorTag, 
-      updatedAt: new Date().toISOString() 
-    };
-
+    if (!management) return;
+    
     const updatedManagement = {
       ...management,
-      kanbanCards: management.kanbanCards.map(card =>
-        card.id === cardId ? updatedCard : card
-      )
+      kanbanCards: management.kanbanCards.map(card => 
+        card.id === cardId 
+          ? { ...card, colorTag, updatedAt: new Date().toISOString() }
+          : card
+      ),
+      lastUpdated: new Date().toISOString()
     };
-
-    saveManagement(updatedManagement);
     
-    // Mettre à jour selectedCard immédiatement
-    if (selectedCard && selectedCard.id === cardId) {
-      setSelectedCard(updatedCard);
-    }
+    saveManagement(updatedManagement);
   };
 
-  // Mettre à jour le screenshot d'une carte
   const updateCardScreenshot = (cardId: string, screenshot: KanbanCard['screenshot']) => {
-    if (!management || !management.kanbanCards || !Array.isArray(management.kanbanCards)) return;
-
-    const updatedCard = { 
-      ...selectedCard!, 
-      screenshot, 
-      updatedAt: new Date().toISOString() 
-    };
-
+    if (!management) return;
+    
     const updatedManagement = {
       ...management,
-      kanbanCards: management.kanbanCards.map(card =>
-        card.id === cardId ? updatedCard : card
-      )
+      kanbanCards: management.kanbanCards.map(card => 
+        card.id === cardId 
+          ? { ...card, screenshot, updatedAt: new Date().toISOString() }
+          : card
+      ),
+      lastUpdated: new Date().toISOString()
     };
-
-    saveManagement(updatedManagement);
     
-    // Mettre à jour selectedCard immédiatement
-    if (selectedCard && selectedCard.id === cardId) {
-      setSelectedCard(updatedCard);
-    }
+    saveManagement(updatedManagement);
   };
 
-  // Gérer l'upload de fichier
+  // Gestion des uploads de fichiers
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !selectedCard) return;
-
-    // Vérifier le type de fichier
-    if (!file.type.startsWith('image/')) {
-      alert('Veuillez sélectionner un fichier image.');
-      return;
-    }
-
-    // Vérifier la taille (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Le fichier est trop volumineux. Taille maximum : 5MB.');
-      return;
-    }
+    if (!file || !uploadingScreenshot) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -929,12 +819,13 @@ export default function AuditManagementPage() {
         data: e.target?.result as string,
         uploadedAt: new Date().toISOString()
       };
-      updateCardScreenshot(selectedCard.id, screenshot);
+      
+      updateCardScreenshot(uploadingScreenshot, screenshot);
+      setUploadingScreenshot(null);
     };
     reader.readAsDataURL(file);
   };
 
-  // Supprimer le screenshot
   const removeScreenshot = () => {
     if (!selectedCard) return;
     updateCardScreenshot(selectedCard.id, undefined);
@@ -942,18 +833,46 @@ export default function AuditManagementPage() {
 
   // Calculer les statistiques
   const getStats = () => {
-    if (!management || !management.kanbanCards || !Array.isArray(management.kanbanCards)) {
-      return { total: 0, todo: 0, inprogress: 0, validated: 0, postponed: 0 };
-    }
-
+    if (!management) return { total: 0, todo: 0, inprogress: 0, validated: 0, postponed: 0 };
+    
     const cards = management.kanbanCards;
     return {
       total: cards.length,
-      todo: cards.filter(c => c.status === 'todo').length,
-      inprogress: cards.filter(c => c.status === 'inprogress').length,
-      validated: cards.filter(c => c.status === 'validated').length,
-      postponed: cards.filter(c => c.status === 'postponed').length
+      todo: cards.filter(card => card.status === 'todo').length,
+      inprogress: cards.filter(card => card.status === 'inprogress').length,
+      validated: cards.filter(card => card.status === 'validated').length,
+      postponed: cards.filter(card => card.status === 'postponed').length
     };
+  };
+
+  const stats = getStats();
+
+  // Gestion des violations manuelles
+  const addManualViolation = (violation: ExtendedRGAAViolation) => {
+    if (!management) return;
+    
+    const newCard: KanbanCard = {
+      id: `manual-${Date.now()}`,
+      violation,
+      status: 'todo',
+      priority: violation.impact === 'critical' ? 'critical' : 
+               violation.impact === 'serious' ? 'high' : 
+               violation.impact === 'moderate' ? 'medium' : 'low',
+      notes: '',
+      updatedAt: new Date().toISOString(),
+      customTitle: `Critère ${violation.criterion}`,
+      customDescription: violation.description
+    };
+    
+    const updatedManagement = {
+      ...management,
+      kanbanCards: [...management.kanbanCards, newCard],
+      lastUpdated: new Date().toISOString()
+    };
+    
+    saveManagement(updatedManagement);
+    setManualViolations([...manualViolations, violation]);
+    setShowManualForm(false);
   };
 
   if (isLoading) {
@@ -967,598 +886,615 @@ export default function AuditManagementPage() {
     );
   }
 
-  if (!auditData || !management) {
+  if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Audit introuvable</h2>
-          <p className="text-gray-600 mb-4">L'audit demandé n'existe pas ou a été supprimé.</p>
+          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Erreur</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/?section=history')}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Retour à l'accueil
+            Retour à l'historique
           </button>
         </div>
       </div>
     );
   }
 
-  const stats = getStats();
+  if (!auditData || !management) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Audit non trouvé</h2>
+          <p className="text-gray-600 mb-4">L'audit demandé n'existe pas ou n'est plus disponible.</p>
+          <button
+            onClick={() => router.push('/?section=history')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Retour à l'historique
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* En-tête */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => router.push('/?section=history')}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Gestion d'Audit</h1>
-                <p className="text-sm text-gray-500">
-                  {auditData.url} • {new Date(management.lastUpdated).toLocaleDateString('fr-FR')}
-                </p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Topbar Navigation */}
+      <TopBar 
+        activeSection="home" 
+        onSectionChange={() => {}}
+        onAnalyzeClick={() => {}}
+      />
 
-            <div className="flex items-center space-x-3">
-              <div className="text-sm text-gray-500">
-                Dernière modification: {new Date(management.lastUpdated).toLocaleString('fr-FR')}
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation par onglets */}
-          <div className="mt-6 border-b border-gray-200">
-            <nav className="flex space-x-8">
-              {[
-                { id: 'kanban', label: 'Tableau Kanban', icon: Kanban },
-                { id: 'notes', label: 'Notes', icon: FileText },
-                { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-                { id: 'manual', label: 'Audit manuel', icon: User },
-                { id: 'guide', label: 'Guide d\'audit manuel', icon: Lightbulb }
-              ].map(tab => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                      activeTab === tab.id
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 mr-2" />
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+      {/* Banner de vérification d'email */}
+      <div className="ml-64 relative z-10">
+        <div className="px-6 pt-4">
+          <EmailVerificationBanner />
         </div>
-      </header>
+      </div>
 
-      {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Statistiques rapides */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Target className="h-8 w-8 text-gray-400" />
-              </div>
-              <div className="ml-4">
-                <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
-                <div className="text-sm text-gray-500">Total violations</div>
-              </div>
-            </div>
-          </div>
+      {/* Sidebar */}
+      <Sidebar 
+        activeSection="history" 
+        onSectionChange={() => {}}
+      />
 
-          {Object.entries(statusConfig).map(([status, config]) => {
-            const Icon = config.icon;
-            const count = stats[status as keyof typeof stats];
-            return (
-              <div key={status} className="bg-white rounded-lg border border-gray-200 p-4">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Icon className={`h-8 w-8 ${config.textColor.replace('text-', 'text-')}`} />
-                  </div>
-                  <div className="ml-4">
-                    <div className="text-2xl font-bold text-gray-900">{count}</div>
-                    <div className="text-sm text-gray-500">{config.title}</div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Contenu des onglets */}
-        {activeTab === 'kanban' && (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={rectIntersection}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {Object.entries(statusConfig).map(([status, config]) => {
-                const cards = (management?.kanbanCards && Array.isArray(management.kanbanCards)) 
-                  ? management.kanbanCards.filter(card => card.status === status)
-                  : [];
-                
-                return (
-                  <DroppableColumn
-                    key={status}
-                    id={status}
-                    status={status}
-                    config={config}
-                    cards={cards}
-                    onCardClick={setSelectedCard}
-                  />
-                );
-              })}
-            </div>
-
-            <DragOverlay>
-              {activeId ? (
-                <div className="bg-white rounded-lg border-2 border-blue-400 p-3 shadow-2xl opacity-95 rotate-2 scale-105 transition-transform">
-                  {(() => {
-                    const draggedCard = (management?.kanbanCards && Array.isArray(management.kanbanCards))
-                      ? management.kanbanCards.find(card => card.id === activeId)
-                      : null;
-                    return draggedCard ? (
-                      <div>
-                        <div className="text-sm font-medium text-gray-900 mb-1">
-                          Critère {draggedCard.violation.criterion}
-                        </div>
-                        <div className="text-xs text-blue-600 font-medium">
-                          📦 En cours de déplacement...
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-sm font-medium text-gray-900">
-                        Glisser pour déplacer...
-                      </div>
-                    );
-                  })()}
-                </div>
-              ) : null}
-            </DragOverlay>
-          </DndContext>
-        )}
-
-        {activeTab === 'notes' && (
-          <div className="max-w-4xl mx-auto">
-            {/* Ajouter une note */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Ajouter une note</h3>
-              <div className="space-y-4">
-                <textarea
-                  value={newNoteContent}
-                  onChange={(e) => setNewNoteContent(e.target.value)}
-                  placeholder="Écrivez votre note ici... (Markdown supporté)"
-                  className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                
-                {/* Sélecteur de couleur pour nouvelle note */}
+      {/* Main Content */}
+      <main className="ml-64 relative z-10">
+        {/* En-tête avec bouton de retour */}
+        <header className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => router.push('/?section=history')}
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Retour à l'historique"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Palette className="w-4 h-4 inline mr-1" />
-                    Couleur de la note
-                  </label>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      type="button"
-                      onClick={() => setNewNoteColor(undefined)}
-                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 ${
-                        !newNoteColor ? 'border-gray-600 bg-white shadow-md' : 'border-gray-300 bg-gray-100 hover:border-gray-400'
-                      }`}
-                      title="Aucune couleur"
-                    >
-                      {!newNoteColor && <X className="w-3 h-3 text-gray-600" />}
-                    </button>
-                    {Object.entries(noteColorStyles).map(([color, styles]) => (
-                      <button
-                        key={color}
-                        type="button"
-                        onClick={() => setNewNoteColor(color as AuditNote['color'])}
-                        className={`w-8 h-8 rounded-full ${styles.accent} border-2 transition-all hover:scale-110 ${
-                          newNoteColor === color ? 'border-gray-800 shadow-lg' : 'border-gray-300 hover:border-gray-500'
-                        }`}
-                        title={color}
-                      />
-                    ))}
-                  </div>
+                  <h1 className="text-2xl font-bold text-gray-900">Gestion d'Audit</h1>
+                  <p className="text-sm text-gray-500">
+                    {auditData.url} • {new Date(management.lastUpdated).toLocaleDateString('fr-FR')}
+                  </p>
                 </div>
-                
-                <div className="flex justify-end">
-                  <button
-                    onClick={addNote}
-                    disabled={!newNoteContent.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Ajouter la note
-                  </button>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <div className="text-sm text-gray-500">
+                  Dernière modification: {new Date(management.lastUpdated).toLocaleString('fr-FR')}
                 </div>
               </div>
             </div>
 
-            {/* Liste des notes */}
-            <div className="space-y-4">
-              {management.notes.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                  <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune note</h3>
-                  <p className="text-gray-500">Commencez par ajouter une note ci-dessus.</p>
+            {/* Navigation par onglets */}
+            <div className="mt-6 border-b border-gray-200">
+              <nav className="flex space-x-8">
+                {[
+                  { id: 'kanban', label: 'Tableau Kanban', icon: Kanban },
+                  { id: 'notes', label: 'Notes', icon: FileText },
+                  { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+                  { id: 'manual', label: 'Audit manuel', icon: User },
+                  { id: 'guide', label: 'Guide d\'audit manuel', icon: Lightbulb }
+                ].map(tab => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id as any)}
+                      className={`flex items-center pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                        activeTab === tab.id
+                          ? 'border-blue-500 text-blue-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 mr-2" />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          </div>
+        </header>
+
+        {/* Contenu principal */}
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {/* Statistiques rapides */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Target className="h-8 w-8 text-gray-400" />
                 </div>
-              ) : (
-                management.notes.map(note => {
-                  const isEditing = editingNote === note.id;
-                  const noteStyle = note.color ? noteColorStyles[note.color] : { bg: 'bg-white', border: 'border-gray-200', accent: 'bg-gray-500' };
+                <div className="ml-4">
+                  <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+                  <div className="text-sm text-gray-500">Total violations</div>
+                </div>
+              </div>
+            </div>
+
+            {Object.entries(statusConfig).map(([status, config]) => {
+              const Icon = config.icon;
+              const count = stats[status as keyof typeof stats];
+              return (
+                <div key={status} className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <Icon className={`h-8 w-8 ${config.textColor.replace('text-', 'text-')}`} />
+                    </div>
+                    <div className="ml-4">
+                      <div className="text-2xl font-bold text-gray-900">{count}</div>
+                      <div className="text-sm text-gray-500">{config.title}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Contenu des onglets */}
+          {activeTab === 'kanban' && (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={rectIntersection}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {Object.entries(statusConfig).map(([status, config]) => {
+                  const cards = (management?.kanbanCards && Array.isArray(management.kanbanCards)) 
+                    ? management.kanbanCards.filter(card => card.status === status)
+                    : [];
                   
                   return (
-                    <div key={note.id} className={`rounded-lg border p-6 ${noteStyle.bg} ${noteStyle.border}`}>
+                    <DroppableColumn
+                      key={status}
+                      id={status}
+                      status={status}
+                      config={config}
+                      cards={cards}
+                      onCardClick={setSelectedCard}
+                    />
+                  );
+                })}
+              </div>
 
-                      
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="text-sm text-gray-500">
-                            {new Date(note.timestamp).toLocaleString('fr-FR')}
+              <DragOverlay>
+                {activeId ? (
+                  <div className="bg-white rounded-lg border-2 border-blue-400 p-3 shadow-2xl opacity-95 rotate-2 scale-105 transition-transform">
+                    {(() => {
+                      const draggedCard = (management?.kanbanCards && Array.isArray(management.kanbanCards))
+                        ? management.kanbanCards.find(card => card.id === activeId)
+                        : null;
+                      return draggedCard ? (
+                        <div>
+                          <div className="text-sm font-medium text-gray-900 mb-1">
+                            Critère {draggedCard.violation.criterion}
                           </div>
-                          {note.color && (
-                            <div className="flex items-center space-x-1">
-                              <div className={`w-3 h-3 rounded-full ${noteStyle.accent}`}></div>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          {!isEditing && (
-                            <>
-                              <button
-                                onClick={() => startEditNote(note)}
-                                className="text-blue-500 hover:text-blue-700 p-1 rounded transition-colors"
-                                title="Modifier"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </button>
-                              
-                              {/* Sélecteur rapide de couleur */}
-                              <div className="flex items-center space-x-1">
-                                <button
-                                  onClick={() => updateNoteColor(note.id, undefined)}
-                                  className="w-4 h-4 border border-gray-400 rounded-full bg-white hover:bg-gray-100 transition-colors"
-                                  title="Supprimer la couleur"
-                                >
-                                  <X className="w-2 h-2 text-gray-400 mx-auto" />
-                                </button>
-                                {Object.entries(noteColorStyles).slice(0, 5).map(([color, styles]) => (
-                                  <button
-                                    key={color}
-                                    onClick={() => updateNoteColor(note.id, color as AuditNote['color'])}
-                                    className={`w-4 h-4 rounded-full ${styles.accent} hover:scale-110 transition-transform ${
-                                      note.color === color ? 'ring-2 ring-gray-400' : ''
-                                    }`}
-                                    title={`Couleur ${color}`}
-                                  />
-                                ))}
-                              </div>
-                            </>
-                          )}
-                          
-                          <button
-                            onClick={() => deleteNote(note.id)}
-                            className="text-red-500 hover:text-red-700 p-1 rounded transition-colors"
-                            title="Supprimer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                      
-                      {isEditing ? (
-                        <div className="space-y-4">
-                          <textarea
-                            value={editNoteContent}
-                            onChange={(e) => setEditNoteContent(e.target.value)}
-                            className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          
-                          {/* Sélecteur de couleur pour édition */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              <Palette className="w-4 h-4 inline mr-1" />
-                              Couleur de la note
-                            </label>
-                            <div className="flex items-center space-x-2">
-                              <button
-                                type="button"
-                                onClick={() => setEditNoteColor(undefined)}
-                                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 ${
-                                  !editNoteColor ? 'border-gray-600 bg-white shadow-md' : 'border-gray-300 bg-gray-100 hover:border-gray-400'
-                                }`}
-                                title="Aucune couleur"
-                              >
-                                {!editNoteColor && <X className="w-2 h-2 text-gray-600" />}
-                              </button>
-                              {Object.entries(noteColorStyles).map(([color, styles]) => (
-                                <button
-                                  key={color}
-                                  type="button"
-                                  onClick={() => setEditNoteColor(color as AuditNote['color'])}
-                                  className={`w-6 h-6 rounded-full ${styles.accent} border-2 transition-all hover:scale-110 ${
-                                    editNoteColor === color ? 'border-gray-800 shadow-lg' : 'border-gray-300 hover:border-gray-500'
-                                  }`}
-                                  title={color}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-end space-x-2">
-                            <button
-                              onClick={cancelEditNote}
-                              className="px-3 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                            >
-                              Annuler
-                            </button>
-                            <button
-                              onClick={() => saveEditNote(note.id)}
-                              disabled={!editNoteContent.trim()}
-                              className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                            >
-                              <Save className="w-4 h-4 mr-2" />
-                              Sauvegarder
-                            </button>
+                          <div className="text-xs text-blue-600 font-medium">
+                            📦 En cours de déplacement...
                           </div>
                         </div>
                       ) : (
-                        <div className="prose prose-sm max-w-none">
-                          <div className="whitespace-pre-wrap text-gray-700">
-                            {note.content}
-                          </div>
+                        <div className="text-sm font-medium text-gray-900">
+                          Glisser pour déplacer...
                         </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        )}
+                      );
+                    })()}
+                  </div>
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          )}
 
-        {activeTab === 'dashboard' && (
-          <div className="space-y-8">
-            {/* Graphique de progression */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-6">Progression de l'audit</h3>
-              
+          {activeTab === 'notes' && (
+            <div className="max-w-4xl mx-auto">
+              {/* Ajouter une note */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Ajouter une note</h3>
+                <div className="space-y-4">
+                  <textarea
+                    value={newNoteContent}
+                    onChange={(e) => setNewNoteContent(e.target.value)}
+                    placeholder="Écrivez votre note ici... (Markdown supporté)"
+                    className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  
+                  {/* Sélecteur de couleur pour nouvelle note */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Palette className="w-4 h-4 inline mr-1" />
+                      Couleur de la note
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => setNewNoteColor(undefined)}
+                        className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 ${
+                          !newNoteColor ? 'border-gray-600 bg-white shadow-md' : 'border-gray-300 bg-gray-100 hover:border-gray-400'
+                        }`}
+                        title="Aucune couleur"
+                      >
+                        {!newNoteColor && <X className="w-3 h-3 text-gray-600" />}
+                      </button>
+                      {Object.entries(noteColorStyles).map(([color, styles]) => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => setNewNoteColor(color as AuditNote['color'])}
+                          className={`w-8 h-8 rounded-full ${styles.accent} border-2 transition-all hover:scale-110 ${
+                            newNoteColor === color ? 'border-gray-800 shadow-lg' : 'border-gray-300 hover:border-gray-500'
+                          }`}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <button
+                      onClick={addNote}
+                      disabled={!newNoteContent.trim()}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Ajouter la note
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Liste des notes */}
               <div className="space-y-4">
-                {/* Barre de progression globale */}
-                <div>
-                  <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>Progression globale</span>
-                    <span>{Math.round((stats.validated / stats.total) * 100)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${(stats.validated / stats.total) * 100}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Répartition par statut */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-                  {Object.entries(statusConfig).map(([status, config]) => {
-                    const count = stats[status as keyof typeof stats];
-                    const percentage = Math.round((count / stats.total) * 100);
-                    
-                    return (
-                      <div key={status} className="text-center">
-                        <div className={`text-2xl font-bold mb-1 ${config.textColor}`}>
-                          {count}
-                        </div>
-                        <div className="text-sm text-gray-500 mb-2">{config.title}</div>
-                        <div className="text-xs text-gray-400">{percentage}%</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Statistiques détaillées */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Répartition par priorité */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Répartition par priorité</h4>
-                <div className="space-y-3">
-                  {Object.entries(priorityColors).map(([priority, colorClass]) => {
-                    const count = (management?.kanbanCards && Array.isArray(management.kanbanCards))
-                      ? management.kanbanCards.filter(card => card.priority === priority).length
-                      : 0;
-                    const percentage = stats.total ? Math.round((count / stats.total) * 100) : 0;
-                    
-                    return (
-                      <div key={priority} className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <span className={`px-2 py-1 rounded-full text-xs border ${colorClass}`}>
-                            {priority}
-                          </span>
-                          <span className="ml-3 text-sm text-gray-600">{count} violations</span>
-                        </div>
-                        <span className="text-sm text-gray-500">{percentage}%</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Activité récente */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Activité récente</h4>
-                <div className="space-y-3">
-                  {(management?.kanbanCards && Array.isArray(management.kanbanCards) ? management.kanbanCards : [])
-                    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-                    .slice(0, 5)
-                    .map(card => (
-                      <div key={card.id} className="flex items-center space-x-3 text-sm">
-                        <div className={`w-2 h-2 rounded-full ${
-                          card.status === 'validated' ? 'bg-green-500' :
-                          card.status === 'inprogress' ? 'bg-blue-500' :
-                          card.status === 'postponed' ? 'bg-orange-500' : 'bg-gray-500'
-                        }`} />
-                        <span className="text-gray-600">
-                          Critère {card.violation.criterion} déplacé vers {statusConfig[card.status].title}
-                        </span>
-                        <span className="text-gray-400 text-xs">
-                          {new Date(card.updatedAt).toLocaleDateString('fr-FR')}
-                        </span>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'manual' && (
-          <div className="space-y-6">
-            {/* En-tête de l'audit manuel */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Audit manuel</h3>
-                  <p className="text-sm text-gray-600">
-                    Vérifiez manuellement chaque critère RGAA pour ce site web. 
-                    Utilisez cette section pour ajouter des violations personnalisées ou vérifier des aspects non couverts par l'analyse automatique.
-                  </p>
-                </div>
-                <div className="flex items-center space-x-4 text-sm">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">
-                      {(management?.kanbanCards || []).filter(card => card.violation.source === 'manual' && card.status === 'validated').length}
-                    </div>
-                    <div className="text-gray-500">Conformes</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">
-                      {(management?.kanbanCards || []).filter(card => card.violation.source === 'manual' && card.status !== 'validated').length}
-                    </div>
-                    <div className="text-gray-500">Non conformes</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Formulaire d'ajout de violation manuelle */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h4 className="text-lg font-medium text-gray-900 mb-4">Ajouter une violation manuelle</h4>
-              <ManualViolationForm 
-                onAddViolation={(violation) => {
-                  if (!management) return;
-                  
-                  const newCard: KanbanCard = {
-                    id: `manual-${Date.now()}-${Math.random()}`,
-                    violation: {
-                      ...violation,
-                      source: 'manual'
-                    },
-                    status: 'todo',
-                    priority: violation.impact === 'critical' ? 'critical' : 
-                             violation.impact === 'serious' ? 'high' : 
-                             violation.impact === 'moderate' ? 'medium' : 'low',
-                    notes: '',
-                    updatedAt: new Date().toISOString()
-                  };
-                  
-                  const updatedManagement = {
-                    ...management,
-                    kanbanCards: [...management.kanbanCards, newCard]
-                  };
-                  
-                  saveManagement(updatedManagement);
-                }}
-              />
-            </div>
-
-            {/* Liste des violations manuelles */}
-            <div className="bg-white rounded-lg border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <h4 className="text-lg font-medium text-gray-900">Violations ajoutées manuellement</h4>
-              </div>
-              <div className="p-6">
-                {(management?.kanbanCards || [])
-                  .filter(card => card.violation.source === 'manual')
-                  .length === 0 ? (
-                  <div className="text-center py-8">
-                    <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune violation manuelle</h3>
-                    <p className="text-gray-500">Ajoutez des violations personnalisées avec le formulaire ci-dessus.</p>
+                {management.notes.length === 0 ? (
+                  <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+                    <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune note</h3>
+                    <p className="text-gray-500">Commencez par ajouter une note ci-dessus.</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {(management?.kanbanCards || [])
-                      .filter(card => card.violation.source === 'manual')
-                      .map(card => (
-                        <div key={card.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-2">
-                                <span className="font-medium text-gray-900">
-                                  Critère {card.violation.criterion}
-                                </span>
-                                <span className={`px-2 py-1 rounded-full text-xs border ${priorityColors[card.priority]}`}>
-                                  {card.priority}
-                                </span>
-                                <span className={`px-2 py-1 rounded-full text-xs ${
-                                  card.status === 'validated' ? 'bg-green-100 text-green-800' :
-                                  card.status === 'inprogress' ? 'bg-blue-100 text-blue-800' :
-                                  card.status === 'postponed' ? 'bg-orange-100 text-orange-800' :
-                                  'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {statusConfig[card.status].title}
-                                </span>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-2">{card.violation.description}</p>
-                              {card.violation.element && (
-                                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                  {card.violation.element}
-                                </code>
-                              )}
+                  management.notes.map(note => {
+                    const isEditing = editingNote === note.id;
+                    const noteStyle = note.color ? noteColorStyles[note.color] : { bg: 'bg-white', border: 'border-gray-200', accent: 'bg-gray-500' };
+                    
+                    return (
+                      <div key={note.id} className={`rounded-lg border p-6 ${noteStyle.bg} ${noteStyle.border}`}>
+
+                        
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="text-sm text-gray-500">
+                              {new Date(note.timestamp).toLocaleString('fr-FR')}
                             </div>
+                            {note.color && (
+                              <div className="flex items-center space-x-1">
+                                <div className={`w-3 h-3 rounded-full ${noteStyle.accent}`}></div>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center space-x-2">
+                            {!isEditing && (
+                              <>
+                                <button
+                                  onClick={() => startEditNote(note)}
+                                  className="text-blue-500 hover:text-blue-700 p-1 rounded transition-colors"
+                                  title="Modifier"
+                                >
+                                  <Edit3 className="w-4 h-4" />
+                                </button>
+                                
+                                {/* Sélecteur rapide de couleur */}
+                                <div className="flex items-center space-x-1">
+                                  <button
+                                    onClick={() => updateNoteColor(note.id, undefined)}
+                                    className="w-4 h-4 border border-gray-400 rounded-full bg-white hover:bg-gray-100 transition-colors"
+                                    title="Supprimer la couleur"
+                                  >
+                                    <X className="w-2 h-2 text-gray-400 mx-auto" />
+                                  </button>
+                                  {Object.entries(noteColorStyles).slice(0, 5).map(([color, styles]) => (
+                                    <button
+                                      key={color}
+                                      onClick={() => updateNoteColor(note.id, color as AuditNote['color'])}
+                                      className={`w-4 h-4 rounded-full ${styles.accent} hover:scale-110 transition-transform ${
+                                        note.color === color ? 'ring-2 ring-gray-400' : ''
+                                      }`}
+                                      title={`Couleur ${color}`}
+                                    />
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                            
                             <button
-                              onClick={() => setSelectedCard(card)}
-                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                              onClick={() => deleteNote(note.id)}
+                              className="text-red-500 hover:text-red-700 p-1 rounded transition-colors"
+                              title="Supprimer"
                             >
-                              Modifier
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
-                      ))}
-                  </div>
+                        
+                        {isEditing ? (
+                          <div className="space-y-4">
+                            <textarea
+                              value={editNoteContent}
+                              onChange={(e) => setEditNoteContent(e.target.value)}
+                              className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            
+                            {/* Sélecteur de couleur pour édition */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <Palette className="w-4 h-4 inline mr-1" />
+                                Couleur de la note
+                              </label>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  type="button"
+                                  onClick={(e) => setEditNoteColor(undefined)}
+                                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 ${
+                                    !editNoteColor ? 'border-gray-600 bg-white shadow-md' : 'border-gray-300 bg-gray-100 hover:border-gray-400'
+                                  }`}
+                                  title="Aucune couleur"
+                                >
+                                  {!editNoteColor && <X className="w-2 h-2 text-gray-600" />}
+                                </button>
+                                {Object.entries(noteColorStyles).map(([color, styles]) => (
+                                  <button
+                                    key={color}
+                                    type="button"
+                                    onClick={(e) => setEditNoteColor(color as AuditNote['color'])}
+                                    className={`w-6 h-6 rounded-full ${styles.accent} border-2 transition-all hover:scale-110 ${
+                                      editNoteColor === color ? 'border-gray-800 shadow-lg' : 'border-gray-300 hover:border-gray-500'
+                                    }`}
+                                    title={color}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            
+                            <div className="flex justify-end space-x-2">
+                              <button
+                                onClick={cancelEditNote}
+                                className="px-3 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                              >
+                                Annuler
+                              </button>
+                              <button
+                                onClick={() => saveEditNote(note.id)}
+                                disabled={!editNoteContent.trim()}
+                                className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                              >
+                                <Save className="w-4 h-4 mr-2" />
+                                Sauvegarder
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="prose prose-sm max-w-none">
+                            <div className="whitespace-pre-wrap text-gray-700">
+                              {note.content}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === 'guide' && (
-          <div className="h-full">
-            <ManualAuditPage />
-          </div>
-        )}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-8">
+              {/* Graphique de progression */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-6">Progression de l'audit</h3>
+                
+                <div className="space-y-4">
+                  {/* Barre de progression globale */}
+                  <div>
+                    <div className="flex justify-between text-sm text-gray-600 mb-2">
+                      <span>Progression globale</span>
+                      <span>{Math.round((stats.validated / stats.total) * 100)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${(stats.validated / stats.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Répartition par statut */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+                    {Object.entries(statusConfig).map(([status, config]) => {
+                      const count = stats[status as keyof typeof stats];
+                      const percentage = Math.round((count / stats.total) * 100);
+                      
+                      return (
+                        <div key={status} className="text-center">
+                          <div className={`text-2xl font-bold mb-1 ${config.textColor}`}>
+                            {count}
+                          </div>
+                          <div className="text-sm text-gray-500 mb-2">{config.title}</div>
+                          <div className="text-xs text-gray-400">{percentage}%</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Statistiques détaillées */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Répartition par priorité */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">Répartition par priorité</h4>
+                  <div className="space-y-3">
+                    {Object.entries(priorityColors).map(([priority, colorClass]) => {
+                      const count = (management?.kanbanCards && Array.isArray(management.kanbanCards))
+                        ? management.kanbanCards.filter(card => card.priority === priority).length
+                        : 0;
+                      const percentage = stats.total ? Math.round((count / stats.total) * 100) : 0;
+                      
+                      return (
+                        <div key={priority} className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <span className={`px-2 py-1 rounded-full text-xs border ${colorClass}`}>
+                              {priority}
+                            </span>
+                            <span className="ml-3 text-sm text-gray-600">{count} violations</span>
+                          </div>
+                          <span className="text-sm text-gray-500">{percentage}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Activité récente */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">Activité récente</h4>
+                  <div className="space-y-3">
+                    {(management?.kanbanCards && Array.isArray(management.kanbanCards) ? management.kanbanCards : [])
+                      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+                      .slice(0, 5)
+                      .map(card => (
+                        <div key={card.id} className="flex items-center space-x-3 text-sm">
+                          <div className={`w-2 h-2 rounded-full ${
+                            card.status === 'validated' ? 'bg-green-500' :
+                            card.status === 'inprogress' ? 'bg-blue-500' :
+                            card.status === 'postponed' ? 'bg-orange-500' : 'bg-gray-500'
+                          }`} />
+                          <span className="text-gray-600">
+                            Critère {card.violation.criterion} déplacé vers {statusConfig[card.status].title}
+                          </span>
+                          <span className="text-gray-400 text-xs">
+                            {new Date(card.updatedAt).toLocaleDateString('fr-FR')}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'manual' && (
+            <div className="space-y-6">
+              {/* En-tête de l'audit manuel */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Audit manuel</h3>
+                    <p className="text-sm text-gray-600">
+                      Vérifiez manuellement chaque critère RGAA pour ce site web. 
+                      Utilisez cette section pour ajouter des violations personnalisées ou vérifier des aspects non couverts par l'analyse automatique.
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-4 text-sm">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">
+                        {(management?.kanbanCards || []).filter(card => card.violation.source === 'manual' && card.status === 'validated').length}
+                      </div>
+                      <div className="text-gray-500">Conformes</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">
+                        {(management?.kanbanCards || []).filter(card => card.violation.source === 'manual' && card.status !== 'validated').length}
+                      </div>
+                      <div className="text-gray-500">Non conformes</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Formulaire d'ajout de violation manuelle */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h4 className="text-lg font-medium text-gray-900 mb-4">Ajouter une violation manuelle</h4>
+                <ManualViolationForm 
+                  onAddViolation={addManualViolation}
+                />
+              </div>
+
+              {/* Liste des violations manuelles */}
+              <div className="bg-white rounded-lg border border-gray-200">
+                <div className="p-6 border-b border-gray-200">
+                  <h4 className="text-lg font-medium text-gray-900">Violations ajoutées manuellement</h4>
+                </div>
+                <div className="p-6">
+                  {(management?.kanbanCards || [])
+                    .filter(card => card.violation.source === 'manual')
+                    .length === 0 ? (
+                    <div className="text-center py-8">
+                      <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune violation manuelle</h3>
+                      <p className="text-gray-500">Ajoutez des violations personnalisées avec le formulaire ci-dessus.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {(management?.kanbanCards || [])
+                        .filter(card => card.violation.source === 'manual')
+                        .map(card => (
+                          <div key={card.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <span className="font-medium text-gray-900">
+                                    Critère {card.violation.criterion}
+                                  </span>
+                                  <span className={`px-2 py-1 rounded-full text-xs border ${priorityColors[card.priority]}`}>
+                                    {card.priority}
+                                  </span>
+                                  <span className={`px-2 py-1 rounded-full text-xs ${
+                                    card.status === 'validated' ? 'bg-green-100 text-green-800' :
+                                    card.status === 'inprogress' ? 'bg-blue-100 text-blue-800' :
+                                    card.status === 'postponed' ? 'bg-orange-100 text-orange-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {statusConfig[card.status].title}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-2">{card.violation.description}</p>
+                                {card.violation.element && (
+                                  <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                                    {card.violation.element}
+                                  </code>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => setSelectedCard(card)}
+                                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                              >
+                                Modifier
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'guide' && (
+            <div className="h-full">
+              <ManualAuditPage />
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Modal de détail de carte */}

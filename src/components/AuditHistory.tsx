@@ -19,7 +19,6 @@ interface HistoricalAudit {
 
 interface AuditHistoryProps {
   onResumeAudit: (auditData: { result: AuditResult | ComparativeResult; engine: 'wave' | 'axe' | 'rgaa' | 'all' }) => void;
-  onNewAuditFromHistory: (request: AuditRequest) => void;
 }
 
 const translations = {
@@ -30,7 +29,6 @@ const translations = {
     emptyDescription: 'Commencez par analyser un site web pour voir l\'historique apparaître ici.',
     searchPlaceholder: 'Rechercher par URL...',
     resumeAudit: 'Reprendre l\'audit',
-    newAudit: 'Nouvelle analyse',
     deleteAudit: 'Supprimer',
     confirmDelete: 'Êtes-vous sûr de vouloir supprimer cet audit ?',
     cancel: 'Annuler',
@@ -55,7 +53,6 @@ const translations = {
     emptyDescription: 'Start by analyzing a website to see the history appear here.',
     searchPlaceholder: 'Search by URL...',
     resumeAudit: 'Resume audit',
-    newAudit: 'New analysis',
     deleteAudit: 'Delete',
     confirmDelete: 'Are you sure you want to delete this audit?',
     cancel: 'Cancel',
@@ -75,7 +72,7 @@ const translations = {
   }
 };
 
-export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: AuditHistoryProps) {
+export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
   const { language } = useLanguage();
   const { user } = useAuth();
   const router = useRouter();
@@ -177,15 +174,6 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
     onResumeAudit({
       result: audit.result,
       engine: audit.engine
-    });
-  };
-
-  // Nouvelle analyse sur la même URL
-  const handleNewAudit = (url: string) => {
-    onNewAuditFromHistory({
-      url,
-      language,
-      engine: 'rgaa'
     });
   };
 
@@ -311,13 +299,6 @@ export default function AuditHistory({ onResumeAudit, onNewAuditFromHistory }: A
                     >
                       <Target className="w-5 h-5" />
                       <span className="font-medium">Gestion</span>
-                    </button>
-                    <button
-                      onClick={() => handleNewAudit(audit.url)}
-                      className="inline-flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <TrendingUp className="w-5 h-5" />
-                      <span className="font-medium">{t.newAudit}</span>
                     </button>
                   </div>
                 </div>

@@ -403,7 +403,7 @@ export default function Statistics({}: StatisticsProps) {
       </header>
 
       {/* Cartes de statistiques principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -412,18 +412,6 @@ export default function Statistics({}: StatisticsProps) {
             <div className="ml-4">
               <div className="text-2xl font-bold text-gray-900">{stats.totalAudits}</div>
               <div className="text-sm text-gray-500">{t.totalAudits}</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Target className="h-8 w-8 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900">{stats.averageViolations}</div>
-              <div className="text-sm text-gray-500">{t.averageViolations}</div>
             </div>
           </div>
         </div>
@@ -504,36 +492,37 @@ export default function Statistics({}: StatisticsProps) {
           <BarChart className="w-5 h-5 mr-2 text-purple-600" />
           {t.errorTypesByCriterion}
         </h3>
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {stats.errorTypesByCriterion.map((criterionData) => {
             const totalViolations = criterionData.impacts.reduce((sum, imp) => sum + imp.count, 0);
+            const maxCount = Math.max(...criterionData.impacts.map(imp => imp.count));
             
             return (
               <div key={criterionData.criterion} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-4">
                   <h4 className="font-semibold text-gray-900">Critère {criterionData.criterion}</h4>
                   <span className="text-sm text-gray-500">{totalViolations} {t.violations}</span>
                 </div>
                 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {criterionData.impacts.map((impact) => {
                     const percentage = Math.round((impact.count / totalViolations) * 100);
+                    const barHeight = maxCount > 0 ? (impact.count / maxCount) * 100 : 0;
                     
                     return (
-                      <div key={impact.impact} className="flex items-center">
-                        <div className="w-24 text-sm text-gray-600">
-                          {getImpactName(impact.impact)}
-                        </div>
-                        <div className="flex-1 mx-3">
-                          <div className="relative bg-gray-200 rounded-full h-4">
+                      <div key={impact.impact} className="flex items-end space-x-2">
+                        <div className="flex-1">
+                          <div className="text-xs text-gray-600 mb-1">{getImpactName(impact.impact)}</div>
+                          <div className="relative bg-gray-200 rounded-t h-20">
                             <div 
-                              className={`${getImpactColor(impact.impact)} h-4 rounded-full transition-all duration-300`}
-                              style={{ width: `${percentage}%` }}
+                              className={`${getImpactColor(impact.impact)} rounded-t transition-all duration-300 min-h-[4px]`}
+                              style={{ height: `${barHeight}%` }}
                             ></div>
                           </div>
                         </div>
-                        <div className="w-16 text-right text-sm font-medium text-gray-900">
-                          {impact.count} ({percentage}%)
+                        <div className="text-xs font-medium text-gray-900 text-center min-w-[40px]">
+                          <div>{impact.count}</div>
+                          <div className="text-gray-500">({percentage}%)</div>
                         </div>
                       </div>
                     );
