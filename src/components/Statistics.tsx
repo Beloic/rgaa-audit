@@ -37,13 +37,14 @@ const translations = {
     title: 'Statistiques de vos audits',
     subtitle: 'Analyse complète de vos performances et tendances',
     totalAudits: 'Total des audits',
-    averageScore: 'Score moyen',
+    averageViolations: 'Violations moyennes',
     totalViolations: 'Violations totales',
     complianceRate: 'Taux de conformité',
     recentActivity: 'Activité récente',
     engineBreakdown: 'Répartition par moteur',
     monthlyTrends: 'Tendances mensuelles',
     topViolations: 'Violations les plus fréquentes',
+    errorTypesByCriterion: 'Types d\'erreur par critère',
     performanceMetrics: 'Métriques de performance',
     noData: 'Aucune donnée disponible',
     startAuditing: 'Commencez par effectuer des audits pour voir vos statistiques',
@@ -54,7 +55,6 @@ const translations = {
     period: 'Période',
     audits: 'audits',
     violations: 'violations',
-    score: 'Score',
     date: 'Date',
     url: 'URL',
     engine: 'Moteur',
@@ -65,19 +65,24 @@ const translations = {
     critical: 'Critique',
     high: 'Élevé',
     medium: 'Moyen',
-    low: 'Faible'
+    low: 'Faible',
+    criterion: 'Critère',
+    errorType: 'Type d\'erreur',
+    count: 'Nombre',
+    percentage: 'Pourcentage'
   },
   en: {
     title: 'Your Audit Statistics',
     subtitle: 'Complete analysis of your performance and trends',
     totalAudits: 'Total audits',
-    averageScore: 'Average score',
+    averageViolations: 'Average violations',
     totalViolations: 'Total violations',
     complianceRate: 'Compliance rate',
     recentActivity: 'Recent activity',
     engineBreakdown: 'Engine breakdown',
     monthlyTrends: 'Monthly trends',
     topViolations: 'Most frequent violations',
+    errorTypesByCriterion: 'Error types by criterion',
     performanceMetrics: 'Performance metrics',
     noData: 'No data available',
     startAuditing: 'Start by performing audits to see your statistics',
@@ -88,7 +93,6 @@ const translations = {
     period: 'Period',
     audits: 'audits',
     violations: 'violations',
-    score: 'Score',
     date: 'Date',
     url: 'URL',
     engine: 'Engine',
@@ -99,7 +103,11 @@ const translations = {
     critical: 'Critical',
     high: 'High',
     medium: 'Medium',
-    low: 'Low'
+    low: 'Low',
+    criterion: 'Criterion',
+    errorType: 'Error type',
+    count: 'Count',
+    percentage: 'Percentage'
   }
 };
 
@@ -162,21 +170,20 @@ export default function Statistics({}: StatisticsProps) {
     if (filteredAudits.length === 0) {
       return {
         totalAudits: 0,
-        averageScore: 0,
+        averageViolations: 0,
         totalViolations: 0,
         complianceRate: 0,
         engineBreakdown: {},
         topViolations: [],
+        errorTypesByCriterion: [],
         monthlyData: []
       };
     }
 
     const totalAudits = filteredAudits.length;
-    const averageScore = Math.round(
-      filteredAudits.reduce((sum, audit) => sum + audit.score, 0) / totalAudits
-    );
     const totalViolations = filteredAudits.reduce((sum, audit) => sum + audit.totalViolations, 0);
-    const compliantAudits = filteredAudits.filter(audit => audit.score >= 100).length;
+    const averageViolations = Math.round(totalViolations / totalAudits);
+    const compliantAudits = filteredAudits.filter(audit => audit.totalViolations === 0).length;
     const complianceRate = Math.round((compliantAudits / totalAudits) * 100);
 
     // Répartition par moteur
@@ -201,38 +208,66 @@ export default function Statistics({}: StatisticsProps) {
       .slice(0, 10)
       .map(([criterion, count]) => ({ criterion, count }));
 
+    // Types d'erreur par critère
+    const errorTypesByCriterion: Record<string, Record<string, number>> = {};
+    filteredAudits.forEach(audit => {
+      if ('violations' in audit.result) {
+        audit.result.violations.forEach(violation => {
+          const criterion = violation.criterion || 'unknown';
+          const impact = violation.impact || 'unknown';
+          
+          if (!errorTypesByCriterion[criterion]) {
+            errorTypesByCriterion[criterion] = {};
+          }
+          
+          errorTypesByCriterion[criterion][impact] = (errorTypesByCriterion[criterion][impact] || 0) + 1;
+        });
+      }
+    });
+
+    const errorTypesArray = Object.entries(errorTypesByCriterion)
+      .map(([criterion, impacts]) => ({
+        criterion,
+        impacts: Object.entries(impacts).map(([impact, count]) => ({ impact, count }))
+      }))
+      .sort((a, b) => {
+        const totalA = a.impacts.reduce((sum, imp) => sum + imp.count, 0);
+        const totalB = b.impacts.reduce((sum, imp) => sum + imp.count, 0);
+        return totalB - totalA;
+      })
+      .slice(0, 15); // Top 15 critères
+
     // Données mensuelles pour les graphiques
     const monthlyData = filteredAudits.reduce((acc, audit) => {
       const date = new Date(audit.timestamp);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       
       if (!acc[monthKey]) {
-        acc[monthKey] = { audits: 0, violations: 0, scores: [] };
+        acc[monthKey] = { audits: 0, violations: 0 };
       }
       
       acc[monthKey].audits += 1;
       acc[monthKey].violations += audit.totalViolations;
-      acc[monthKey].scores.push(audit.score);
       
       return acc;
-    }, {} as Record<string, { audits: number; violations: number; scores: number[] }>);
+    }, {} as Record<string, { audits: number; violations: number }>);
 
     const monthlyDataArray = Object.entries(monthlyData)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([month, data]) => ({
         month,
         audits: data.audits,
-        violations: data.violations,
-        averageScore: Math.round(data.scores.reduce((sum, score) => sum + score, 0) / data.scores.length)
+        violations: data.violations
       }));
 
     return {
       totalAudits,
-      averageScore,
+      averageViolations,
       totalViolations,
       complianceRate,
       engineBreakdown,
       topViolations,
+      errorTypesByCriterion: errorTypesArray,
       monthlyData: monthlyDataArray
     };
   };
@@ -262,10 +297,36 @@ export default function Statistics({}: StatisticsProps) {
   };
 
   // Obtenir le statut de conformité
-  const getComplianceStatus = (score: number) => {
-    if (score >= 100) return { status: t.conform, color: 'text-green-600 bg-green-50' };
-    if (score >= 50) return { status: t.partiallyConform, color: 'text-yellow-600 bg-yellow-50' };
+  const getComplianceStatus = (violations: number) => {
+    if (violations === 0) return { status: t.conform, color: 'text-green-600 bg-green-50' };
+    if (violations <= 5) return { status: t.partiallyConform, color: 'text-yellow-600 bg-yellow-50' };
     return { status: t.nonConform, color: 'text-red-600 bg-red-50' };
+  };
+
+  // Obtenir la couleur pour le type d'impact
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'critical': return 'bg-red-600';
+      case 'serious': return 'bg-red-500';
+      case 'high': return 'bg-orange-500';
+      case 'moderate': return 'bg-yellow-500';
+      case 'medium': return 'bg-yellow-400';
+      case 'low': return 'bg-blue-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  // Obtenir le nom traduit de l'impact
+  const getImpactName = (impact: string) => {
+    switch (impact) {
+      case 'critical': return t.critical;
+      case 'serious': return t.critical;
+      case 'high': return t.high;
+      case 'moderate': return t.medium;
+      case 'medium': return t.medium;
+      case 'low': return t.low;
+      default: return impact;
+    }
   };
 
   if (isLoading) {
@@ -319,16 +380,23 @@ export default function Statistics({}: StatisticsProps) {
             
             {/* Sélecteur de période */}
             <div className="flex items-center space-x-2">
-              <select
-                value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value as '7d' | '30d' | '90d' | 'all')}
-                className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="7d">{t.last7Days}</option>
-                <option value="30d">{t.last30Days}</option>
-                <option value="90d">{t.last90Days}</option>
-                <option value="all">{t.allTime}</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={selectedPeriod}
+                  onChange={(e) => setSelectedPeriod(e.target.value as '7d' | '30d' | '90d' | 'all')}
+                  className="border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                >
+                  <option value="7d">{t.last7Days}</option>
+                  <option value="30d">{t.last30Days}</option>
+                  <option value="90d">{t.last90Days}</option>
+                  <option value="all">{t.allTime}</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -354,8 +422,8 @@ export default function Statistics({}: StatisticsProps) {
               <Target className="h-8 w-8 text-green-600" />
             </div>
             <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900">{stats.averageScore}%</div>
-              <div className="text-sm text-gray-500">{t.averageScore}</div>
+              <div className="text-2xl font-bold text-gray-900">{stats.averageViolations}</div>
+              <div className="text-sm text-gray-500">{t.averageViolations}</div>
             </div>
           </div>
         </div>
@@ -430,6 +498,53 @@ export default function Statistics({}: StatisticsProps) {
         </div>
       </div>
 
+      {/* Graphique des types d'erreur par critère */}
+      <div className="mt-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+          <BarChart className="w-5 h-5 mr-2 text-purple-600" />
+          {t.errorTypesByCriterion}
+        </h3>
+        <div className="space-y-6">
+          {stats.errorTypesByCriterion.map((criterionData) => {
+            const totalViolations = criterionData.impacts.reduce((sum, imp) => sum + imp.count, 0);
+            
+            return (
+              <div key={criterionData.criterion} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-semibold text-gray-900">Critère {criterionData.criterion}</h4>
+                  <span className="text-sm text-gray-500">{totalViolations} {t.violations}</span>
+                </div>
+                
+                <div className="space-y-2">
+                  {criterionData.impacts.map((impact) => {
+                    const percentage = Math.round((impact.count / totalViolations) * 100);
+                    
+                    return (
+                      <div key={impact.impact} className="flex items-center">
+                        <div className="w-24 text-sm text-gray-600">
+                          {getImpactName(impact.impact)}
+                        </div>
+                        <div className="flex-1 mx-3">
+                          <div className="relative bg-gray-200 rounded-full h-4">
+                            <div 
+                              className={`${getImpactColor(impact.impact)} h-4 rounded-full transition-all duration-300`}
+                              style={{ width: `${percentage}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        <div className="w-16 text-right text-sm font-medium text-gray-900">
+                          {impact.count} ({percentage}%)
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Tendances mensuelles */}
       <div className="mt-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
@@ -443,7 +558,6 @@ export default function Statistics({}: StatisticsProps) {
                 <th className="text-left py-3 px-4 font-medium text-gray-700">{t.period}</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">{t.audits}</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">{t.violations}</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">{t.averageScore}</th>
               </tr>
             </thead>
             <tbody>
@@ -452,9 +566,6 @@ export default function Statistics({}: StatisticsProps) {
                   <td className="py-3 px-4 text-gray-900">{data.month}</td>
                   <td className="py-3 px-4 text-gray-900 font-medium">{data.audits}</td>
                   <td className="py-3 px-4 text-gray-900">{data.violations}</td>
-                  <td className="py-3 px-4">
-                    <span className="font-medium text-gray-900">{data.averageScore}%</span>
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -475,13 +586,13 @@ export default function Statistics({}: StatisticsProps) {
                 <th className="text-left py-3 px-4 font-medium text-gray-700">{t.date}</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">{t.url}</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">{t.engine}</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">{t.score}</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700">{t.violations}</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">{t.status}</th>
               </tr>
             </thead>
             <tbody>
               {filteredAudits.slice(0, 10).map((audit) => {
-                const compliance = getComplianceStatus(audit.score);
+                const compliance = getComplianceStatus(audit.totalViolations);
                 return (
                   <tr key={audit.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4 text-gray-900">
@@ -496,7 +607,7 @@ export default function Statistics({}: StatisticsProps) {
                         <span className="ml-1 text-gray-700">{getEngineName(audit.engine)}</span>
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-gray-900 font-medium">{audit.score}%</td>
+                    <td className="py-3 px-4 text-gray-900 font-medium">{audit.totalViolations}</td>
                     <td className="py-3 px-4">
                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${compliance.color}`}>
                         {compliance.status}
