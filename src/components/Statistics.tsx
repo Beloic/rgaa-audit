@@ -68,7 +68,11 @@ const translations = {
     criterion: 'Critère',
     errorType: 'Type d\'erreur',
     count: 'Nombre',
-    percentage: 'Pourcentage'
+    percentage: 'Pourcentage',
+    loginRequired: 'Connexion requise',
+    loginRequiredDescription: 'Connectez-vous pour voir vos statistiques d\'audit.',
+    loading: 'Chargement des statistiques...',
+    comparative: 'Comparatif'
   },
   en: {
     title: 'Your Audit Statistics',
@@ -105,7 +109,11 @@ const translations = {
     criterion: 'Criterion',
     errorType: 'Error type',
     count: 'Count',
-    percentage: 'Percentage'
+    percentage: 'Percentage',
+    loginRequired: 'Login required',
+    loginRequiredDescription: 'Please log in to view your audit statistics.',
+    loading: 'Loading statistics...',
+    comparative: 'Comparative'
   }
 };
 
@@ -247,7 +255,7 @@ export default function Statistics({}: StatisticsProps) {
       case 'wave': return 'WAVE';
       case 'axe': return 'Axe Core';
       case 'rgaa': return 'RGAA';
-      case 'all': return 'Comparatif';
+      case 'all': return t.comparative;
       default: return engine.toUpperCase();
     }
   };
@@ -301,7 +309,7 @@ export default function Statistics({}: StatisticsProps) {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement des statistiques...</p>
+          <p className="text-gray-600">{t.loading}</p>
         </div>
       </div>
     );
@@ -312,8 +320,8 @@ export default function Statistics({}: StatisticsProps) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Connexion requise</h2>
-          <p className="text-gray-600">Connectez-vous pour voir vos statistiques d'audit.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t.loginRequired}</h2>
+          <p className="text-gray-600">{t.loginRequiredDescription}</p>
         </div>
       </div>
     );
@@ -444,7 +452,7 @@ export default function Statistics({}: StatisticsProps) {
                   <span className="w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-xs font-bold mr-3">
                     {index + 1}
                   </span>
-                  <span className="font-medium text-gray-700">Critère {violation.criterion}</span>
+                  <span className="font-medium text-gray-700">{t.criterion} {violation.criterion}</span>
                 </div>
                 <span className="text-lg font-bold text-gray-900">{violation.count}</span>
               </div>
