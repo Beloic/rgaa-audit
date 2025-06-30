@@ -506,6 +506,7 @@ export default function AuditManagementPage() {
 
   // États pour la gestion de la visibilité de la navigation
   const [hideNav, setHideNav] = useState(false);
+  const [showContent, setShowContent] = useState(false);
 
   // Charger les données d'audit et de gestion
   useEffect(() => {
@@ -881,7 +882,11 @@ export default function AuditManagementPage() {
 
   useEffect(() => {
     setTimeout(() => setHideNav(true), 100); // Laisse le temps à l'animation de démarrer
-    return () => setHideNav(false);
+    setTimeout(() => setShowContent(true), 100); // Affiche le contenu avec animation
+    return () => {
+      setHideNav(false);
+      setShowContent(false);
+    };
   }, []);
 
   if (isLoading) {
@@ -941,8 +946,8 @@ export default function AuditManagementPage() {
       <div className={`fixed left-0 top-16 h-[calc(100vh-4rem)] z-40 transition-all duration-500 ${hideNav ? 'opacity-0 -translate-x-20 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
         <Sidebar activeSection="history" onSectionChange={() => {}} />
       </div>
-      {/* Main Content */}
-      <main className="ml-64">
+      {/* Main Content animé */}
+      <main className={`ml-64 transition-all duration-500 ${showContent ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'}`}>
         {/* En-tête avec bouton de retour */}
         <header className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6 py-6">
