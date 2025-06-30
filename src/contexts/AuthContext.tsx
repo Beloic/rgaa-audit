@@ -129,6 +129,7 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (updates: Partial<User>) => void;
+  refreshUserData: () => Promise<void>;
   quitBeta: () => Promise<void>;
   hasBetaAccess: () => boolean;
   canPerformAudit: () => boolean;
@@ -234,6 +235,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fonction pour rafraîchir les données utilisateur depuis la base
+  const refreshUserData = async () => {
+    if (!user) return;
+    
+    try {
+      if (USE_API) {
+        // En mode API, récupérer les données depuis Supabase
+        const response = await fetch('/api/user/refresh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email }),
+        });
+        
+        if (response.ok) {
+          const refreshedUser = await response.json();
+          setUser(refreshedUser);
+          localStorage.setItem('rgaa-user', JSON.stringify(refreshedUser));
+          console.log('✅ Données utilisateur rafraîchies depuis Supabase');
+        }
+      } else {
+        // En mode localStorage, synchroniser avec les données persistantes
+        const persistentUser = getUserByEmail(user.email);
+        if (persistentUser) {
+          const syncedUser = {
+            ...persistentUser,
+            lastLoginAt: user.lastLoginAt
+          };
+          setUser(syncedUser);
+          localStorage.setItem('rgaa-user', JSON.stringify(syncedUser));
+          console.log('✅ Données utilisateur rafraîchies depuis localStorage');
+        }
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors du rafraîchissement utilisateur:', error);
+    }
+  };
+
   // Charger l'utilisateur depuis localStorage (session)
   useEffect(() => {
     const loadUser = async () => {
@@ -270,6 +308,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     loadUser();
   }, []);
+
+  // Rafraîchir automatiquement les données toutes les 30 secondes
+  useEffect(() => {
+    if (!user) return;
+
+    const interval = setInterval(() => {
+      refreshUserData();
+    }, 30000); // 30 secondes
+
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // Rafraîchir lors du focus de la fenêtre (retour sur l'onglet)
+  useEffect(() => {
+    if (!user) return;
+
+    const handleFocus = () => {
+      refreshUserData();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user]);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -512,6 +573,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     register,
     logout,
     updateUser,
+    refreshUserData,
     quitBeta,
     hasBetaAccess,
     canPerformAudit,

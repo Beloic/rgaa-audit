@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, LogOut, ChevronDown } from 'lucide-react';
+import { Shield, LogOut, ChevronDown, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import AuthModal from '@/components/AuthModal';
 
@@ -17,11 +17,12 @@ interface TopBarProps {
 export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick }: TopBarProps) {
   const pathname = usePathname();
   const { language, setLanguage } = useLanguage();
-  const { user, isAuthenticated, logout: authLogout, getRemainingAudits, getCurrentPlan } = useAuth();
+  const { user, isAuthenticated, logout: authLogout, getRemainingAudits, getCurrentPlan, refreshUserData } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Écouter les événements d'ouverture de la modal d'authentification
   useEffect(() => {
@@ -59,6 +60,19 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
       return `${baseClasses} text-blue-600 hover:text-blue-700 focus:text-blue-700`;
     }
     return `${baseClasses} text-gray-600 hover:text-gray-900 focus:text-gray-900`;
+  };
+
+  const handleRefreshData = async () => {
+    if (isRefreshing) return;
+    
+    setIsRefreshing(true);
+    try {
+      await refreshUserData();
+    } catch (error) {
+      console.error('Erreur lors du rafraîchissement:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const handleSectionClick = (section: 'home' | 'analyze' | 'rgaa-reference') => {
@@ -238,7 +252,17 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                         </div>
                       </div>
 
-
+                      {/* Section rafraîchissement */}
+                      <div className="border-t border-gray-100 py-2">
+                        <button
+                          onClick={handleRefreshData}
+                          disabled={isRefreshing}
+                          className="w-full px-4 py-2.5 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center space-x-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                          <span className="font-medium">{isRefreshing ? 'Actualisation...' : 'Actualiser les données'}</span>
+                        </button>
+                      </div>
                       
                       {/* Section déconnexion */}
                       <div className="border-t border-gray-100 py-2">
