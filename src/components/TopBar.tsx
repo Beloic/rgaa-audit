@@ -135,6 +135,13 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                 Blog
               </Link>
               <Link 
+                href="/tarifs"
+                className={getLinkClasses('/tarifs')}
+                aria-current={isActive('/tarifs') ? 'page' : undefined}
+              >
+                Tarifs
+              </Link>
+              <Link 
                 href="/quiz"
                 className={getLinkClasses('/quiz')}
                 aria-current={isActive('/quiz') ? 'page' : undefined}
