@@ -13,7 +13,6 @@ import {
 
 export default function TarifsPage() {
   const { user, isAuthenticated, getCurrentPlan } = useAuth();
-  const [isAnnual, setIsAnnual] = useState(false);
   const currentPlan = user ? getCurrentPlan() : null;
 
   const getPlanIcon = (planId: string) => {
@@ -22,8 +21,6 @@ export default function TarifsPage() {
         return <Zap className="w-6 h-6" />;
       case 'pro':
         return <Crown className="w-6 h-6" />;
-      case 'enterprise':
-        return <Building2 className="w-6 h-6" />;
       default:
         return <Shield className="w-6 h-6" />;
     }
@@ -31,35 +28,45 @@ export default function TarifsPage() {
 
   const getFeatureIcon = (feature: string) => {
     if (feature.includes('audit')) return <BarChart3 className="w-4 h-4" />;
-    if (feature.includes('équipe') || feature.includes('membre')) return <Users className="w-4 h-4" />;
+    if (feature.includes('kanban')) return <Check className="w-4 h-4" />;
+    if (feature.includes('note')) return <Check className="w-4 h-4" />;
     if (feature.includes('support')) return <HeadphonesIcon className="w-4 h-4" />;
-    if (feature.includes('API')) return <Key className="w-4 h-4" />;
-    if (feature.includes('white-label') || feature.includes('White-label')) return <Palette className="w-4 h-4" />;
-    if (feature.includes('SLA') || feature.includes('on-premise')) return <Shield className="w-4 h-4" />;
-    if (feature.includes('historique') || feature.includes('Historique')) return <Clock className="w-4 h-4" />;
+    if (feature.includes('historique')) return <Clock className="w-4 h-4" />;
     return <Check className="w-4 h-4" />;
   };
 
-  const formatPrice = (price: number) => {
-    if (price === 0) return 'Gratuit';
-    const finalPrice = isAnnual ? Math.round(price * 10) : price; // -20% si annuel
-    return `${finalPrice}€`;
+  const formatPrice = (price: number, planId: string) => {
+    if (planId === 'free') return '0€ par mois';
+    return `${price}€ par mois`;
   };
+
+  const plans = PRICING_PLANS.filter(plan => plan.id === 'free' || plan.id === 'pro').map(plan => {
+    if (plan.id === 'pro') {
+      return {
+        ...plan,
+        features: [
+          'Audits illimités',
+          'Gestion des audits',
+          'Tableau Kanban',
+          'Prise de note',
+          'Audit manuel',
+          'Support prioritaire',
+          'Historique illimité'
+        ]
+      };
+    }
+    return plan;
+  });
 
   const handleSelectPlan = (planId: string) => {
     if (!isAuthenticated) {
-      // Rediriger vers la page d'inscription avec le plan sélectionné
       window.location.href = `/auth/register?plan=${planId}`;
       return;
     }
-
     if (planId === 'free') {
-      // Downgrade vers gratuit
       alert('Fonctionnalité en cours de développement');
       return;
     }
-
-    // Rediriger vers Stripe pour l'upgrade
     alert(`Redirection vers le paiement pour le plan ${planId}`);
   };
 
@@ -84,48 +91,21 @@ export default function TarifsPage() {
             Choisissez le plan qui correspond à vos besoins. Commencez gratuitement, 
             évoluez quand vous voulez, annulez à tout moment.
           </p>
-
-          {/* Toggle Mensuel/Annuel */}
-          <div className="flex items-center justify-center space-x-4 mb-12">
-            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Mensuel
-            </span>
-            <button
-              onClick={() => setIsAnnual(!isAnnual)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                isAnnual ? 'bg-blue-600' : 'bg-gray-200'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isAnnual ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-            <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Annuel
-            </span>
-            {isAnnual && (
-              <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                -20%
-              </span>
-            )}
-          </div>
         </div>
       </section>
 
       {/* Pricing Cards */}
       <section className="pb-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-8">
-            {PRICING_PLANS.map((plan) => {
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center items-center">
+            {plans.map((plan) => {
               const isCurrentPlan = currentPlan?.id === plan.id;
               const isPopular = plan.popular;
               
               return (
                 <div
                   key={plan.id}
-                  className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
+                  className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:shadow-2xl hover:scale-105 flex flex-col items-center justify-between ${
                     isPopular
                       ? 'border-blue-500 shadow-blue-100'
                       : 'border-gray-200'
@@ -153,7 +133,7 @@ export default function TarifsPage() {
                     </div>
                   )}
 
-                  <div className="p-8">
+                  <div className="p-8 w-full flex flex-col items-center">
                     {/* Header du plan */}
                     <div className="text-center mb-8">
                       <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
@@ -169,24 +149,14 @@ export default function TarifsPage() {
                       
                       <div className="mb-4">
                         <span className="text-4xl font-bold text-gray-900">
-                          {formatPrice(plan.price)}
+                          {formatPrice(plan.price, plan.id)}
                         </span>
-                        {plan.price > 0 && (
-                          <span className="text-gray-500 text-sm">
-                            /{isAnnual ? 'an' : 'mois'}
-                          </span>
-                        )}
+                        <span className="text-gray-500 text-sm"> /mois</span>
                       </div>
-
-                      {isAnnual && plan.price > 0 && (
-                        <div className="text-sm text-green-600 font-medium">
-                          Économisez {Math.round(plan.price * 2.4)}€ par an
-                        </div>
-                      )}
                     </div>
 
                     {/* Fonctionnalités */}
-                    <div className="space-y-4 mb-8">
+                    <div className="space-y-4 mb-8 w-full">
                       {plan.features.map((feature, index) => (
                         <div key={index} className="flex items-start space-x-3">
                           <div className="flex-shrink-0 mt-0.5">
@@ -219,25 +189,12 @@ export default function TarifsPage() {
                       ) : (
                         <>
                           <span>
-                            {plan.id === 'free' ? 'Commencer gratuitement' : 
-                             plan.id === 'pro' ? 'Passer au Pro' : 
-                             'Contacter les ventes'}
+                            {plan.id === 'free' ? 'Commencer gratuitement' : 'Passer au Pro'}
                           </span>
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
                     </button>
-
-                    {plan.id === 'enterprise' && (
-                      <div className="text-center mt-4">
-                        <Link 
-                          href="/contact"
-                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                        >
-                          Ou contactez-nous pour un devis personnalisé
-                        </Link>
-                      </div>
-                    )}
                   </div>
                 </div>
               );
@@ -286,16 +243,6 @@ export default function TarifsPage() {
               <p className="text-gray-600">
                 Le plan gratuit vous permet de tester nos fonctionnalités de base. 
                 Les plans payants incluent une garantie de remboursement de 30 jours.
-              </p>
-            </div>
-
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Comment fonctionne la facturation annuelle ?
-              </h3>
-              <p className="text-gray-600">
-                La facturation annuelle vous fait économiser 20%. 
-                Vous payez une fois par an et bénéficiez d'une réduction automatique.
               </p>
             </div>
 
