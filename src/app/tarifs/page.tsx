@@ -21,6 +21,8 @@ export default function TarifsPage() {
         return <Zap className="w-6 h-6" />;
       case 'pro':
         return <Crown className="w-6 h-6" />;
+      case 'enterprise':
+        return <Building2 className="w-6 h-6" />;
       default:
         return <Shield className="w-6 h-6" />;
     }
@@ -32,15 +34,17 @@ export default function TarifsPage() {
     if (feature.includes('note')) return <Check className="w-4 h-4" />;
     if (feature.includes('support')) return <HeadphonesIcon className="w-4 h-4" />;
     if (feature.includes('historique')) return <Clock className="w-4 h-4" />;
+    if (feature.includes('intégration')) return <Globe className="w-4 h-4" />;
     return <Check className="w-4 h-4" />;
   };
 
   const formatPrice = (price: number, planId: string) => {
-    if (planId === 'free') return '0€ par mois';
-    return `${price}€ par mois`;
+    if (planId === 'free') return '0€/mois';
+    if (planId === 'enterprise') return 'Sur devis';
+    return `${price}€/mois`;
   };
 
-  const plans = PRICING_PLANS.filter(plan => plan.id === 'free' || plan.id === 'pro').map(plan => {
+  const plans = PRICING_PLANS.filter(plan => plan.id === 'free' || plan.id === 'pro' || plan.id === 'enterprise').map(plan => {
     if (plan.id === 'pro') {
       return {
         ...plan,
@@ -55,6 +59,21 @@ export default function TarifsPage() {
         ]
       };
     }
+    if (plan.id === 'enterprise') {
+      return {
+        ...plan,
+        features: [
+          'Audits illimités',
+          'Gestion des audits',
+          'Tableau Kanban',
+          'Prise de note',
+          'Audit manuel',
+          'Support prioritaire',
+          'Historique illimité',
+          'Intégration directe dans vos systèmes'
+        ]
+      };
+    }
     return plan;
   });
 
@@ -65,6 +84,10 @@ export default function TarifsPage() {
     }
     if (planId === 'free') {
       alert('Fonctionnalité en cours de développement');
+      return;
+    }
+    if (planId === 'enterprise') {
+      window.location.href = '/contact';
       return;
     }
     alert(`Redirection vers le paiement pour le plan ${planId}`);
@@ -96,8 +119,8 @@ export default function TarifsPage() {
 
       {/* Pricing Cards */}
       <section className="pb-20">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center items-center">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center">
             {plans.map((plan) => {
               const isCurrentPlan = currentPlan?.id === plan.id;
               const isPopular = plan.popular;
@@ -151,7 +174,6 @@ export default function TarifsPage() {
                         <span className="text-4xl font-bold text-gray-900">
                           {formatPrice(plan.price, plan.id)}
                         </span>
-                        <span className="text-gray-500 text-sm"> /mois</span>
                       </div>
                     </div>
 
@@ -189,7 +211,7 @@ export default function TarifsPage() {
                       ) : (
                         <>
                           <span>
-                            {plan.id === 'free' ? 'Commencer gratuitement' : 'Passer au Pro'}
+                            {plan.id === 'free' ? 'Commencer gratuitement' : plan.id === 'pro' ? 'Passer au Pro' : 'Contacter les ventes'}
                           </span>
                           <ArrowRight className="w-4 h-4" />
                         </>
@@ -223,26 +245,6 @@ export default function TarifsPage() {
               <p className="text-gray-600">
                 Oui, vous pouvez passer à un plan supérieur ou inférieur à tout moment. 
                 Les changements prennent effet immédiatement et nous calculons la facturation au prorata.
-              </p>
-            </div>
-
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Que se passe-t-il si je dépasse ma limite d'audits ?
-              </h3>
-              <p className="text-gray-600">
-                Nous vous notifierons lorsque vous approchez de votre limite. 
-                Vous pouvez soit attendre le mois suivant, soit passer à un plan supérieur pour continuer.
-              </p>
-            </div>
-
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Y a-t-il une période d'essai gratuite ?
-              </h3>
-              <p className="text-gray-600">
-                Le plan gratuit vous permet de tester nos fonctionnalités de base. 
-                Les plans payants incluent une garantie de remboursement de 30 jours.
               </p>
             </div>
 
