@@ -78,7 +78,7 @@ export default function TarifsPage() {
       {/* Pricing Cards */}
       <section className="pb-20">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-stretch">
             {plans.map((plan) => {
               const isCurrentPlan = currentPlan?.id === plan.id;
               const isPopular = plan.popular;
@@ -86,7 +86,7 @@ export default function TarifsPage() {
               return (
                 <div
                   key={plan.id}
-                  className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 flex flex-col items-center justify-between h-full min-h-[600px] ${
+                  className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 flex flex-col h-full min-h-[480px] ${
                     isPopular
                       ? 'border-blue-500 shadow-blue-100'
                       : 'border-gray-200'
@@ -104,9 +104,7 @@ export default function TarifsPage() {
                     </div>
                   )}
 
-
-
-                  <div className="p-8 w-full flex flex-col items-center flex-1">
+                  <div className="p-8 w-full flex flex-col flex-1">
                     {/* Header du plan */}
                     <div className="text-center mb-8">
                       <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
@@ -141,40 +139,42 @@ export default function TarifsPage() {
                       ))}
                     </div>
 
-                    {/* Bouton CTA */}
-                    <button
-                      onClick={() => {
-                        if (plan.id === 'free') {
-                          window.location.href = '/auth/register?plan=free';
-                        } else if (plan.id === 'pro') {
-                          window.open(STRIPE_PRO_LINK, '_blank', 'noopener,noreferrer');
-                        } else {
-                          window.location.href = getContactMailto();
-                        }
-                      }}
-                      disabled={isCurrentPlan}
-                      className={`w-full py-3 px-6 rounded-lg font-medium transition-all duration-300 flex items-center justify-center space-x-2 ${
-                        isCurrentPlan
-                          ? 'bg-green-50 text-green-700 border border-green-200 cursor-default'
-                          : isPopular
-                          ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
-                          : 'bg-gray-50 text-gray-900 border border-gray-200 hover:bg-gray-100 hover:border-gray-300'
-                      }`}
-                    >
-                      {isCurrentPlan ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          <span>Plan actuel</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>
-                            {plan.id === 'free' ? 'Commencer gratuitement' : plan.id === 'pro' ? 'Démarrer' : 'Demander un devis'}
-                          </span>
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </button>
+                    <div className="mt-auto pt-2">
+                      {/* Bouton CTA */}
+                      <button
+                        onClick={() => {
+                          if (plan.id === 'free') {
+                            window.location.href = '/auth/register?plan=free';
+                          } else if (plan.id === 'pro') {
+                            window.open(STRIPE_PRO_LINK, '_blank', 'noopener,noreferrer');
+                          } else {
+                            window.location.href = getContactMailto();
+                          }
+                        }}
+                        disabled={isCurrentPlan}
+                        className={`w-full py-3 px-6 rounded-lg font-medium transition-all duration-300 flex items-center justify-center space-x-2 ${
+                          isCurrentPlan
+                            ? 'bg-green-50 text-green-700 border border-green-200 cursor-default'
+                            : isPopular
+                            ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
+                            : 'bg-gray-50 text-gray-900 border border-gray-200 hover:bg-gray-100 hover:border-gray-300'
+                        }`}
+                      >
+                        {isCurrentPlan ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            <span>Plan actuel</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>
+                              {plan.id === 'free' ? 'Commencer gratuitement' : plan.id === 'pro' ? 'Démarrer' : 'Demander un devis'}
+                            </span>
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               );

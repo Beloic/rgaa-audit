@@ -7,7 +7,7 @@ import {
   Clock, CheckCircle, Circle, AlertCircle, Target, 
   BarChart3, FileText, Kanban, Settings,
   MessageSquare, Flag, User, Archive, Image, Upload, X, Palette, Lightbulb,
-  Filter, Search, Download, Share2, Eye, EyeOff, Star, StarOff, AlertTriangle, Info, HelpCircle, Zap, Shield, Cpu, BarChart, BookOpen
+  Filter, Search, Download, Share2, Eye, EyeOff, Star, StarOff, AlertTriangle, Info, HelpCircle, Zap, Shield, Cpu, BookOpen
 } from 'lucide-react';
 import {
   DndContext,
@@ -983,7 +983,7 @@ export default function AuditManagementPage() {
                   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                   { id: 'manual', label: 'Audit manuel', icon: User },
                   { id: 'guide', label: 'Guide d\'audit manuel', icon: Lightbulb },
-                  { id: 'rgaa', label: 'Référentiel RGAA', icon: BookOpen }
+                  { id: 'rgaa', label: 'Référentiel RGAA', icon: BookOpen },
                 ].map(tab => {
                   const Icon = tab.icon;
                   return (
@@ -1001,6 +1001,14 @@ export default function AuditManagementPage() {
                     </button>
                   );
                 })}
+                {/* Onglet Statistiques */}
+                <button
+                  onClick={() => router.push('/?section=statistics')}
+                  className="flex items-center pb-4 px-1 border-b-2 font-medium text-sm transition-colors text-gray-500 hover:text-blue-600 hover:border-blue-500"
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Statistiques
+                </button>
               </nav>
             </div>
           </div>
