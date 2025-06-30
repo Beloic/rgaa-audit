@@ -304,75 +304,43 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
               <div className="px-6 py-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {/* Moteur d'analyse utilisé */}
-                  <div className="text-center">
-                    <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full mb-3 transition-transform hover:scale-105 ${
-                      audit.engine === 'rgaa' 
-                        ? 'bg-gradient-to-br from-green-50 to-green-100' 
-                        : audit.engine === 'wave'
-                        ? 'bg-gradient-to-br from-blue-50 to-blue-100'
-                        : audit.engine === 'axe'
-                        ? 'bg-gradient-to-br from-purple-50 to-purple-100'
-                        : 'bg-gradient-to-br from-indigo-50 to-indigo-100'
-                    }`}>
-                      <div className="flex flex-col items-center justify-center">
-                        <div className={`mb-1 flex justify-center ${
-                          audit.engine === 'rgaa' ? 'text-green-600' :
-                          audit.engine === 'wave' ? 'text-blue-600' :
-                          audit.engine === 'axe' ? 'text-purple-600' :
-                          'text-indigo-600'
-                        }`}>
-                          {getEngineIcon(audit.engine, "w-8 h-8")}
-                        </div>
-                        <div className={`text-xs font-bold text-center ${
-                          audit.engine === 'rgaa' ? 'text-green-600' :
-                          audit.engine === 'wave' ? 'text-blue-600' :
-                          audit.engine === 'axe' ? 'text-purple-600' :
-                          'text-indigo-600'
-                        }`}>
-                          {getEngineName(audit.engine)}
-                        </div>
-                      </div>
+                  <div className="flex flex-col items-center justify-center p-0">
+                    <div className="bg-purple-50 border border-purple-100 rounded-xl shadow w-full py-6 flex flex-col items-center mb-2">
+                      <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-purple-200/60 text-purple-700 mb-2">
+                        {getEngineIcon(audit.engine, "w-6 h-6")}
+                      </span>
+                      <span className="text-sm font-semibold text-purple-800" style={{fontFamily: 'inherit'}}>{getEngineName(audit.engine)}</span>
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Moteur d'analyse</p>
+                    <span className="text-xs text-gray-500 mt-1">Moteur d'analyse</span>
                   </div>
-
-                  {/* Violations avec indicateur visuel amélioré */}
-                  <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-red-50 to-red-100 mb-3 transition-transform hover:scale-105">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-red-600 mb-1">
-                          {audit.totalViolations}
-                        </div>
-                        <div className="text-xs text-red-500 font-medium">
-                          issues
-                        </div>
-                      </div>
+                  {/* Violations */}
+                  <div className="flex flex-col items-center justify-center p-0">
+                    <div className="bg-red-50 border border-red-100 rounded-xl shadow w-full py-6 flex flex-col items-center mb-2">
+                      <span className="text-2xl font-extrabold text-red-700 mb-1" style={{fontFamily: 'inherit'}}>{audit.totalViolations}</span>
+                      <span className="text-xs font-medium text-red-600" style={{fontFamily: 'inherit'}}>violations</span>
                     </div>
-                    <p className="text-sm font-medium text-gray-600">{t.violations} détectées</p>
+                    <span className="text-xs text-gray-500 mt-1">Violations détectées</span>
                   </div>
-
                   {/* Statut de conformité */}
-                  <div className="text-center">
-                    <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full mb-3 transition-transform hover:scale-105 ${
+                  <div className="flex flex-col items-center justify-center p-0">
+                    <div className={`rounded-xl shadow w-full py-6 flex flex-col items-center mb-2 border ${
                       audit.score >= 100 
-                        ? 'bg-gradient-to-br from-green-50 to-green-100' 
+                        ? 'bg-green-50 border-green-100' 
                         : audit.score >= 50 
-                        ? 'bg-gradient-to-br from-orange-50 to-orange-100'
-                        : 'bg-gradient-to-br from-red-50 to-red-100'
+                        ? 'bg-orange-50 border-orange-100'
+                        : 'bg-red-50 border-red-100'
                     }`}>
-                      <div className="text-center px-2">
-                        <div className={`text-xs font-bold leading-tight ${
-                          audit.score >= 100 ? 'text-green-600' :
-                          audit.score >= 50 ? 'text-orange-600' :
-                          'text-red-600'
-                        }`}>
-                          {audit.score >= 100 ? 'Conforme' :
-                           audit.score >= 50 ? 'Partiellement conforme' :
-                           'Non conforme'}
-                        </div>
-                      </div>
+                      <span className={`text-sm font-bold mb-1 ${
+                        audit.score >= 100 ? 'text-green-700' :
+                        audit.score >= 50 ? 'text-orange-700' :
+                        'text-red-700'
+                      }`} style={{fontFamily: 'inherit'}}>
+                        {audit.score >= 100 ? 'Conforme' :
+                         audit.score >= 50 ? 'Partiellement conforme' :
+                         'Non conforme'}
+                      </span>
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Statut de conformité</p>
+                    <span className="text-xs text-gray-500 mt-1">Statut de conformité</span>
                   </div>
                 </div>
               </div>
@@ -412,11 +380,11 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center mb-3">
+              <h1 className="text-4xl font-bold text-gray-900 flex items-center mb-3" style={{fontFamily: 'inherit'}}>
                 <Clock className="w-10 h-10 mr-4 text-blue-600" />
                 {t.title}
               </h1>
-              <p className="text-gray-600 text-lg">{t.subtitle}</p>
+              <p className="text-gray-600 text-lg" style={{fontFamily: 'inherit'}}>{t.subtitle}</p>
               
               {/* Message si utilisateur non connecté */}
               {!user && (
@@ -447,9 +415,10 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
             {audits.length > 0 && (
               <button
                 onClick={() => setClearAllConfirm(true)}
-                className="inline-flex items-center px-6 py-3 bg-white border border-red-300 text-red-700 font-medium rounded-xl hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all shadow-sm"
+                className="inline-flex items-center px-4 py-2 bg-white border border-red-200 text-red-600 font-normal rounded-lg hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition-all shadow-sm text-sm"
+                style={{fontFamily: 'inherit'}}
               >
-                <Trash2 className="w-5 h-5 mr-2" />
+                <Trash2 className="w-4 h-4 mr-2" />
                 {t.clearAll}
               </button>
             )}
