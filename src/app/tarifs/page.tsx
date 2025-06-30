@@ -6,9 +6,7 @@ import TopBar from '@/components/TopBar';
 import Footer from '@/components/Footer';
 import { useAuth, PRICING_PLANS } from '@/contexts/AuthContext';
 import { 
-  Check, Crown, Zap, Shield, Users, BarChart3, 
-  Clock, Star, ArrowRight, Sparkles, Building2,
-  HeadphonesIcon, Key, Globe, Palette
+  Check, Crown, Zap, Shield, Star, ArrowRight, Sparkles, Building2
 } from 'lucide-react';
 
 const STRIPE_PRO_LINK = 'https://buy.stripe.com/4gMdR8eO9fIz4Pz8jP1oI01'; // Lien Stripe officiel
@@ -31,13 +29,7 @@ export default function TarifsPage() {
   };
 
   const getFeatureIcon = (feature: string) => {
-    if (feature.includes('audit')) return <BarChart3 className="w-4 h-4" />;
-    if (feature.includes('kanban')) return <Check className="w-4 h-4" />;
-    if (feature.includes('note')) return <Check className="w-4 h-4" />;
-    if (feature.includes('support')) return <HeadphonesIcon className="w-4 h-4" />;
-    if (feature.includes('historique')) return <Clock className="w-4 h-4" />;
-    if (feature.includes('intégration')) return <Globe className="w-4 h-4" />;
-    return <Check className="w-4 h-4" />;
+    return <Check className="w-4 h-4 text-green-600" />;
   };
 
   const formatPrice = (price: number, planId: string) => {
@@ -112,15 +104,7 @@ export default function TarifsPage() {
                     </div>
                   )}
 
-                  {/* Badge plan actuel */}
-                  {isCurrentPlan && (
-                    <div className="absolute -top-4 right-4">
-                      <div className="inline-flex items-center px-3 py-1 bg-green-600 text-white text-sm font-medium rounded-full shadow-lg">
-                        <Check className="w-4 h-4 mr-1" />
-                        Plan actuel
-                      </div>
-                    </div>
-                  )}
+
 
                   <div className="p-8 w-full flex flex-col items-center flex-1">
                     {/* Header du plan */}

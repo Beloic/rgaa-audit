@@ -6,9 +6,7 @@ import TopBar from '@/components/TopBar';
 import Footer from '@/components/Footer';
 import { useAuth, PRICING_PLANS } from '@/contexts/AuthContext';
 import { 
-  Check, Crown, Zap, Shield, Users, BarChart3, 
-  Clock, Star, ArrowRight, Sparkles, Building2,
-  HeadphonesIcon, Key, Globe, Palette
+  Check, Crown, Zap, Shield, Star, ArrowRight, Sparkles, Building2
 } from 'lucide-react';
 
 export default function PricingPage() {
@@ -30,14 +28,7 @@ export default function PricingPage() {
   };
 
   const getFeatureIcon = (feature: string) => {
-    if (feature.includes('audit')) return <BarChart3 className="w-4 h-4" />;
-    if (feature.includes('équipe') || feature.includes('membre')) return <Users className="w-4 h-4" />;
-    if (feature.includes('support')) return <HeadphonesIcon className="w-4 h-4" />;
-    if (feature.includes('API')) return <Key className="w-4 h-4" />;
-    if (feature.includes('white-label') || feature.includes('White-label')) return <Palette className="w-4 h-4" />;
-    if (feature.includes('SLA') || feature.includes('on-premise')) return <Shield className="w-4 h-4" />;
-    if (feature.includes('historique') || feature.includes('Historique')) return <Clock className="w-4 h-4" />;
-    return <Check className="w-4 h-4" />;
+    return <Check className="w-4 h-4 text-green-600" />;
   };
 
   const formatPrice = (price: number) => {
@@ -143,15 +134,7 @@ export default function PricingPage() {
                     </div>
                   )}
 
-                  {/* Badge plan actuel */}
-                  {isCurrentPlan && (
-                    <div className="absolute -top-4 right-4">
-                      <div className="inline-flex items-center px-3 py-1 bg-green-600 text-white text-sm font-medium rounded-full shadow-lg">
-                        <Check className="w-4 h-4 mr-1" />
-                        Plan actuel
-                      </div>
-                    </div>
-                  )}
+
 
                   <div className="p-8">
                     {/* Header du plan */}
