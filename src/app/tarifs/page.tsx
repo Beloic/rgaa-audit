@@ -11,6 +11,8 @@ import {
   HeadphonesIcon, Key, Globe, Palette
 } from 'lucide-react';
 
+const STRIPE_PRO_LINK = 'https://buy.stripe.com/test_XXXXXXXXXXXX'; // Remplace par ton vrai lien Stripe
+
 export default function TarifsPage() {
   const { user, isAuthenticated, getCurrentPlan } = useAuth();
   const currentPlan = user ? getCurrentPlan() : null;
@@ -92,7 +94,7 @@ export default function TarifsPage() {
               return (
                 <div
                   key={plan.id}
-                  className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 flex flex-col items-center justify-between ${
+                  className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 flex flex-col items-center justify-between h-full min-h-[600px] ${
                     isPopular
                       ? 'border-blue-500 shadow-blue-100'
                       : 'border-gray-200'
@@ -120,7 +122,7 @@ export default function TarifsPage() {
                     </div>
                   )}
 
-                  <div className="p-8 w-full flex flex-col items-center">
+                  <div className="p-8 w-full flex flex-col items-center flex-1">
                     {/* Header du plan */}
                     <div className="text-center mb-8">
                       <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
@@ -157,7 +159,15 @@ export default function TarifsPage() {
 
                     {/* Bouton CTA */}
                     <button
-                      onClick={() => handleSelectPlan(plan.id)}
+                      onClick={() => {
+                        if (plan.id === 'free') {
+                          window.location.href = '/auth/register?plan=free';
+                        } else if (plan.id === 'pro') {
+                          window.location.href = STRIPE_PRO_LINK;
+                        } else {
+                          window.location.href = getContactMailto();
+                        }
+                      }}
                       disabled={isCurrentPlan}
                       className={`w-full py-3 px-6 rounded-lg font-medium transition-all duration-300 flex items-center justify-center space-x-2 ${
                         isCurrentPlan
@@ -175,7 +185,7 @@ export default function TarifsPage() {
                       ) : (
                         <>
                           <span>
-                            {plan.id === 'free' ? 'Commencer gratuitement' : plan.id === 'pro' ? 'Demander le Pro' : 'Demander un devis'}
+                            {plan.id === 'free' ? 'Commencer gratuitement' : plan.id === 'pro' ? 'Démarrer' : 'Demander un devis'}
                           </span>
                           <ArrowRight className="w-4 h-4" />
                         </>
