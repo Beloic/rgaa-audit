@@ -3,18 +3,6 @@
 import Link from 'next/link';
 import TopBar from '@/components/TopBar';
 import { useLanguage } from '@/contexts/LanguageContext';
-<<<<<<< HEAD
-import { Shield, Calendar, Clock, ArrowLeft, Smartphone, Tablet, Touch, Eye, Settings, Volume2, CheckCircle, Target, Users } from 'lucide-react';
-import Footer from '@/components/Footer';
-
-export default function AccessibiliteMobilePage() {
-  const { language } = useLanguage();
-=======
-import { Calendar, Clock, ArrowLeft, Smartphone, Tablet, Hand, CheckCircle, Target } from 'lucide-react';
-import Footer from '@/components/Footer';
-
-export default function AccessibiliteMobilePage() {
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -78,21 +66,6 @@ export default function AccessibiliteMobilePage() {
                 Avec plus de 60% du trafic web sur mobile, l'accessibilité mobile n'est plus optionnelle. Les appareils tactiles introduisent de nouveaux paradigmes d'interaction qui nécessitent une approche spécifique pour garantir l'inclusivité.
               </p>
               
-<<<<<<< HEAD
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                <div className="flex items-start">
-                  <Smartphone className="w-6 h-6 text-gray-600 mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="text-gray-800 font-medium mb-2">Défis spécifiques au mobile</p>
-                    <p className="text-gray-700 text-sm">
-=======
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <div className="flex items-start">
-                  <Smartphone className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="text-blue-800 font-medium mb-2">Défis spécifiques au mobile</p>
-                    <p className="text-blue-700 text-sm">
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       Écrans plus petits, interactions tactiles, contextes d'usage variés (transport, extérieur...) et technologies d'assistance mobiles créent de nouveaux enjeux d'accessibilité.
                     </p>
                   </div>
@@ -103,11 +76,6 @@ export default function AccessibiliteMobilePage() {
             {/* Technologies d'assistance mobile */}
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-<<<<<<< HEAD
-                <span className="bg-gray-100 text-gray-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">1</span>
-=======
-                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">1</span>
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                 Technologies d'assistance mobiles
               </h2>
               
@@ -162,75 +130,11 @@ export default function AccessibiliteMobilePage() {
               </div>
             </section>
 
-<<<<<<< HEAD
-            {/* Zones tactiles */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="bg-gray-100 text-gray-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">2</span>
-                Taille et espacement des zones tactiles
-              </h2>
-              
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  Les recommandations pour les zones tactiles sont cruciales pour l'accessibilité mobile, particulièrement pour les personnes avec des difficultés motrices.
-                </p>
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-semibold text-gray-600 mb-3">❌ Problèmes fréquents</h3>
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                      <ul className="text-gray-700 space-y-2 text-sm">
-                        <li>• Boutons &lt; 44px (iOS) ou &lt; 48dp (Android)</li>
-                        <li>• Liens trop proches (&lt; 8px d'espacement)</li>
-                        <li>• Zone tactile ≠ zone visuelle</li>
-                        <li>• Éléments dans les coins difficiles d'accès</li>
-                        <li>• Actions destructives sans confirmation</li>
-                      </ul>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-semibold text-gray-600 mb-3">✅ Bonnes pratiques</h3>
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                      <ul className="text-gray-700 space-y-2 text-sm">
-                        <li>• Minimum 44x44px (iOS) / 48x48dp (Android)</li>
-                        <li>• Espacement minimum 8px entre éléments</li>
-                        <li>• Zone tactile étendue si nécessaire</li>
-                        <li>• Actions principales accessibles au pouce</li>
-                        <li>• Confirmations pour actions importantes</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                  <p className="text-gray-800 text-sm">
-                    <strong>Règle du pouce :</strong> 9mm × 9mm minimum selon les guidelines WCAG, soit environ 44px sur la plupart des écrans modernes.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Gestes et interactions */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="bg-gray-100 text-gray-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">3</span>
-=======
-            {/* Gestes et interactions */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">2</span>
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                 Gestes d'accessibilité et interactions tactiles
               </h2>
               
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
                 <div className="flex items-start mb-4">
-<<<<<<< HEAD
-                  <Touch className="w-6 h-6 text-gray-600 mr-3 mt-1 flex-shrink-0" />
-=======
-                  <Hand className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                   <div>
                     <p className="text-gray-700 leading-relaxed mb-4">
                       Les utilisateurs de technologies d'assistance mobiles utilisent des gestes spécifiques très différents de la navigation standard.
@@ -261,19 +165,6 @@ export default function AccessibiliteMobilePage() {
                     </div>
                   </div>
                   
-<<<<<<< HEAD
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                    <h3 className="font-semibold text-gray-800 mb-4">Gestes TalkBack (Android)</h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <ul className="text-gray-700 space-y-2 text-sm">
-=======
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                    <h3 className="font-semibold text-blue-800 mb-4">Gestes TalkBack (Android)</h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <ul className="text-blue-700 space-y-2 text-sm">
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                           <li>• <strong>Balayage droit/gauche :</strong> Navigation linéaire</li>
                           <li>• <strong>Balayage haut/bas :</strong> Granularité de lecture</li>
                           <li>• <strong>Double tap :</strong> Activation</li>
@@ -281,19 +172,6 @@ export default function AccessibiliteMobilePage() {
                         </ul>
                       </div>
                       <div>
-<<<<<<< HEAD
-                        <ul className="text-gray-700 space-y-2 text-sm">
-                          <li>• <strong>L avec 1 doigt :</strong> Défilement continu</li>
-                          <li>• <strong>Balayage global :</strong> Actions rapides</li>
-                          <li>• <strong>Secousse :</strong> Lecture continue</li>
-                          <li>• <strong>Gestes personnalisés :</strong> Raccourcis</li>
-=======
-                        <ul className="text-blue-700 space-y-2 text-sm">
-                          <li>• <strong>L avec 1 doigt :</strong> Défilement continu</li>
-                          <li>• <strong>Balayage global :</strong> Actions rapides</li>
-                          <li>• <strong>Tap et maintien :</strong> Description détaillée</li>
-                          <li>• <strong>Geste personnalisé :</strong> Raccourcis configurables</li>
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                         </ul>
                       </div>
                     </div>
@@ -302,184 +180,6 @@ export default function AccessibiliteMobilePage() {
               </div>
             </section>
 
-<<<<<<< HEAD
-            {/* Checklist mobile */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <CheckCircle className="w-6 h-6 text-gray-600 mr-3" />
-                Checklist accessibilité mobile
-              </h2>
-              
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-semibold text-gray-700 mb-3">Interface tactile ✓</h3>
-                    <ul className="text-gray-700 space-y-1 text-sm">
-=======
-            {/* Tailles tactiles */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">3</span>
-                Tailles et espacement des éléments tactiles
-              </h2>
-              
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  La précision tactile est limitée par la taille des doigts et les capacités motrices. Les recommandations d'accessibilité mobile sont plus strictes que pour le desktop.
-                </p>
-                
-                <div className="grid gap-6">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-blue-800 mb-3">Dimensions minimales</h3>
-                    <ul className="text-blue-700 space-y-2 text-sm">
-                      <li>• <strong>Règle du pouce :</strong> 9mm × 9mm minimum selon les guidelines RGAA, soit environ 44px sur la plupart des écrans modernes.</li>
-                      <li>• <strong>Espacement :</strong> Minimum 8px entre éléments interactifs</li>
-                      <li>• <strong>Liens en texte :</strong> Minimum 44px de hauteur avec padding</li>
-                      <li>• <strong>Boutons importants :</strong> Recommandé 60px × 60px pour faciliter l'usage</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-800 mb-3">Bonnes pratiques d'espacement</h3>
-                    <ul className="text-gray-700 space-y-2 text-sm">
-                      <li>• <strong>Navigation principale :</strong> Éléments bien séparés et facilement atteignables</li>
-                      <li>• <strong>Formulaires :</strong> Espacement généreux entre champs</li>
-                      <li>• <strong>Actions destructives :</strong> Isolées pour éviter les erreurs</li>
-                      <li>• <strong>Zone de préhension :</strong> Actions principales dans la zone du pouce</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Responsive et orientation */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">4</span>
-                Responsive et orientation d'écran
-              </h2>
-              
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  L'accessibilité mobile implique de supporter toutes les orientations et tailles d'écran, car certains utilisateurs ne peuvent pas faire pivoter leur appareil.
-                </p>
-                
-                <div className="grid gap-6">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-blue-800 mb-3">Support des orientations</h3>
-                    <ul className="text-blue-700 space-y-2 text-sm">
-                      <li>• <strong>Portrait obligatoire :</strong> Certains utilisateurs ne peuvent pas tourner l'appareil</li>
-                      <li>• <strong>Paysage recommandé :</strong> Améliore la lisibilité pour certains handicaps</li>
-                      <li>• <strong>Contenu identique :</strong> Même fonctionnalités dans les deux orientations</li>
-                      <li>• <strong>Pas de rotation forcée :</strong> Laisser le choix à l'utilisateur</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-800 mb-3">Adaptation aux tailles d'écran</h3>
-                    <ul className="text-gray-700 space-y-2 text-sm">
-                      <li>• <strong>Zoom jusqu'à 200% :</strong> Sans perte de fonctionnalité</li>
-                      <li>• <strong>Breakpoints multiples :</strong> Petit mobile, grand mobile, tablette</li>
-                      <li>• <strong>Navigation adaptative :</strong> Menu burger ou onglets selon l'espace</li>
-                      <li>• <strong>Contenu prioritaire :</strong> Hiérarchisation selon l'espace disponible</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Contexte d'usage */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">5</span>
-                Contextes d'usage mobile spécifiques
-              </h2>
-              
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  L'usage mobile se fait souvent dans des contextes difficiles qui amplifient les besoins d'accessibilité.
-                </p>
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-3">Contraintes environnementales</h3>
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                      <ul className="text-gray-700 space-y-2 text-sm">
-                        <li>• <strong>Luminosité variable :</strong> Soleil, obscurité</li>
-                        <li>• <strong>Bruit ambiant :</strong> Transport, rue</li>
-                        <li>• <strong>Vibrations :</strong> Véhicules, marche</li>
-                        <li>• <strong>Usage d'une main :</strong> Transport en commun</li>
-                        <li>• <strong>Gants :</strong> Hiver, travail</li>
-                      </ul>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-semibold text-blue-800 mb-3">Adaptations nécessaires</h3>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <ul className="text-blue-700 space-y-2 text-sm">
-                        <li>• <strong>Contraste élevé :</strong> Lisibilité en extérieur</li>
-                        <li>• <strong>Feedback tactile :</strong> Vibrations pour confirmations</li>
-                        <li>• <strong>Zones tactiles larges :</strong> Précision réduite</li>
-                        <li>• <strong>Navigation simple :</strong> Attention partagée</li>
-                        <li>• <strong>Sauvegarde auto :</strong> Interruptions fréquentes</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Tests spécifiques mobile */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">6</span>
-                Tests d'accessibilité mobile
-              </h2>
-              
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  Tester l'accessibilité mobile nécessite des approches spécifiques, en plus des tests web classiques.
-                </p>
-                
-                <div className="grid gap-6">
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-800 mb-3">Tests automatisés mobiles</h3>
-                    <ul className="text-gray-700 space-y-2 text-sm">
-                      <li>• <strong>Lighthouse mobile :</strong> Score accessibilité spécifique mobile</li>
-                      <li>• <strong>axe DevTools :</strong> Sur émulateur mobile Chrome</li>
-                      <li>• <strong>Accessibility Scanner (Android) :</strong> App Google dédiée</li>
-                      <li>• <strong>Tests responsive :</strong> Différentes tailles d'écran</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-800 mb-3">Tests manuels essentiels</h3>
-                    <ul className="text-gray-700 space-y-2 text-sm">
-                      <li>• <strong>VoiceOver activé :</strong> Navigation complète iOS</li>
-                      <li>• <strong>TalkBack activé :</strong> Navigation complète Android</li>
-                      <li>• <strong>Usage d'une main :</strong> Toutes les fonctions accessibles</li>
-                      <li>• <strong>Zoom 200% :</strong> Fonctionnalité préservée</li>
-                      <li>• <strong>Mode sombre :</strong> Lisibilité maintenue</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Checklist mobile */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <CheckCircle className="w-6 h-6 text-blue-600 mr-3" />
-                Checklist accessibilité mobile
-              </h2>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-semibold text-blue-700 mb-3">Interface tactile ✓</h3>
-                    <ul className="text-blue-700 space-y-1 text-sm">
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       <li>□ Zones tactiles ≥ 44px</li>
                       <li>□ Espacement ≥ 8px entre éléments</li>
                       <li>□ Feedback tactile approprié</li>
@@ -488,13 +188,6 @@ export default function AccessibiliteMobilePage() {
                   </div>
                   
                   <div>
-<<<<<<< HEAD
-                    <h3 className="font-semibold text-gray-700 mb-3">Technologies d'assistance ✓</h3>
-                    <ul className="text-gray-700 space-y-1 text-sm">
-=======
-                    <h3 className="font-semibold text-blue-700 mb-3">Technologies d'assistance ✓</h3>
-                    <ul className="text-blue-700 space-y-1 text-sm">
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       <li>□ VoiceOver fonctionnel (iOS)</li>
                       <li>□ TalkBack fonctionnel (Android)</li>
                       <li>□ Voice Control supporté</li>
@@ -503,13 +196,6 @@ export default function AccessibiliteMobilePage() {
                   </div>
                   
                   <div>
-<<<<<<< HEAD
-                    <h3 className="font-semibold text-gray-700 mb-3">Responsive ✓</h3>
-                    <ul className="text-gray-700 space-y-1 text-sm">
-=======
-                    <h3 className="font-semibold text-blue-700 mb-3">Responsive ✓</h3>
-                    <ul className="text-blue-700 space-y-1 text-sm">
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       <li>□ Portrait et paysage supportés</li>
                       <li>□ Zoom 200% fonctionnel</li>
                       <li>□ Contenu adapté aux petits écrans</li>
@@ -518,13 +204,6 @@ export default function AccessibiliteMobilePage() {
                   </div>
                   
                   <div>
-<<<<<<< HEAD
-                    <h3 className="font-semibold text-gray-700 mb-3">Contexte d'usage ✓</h3>
-                    <ul className="text-gray-700 space-y-1 text-sm">
-=======
-                    <h3 className="font-semibold text-blue-700 mb-3">Contexte d'usage ✓</h3>
-                    <ul className="text-blue-700 space-y-1 text-sm">
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       <li>□ Contraste élevé pour l'extérieur</li>
                       <li>□ Usage d'une main possible</li>
                       <li>□ Sauvegarde automatique</li>
@@ -543,29 +222,6 @@ export default function AccessibiliteMobilePage() {
                 <p className="text-gray-700 mb-4">
                   Avec la domination du mobile, ignorer l'accessibilité tactile c'est exclure une part importante de vos utilisateurs. Les spécificités mobiles demandent une attention particulière mais les bénéfices sont immenses.
                 </p>
-<<<<<<< HEAD
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link 
-                    href="/" 
-                    className="inline-flex items-center bg-blue-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-blue-700 focus:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  >
-                    Tester votre site mobile
-                  </Link>
-                  <Link 
-                    href="/blog" 
-                    className="inline-flex items-center bg-gray-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-gray-700 focus:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  >
-                    Voir d'autres guides
-                  </Link>
-=======
-                <div className="flex justify-center">
-                  <Link 
-                    href="/" 
-                    className="inline-flex items-center bg-blue-600 text-white font-medium px-8 py-3 rounded-lg hover:bg-blue-700 focus:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  >
-                    Tester votre site mobile
-                  </Link>
->>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                 </div>
               </div>
             </section>
