@@ -41,7 +41,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   };
 
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 flex flex-col">
+    <div className="h-screen w-64 bg-white border-r border-gray-200 flex flex-col z-50">
       <nav className="p-4 space-y-2 flex-1" aria-label="Navigation secondaire">
         <button
           onClick={() => onSectionChange('analyze')}
@@ -102,6 +102,6 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           </a>
         </div>
       </div>
-    </aside>
+    </div>
   );
 } 
