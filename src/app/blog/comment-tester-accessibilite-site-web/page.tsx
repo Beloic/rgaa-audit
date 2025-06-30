@@ -7,7 +7,7 @@ import { Shield, Calendar, Clock, ArrowLeft, TestTube, Users, Laptop, Smartphone
 import Footer from '@/components/Footer';
 
 export default function TesterAccessibilitePage() {
-  const { language } = useLanguage();
+  // const { language } = useLanguage(); // Décommenter si besoin d'internationalisation
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -71,11 +71,7 @@ export default function TesterAccessibilitePage() {
                 Tester l'accessibilité de votre site web est une étape cruciale pour garantir une expérience inclusive. Cette démarche combine plusieurs approches complémentaires : audits automatisés, tests manuels et validation par des utilisateurs réels.
               </p>
               
-                      Nous vous proposons une méthodologie en 5 étapes, des tests les plus simples aux plus approfondis. Chaque niveau apporte des informations précieuses pour améliorer votre site.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              Nous vous proposons une méthodologie en 5 étapes, des tests les plus simples aux plus approfondis. Chaque niveau apporte des informations précieuses pour améliorer votre site.
             </section>
 
             {/* Étape 1 */}
@@ -235,13 +231,6 @@ export default function TesterAccessibilitePage() {
                     </ul>
                   </div>
                   
-                      <li>• Vidéos : sous-titres présents et de qualité ?</li>
-                      <li>• Audio : transcription disponible ?</li>
-                      <li>• Alertes sonores : alternative visuelle ?</li>
-                      <li>• Test sans audio activé</li>
-                    </ul>
-                  </div>
-                  
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <h3 className="font-semibold text-gray-800 mb-3">Tests cognitifs</h3>
                     <ul className="text-gray-700 space-y-1 text-sm">
@@ -296,28 +285,42 @@ export default function TesterAccessibilitePage() {
               </div>
             </section>
 
-                      <li>□ Aucune erreur axe critique</li>
+            {/* Résultats */}
+            <section className="mb-12">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Résultats</h2>
+                <div className="grid gap-6">
+                  <div>
+                    <h3 className="font-semibold text-gray-800 mb-3">Erreurs détectées</h3>
+                    <ul className="text-gray-700 space-y-2 text-sm">
+                      <li>• □ Aucune erreur axe critique</li>
                     </ul>
                   </div>
                   
                   <div>
-                      <li>□ Navigation clavier complète</li>
-                      <li>□ Test lecteur d'écran effectué</li>
-                      <li>□ Zoom 200% fonctionnel</li>
+                    <h3 className="font-semibold text-gray-800 mb-3">Tests effectués</h3>
+                    <ul className="text-gray-700 space-y-2 text-sm">
+                      <li>• □ Navigation clavier complète</li>
+                      <li>• □ Test lecteur d'écran effectué</li>
+                      <li>• □ Zoom 200% fonctionnel</li>
                     </ul>
                   </div>
                   
                   <div>
-                      <li>□ Test avec utilisateurs handicapés</li>
-                      <li>□ Feedback intégré</li>
-                      <li>□ Améliorations implémentées</li>
+                    <h3 className="font-semibold text-gray-800 mb-3">Tests avec utilisateurs handicapés</h3>
+                    <ul className="text-gray-700 space-y-2 text-sm">
+                      <li>• □ Test avec utilisateurs handicapés</li>
+                      <li>• □ Feedback intégré</li>
+                      <li>• □ Améliorations implémentées</li>
                     </ul>
                   </div>
                   
                   <div>
-                      <li>□ Déclaration d'accessibilité</li>
-                      <li>□ Plan d'amélioration</li>
-                      <li>□ Contact accessibilité</li>
+                    <h3 className="font-semibold text-gray-800 mb-3">Déclaration d'accessibilité</h3>
+                    <ul className="text-gray-700 space-y-2 text-sm">
+                      <li>• □ Déclaration d'accessibilité</li>
+                      <li>• □ Plan d'amélioration</li>
+                      <li>• □ Contact accessibilité</li>
                     </ul>
                   </div>
                 </div>
@@ -356,3 +359,4 @@ export default function TesterAccessibilitePage() {
       </main>
     </div>
   );
+}
