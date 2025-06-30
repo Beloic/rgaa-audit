@@ -170,59 +170,26 @@ const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 29,
+    price: 5,
     currency: 'EUR',
     interval: 'month',
-    description: 'Idéal pour les professionnels et petites équipes',
-    features: [
-      'Audits illimités par jour',
-      '50 audits par mois',
-      'Gestion d\'équipe (5 membres)',
-      'Rapports PDF personnalisés',
-      'Support prioritaire',
-      'Historique illimité',
-      'API REST',
-      'Intégrations CI/CD'
-    ],
-    limits: {
-      auditsPerDay: 'unlimited',
-      auditsPerMonth: 50,
-      teamMembers: 5,
-      storage: 10,
-      apiAccess: true,
-      prioritySupport: true,
-      customReports: true,
-      whiteLabel: false
-    },
-    popular: true
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 199,
-    currency: 'EUR',
-    interval: 'month',
-    description: 'Pour les grandes organisations',
+    description: 'Pour les professionnels sans limite',
     features: [
       'Audits illimités',
-      'Équipe illimitée',
-      'White-label complet',
-      'Support dédié 24/7',
-      'Formation personnalisée',
-      'SLA garanti',
-      'Déploiement on-premise',
-      'Conformité SOC2/GDPR'
+      'Support prioritaire',
+      'Historique illimité'
     ],
     limits: {
       auditsPerDay: 'unlimited',
       auditsPerMonth: 'unlimited',
-      teamMembers: 'unlimited',
-      storage: 'unlimited',
-      apiAccess: true,
+      teamMembers: 1,
+      storage: 10,
+      apiAccess: false,
       prioritySupport: true,
-      customReports: true,
-      whiteLabel: true
-    }
+      customReports: false,
+      whiteLabel: false
+    },
+    popular: true
   }
 ];
 
