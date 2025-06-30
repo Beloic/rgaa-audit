@@ -379,40 +379,35 @@ export default function Statistics({}: StatisticsProps) {
 
       {/* Cartes de statistiques principales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <BarChart3 className="h-8 w-8 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900">{stats.totalAudits}</div>
-              <div className="text-sm text-gray-500">{t.totalAudits}</div>
-            </div>
+        {/* Total audits */}
+        <div className="relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-blue-100">
+          <div className="absolute top-4 right-4">
+            <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-200/60 shadow text-blue-700">
+              <BarChart3 className="w-7 h-7" />
+            </span>
           </div>
+          <div className="text-4xl font-extrabold text-blue-900 mb-2">{stats.totalAudits}</div>
+          <div className="text-base text-blue-700 font-medium tracking-wide">{t.totalAudits}</div>
         </div>
-
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <AlertTriangle className="h-8 w-8 text-orange-600" />
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900">{stats.totalViolations}</div>
-              <div className="text-sm text-gray-500">{t.totalViolations}</div>
-            </div>
+        {/* Total violations */}
+        <div className="relative bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-orange-100">
+          <div className="absolute top-4 right-4">
+            <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-200/60 shadow text-orange-700">
+              <AlertTriangle className="w-7 h-7" />
+            </span>
           </div>
+          <div className="text-4xl font-extrabold text-orange-900 mb-2">{stats.totalViolations}</div>
+          <div className="text-base text-orange-700 font-medium tracking-wide">{t.totalViolations}</div>
         </div>
-
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Award className="h-8 w-8 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900">{stats.complianceRate}%</div>
-              <div className="text-sm text-gray-500">{t.complianceRate}</div>
-            </div>
+        {/* Compliance rate */}
+        <div className="relative bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-purple-100">
+          <div className="absolute top-4 right-4">
+            <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-200/60 shadow text-purple-700">
+              <Award className="w-7 h-7" />
+            </span>
           </div>
+          <div className="text-4xl font-extrabold text-purple-900 mb-2">{stats.complianceRate}%</div>
+          <div className="text-base text-purple-700 font-medium tracking-wide">{t.complianceRate}</div>
         </div>
       </div>
 

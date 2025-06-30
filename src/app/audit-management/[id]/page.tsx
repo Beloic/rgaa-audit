@@ -504,9 +504,9 @@ export default function AuditManagementPage() {
   // Référence pour les modales
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // États pour la gestion de la visibilité de la navigation
-  const [hideNav, setHideNav] = useState(false);
-  const [showContent, setShowContent] = useState(false);
+  // Navigation toujours cachée en gestion d'audit
+  const hideNav = true;
+  const showContent = true;
 
   // Charger les données d'audit et de gestion
   useEffect(() => {
@@ -880,24 +880,6 @@ export default function AuditManagementPage() {
     setShowManualForm(false);
   };
 
-  useEffect(() => {
-    setTimeout(() => setHideNav(true), 100); // Laisse le temps à l'animation de démarrer
-    setTimeout(() => setShowContent(true), 100); // Affiche le contenu avec animation
-    return () => {
-      setHideNav(false);
-      setShowContent(false);
-    };
-  }, []);
-
-  // Handler pour le retour avec animation
-  const handleBack = () => {
-    setHideNav(false);
-    setShowContent(false);
-    setTimeout(() => {
-      router.push('/?section=history');
-    }, 500);
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -947,23 +929,23 @@ export default function AuditManagementPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Topbar Navigation animée */}
-      <div className={`transition-all duration-500 ${hideNav ? 'opacity-0 -translate-y-8 pointer-events-none' : 'opacity-100 translate-y-0'} sticky top-0 z-50`}>
+      {/* Topbar Navigation masquée */}
+      <div className={`${hideNav ? 'hidden' : ''} sticky top-0 z-50`}>
         <TopBar activeSection="home" onSectionChange={() => {}} onAnalyzeClick={() => {}} />
       </div>
-      {/* Sidebar animée */}
-      <div className={`fixed left-0 top-16 h-[calc(100vh-4rem)] z-40 transition-all duration-500 ${hideNav ? 'opacity-0 -translate-x-20 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
+      {/* Sidebar masquée */}
+      <div className={`fixed left-0 top-16 h-[calc(100vh-4rem)] z-40 ${hideNav ? 'hidden' : ''}`}>
         <Sidebar activeSection="history" onSectionChange={() => {}} />
       </div>
-      {/* Main Content animé */}
-      <main className={`w-full min-h-screen transition-all duration-500 ${showContent ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'}`}>
+      {/* Main Content */}
+      <main className={`w-full min-h-screen`}>
         {/* En-tête avec bouton de retour */}
         <header className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={handleBack}
+                  onClick={() => router.push('/?section=history')}
                   className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                   title="Retour à l'historique"
                 >

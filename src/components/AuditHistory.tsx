@@ -131,20 +131,16 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
   // Grouper les audits par période
   const groupAuditsByPeriod = (audits: HistoricalAudit[]) => {
     const now = new Date();
-    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     const groups = {
-      lastWeek: [] as HistoricalAudit[],
       lastMonth: [] as HistoricalAudit[],
       older: [] as HistoricalAudit[]
     };
 
     audits.forEach(audit => {
       const auditDate = new Date(audit.timestamp);
-      if (auditDate >= oneWeekAgo) {
-        groups.lastWeek.push(audit);
-      } else if (auditDate >= oneMonthAgo) {
+      if (auditDate >= oneMonthAgo) {
         groups.lastMonth.push(audit);
       } else {
         groups.older.push(audit);
@@ -508,7 +504,6 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
         </div>
       ) : (
         <div>
-          <AuditGroup title={t.lastWeek} audits={groupedAudits.lastWeek} />
           <AuditGroup title={t.lastMonth} audits={groupedAudits.lastMonth} />
           <AuditGroup title={t.older} audits={groupedAudits.older} />
 
