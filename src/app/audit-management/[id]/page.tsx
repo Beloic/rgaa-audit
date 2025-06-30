@@ -946,7 +946,7 @@ export default function AuditManagementPage() {
       />
 
       {/* Main Content */}
-      <main className="ml-64 relative z-10">
+      <main className="ml-64">
         {/* En-tête avec bouton de retour */}
         <header className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6 py-6">

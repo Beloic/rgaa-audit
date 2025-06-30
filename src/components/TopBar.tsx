@@ -212,34 +212,6 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                         </div>
                       </div>
 
-                      {/* Section usage */}
-                      <div className="px-4 py-3 border-t border-gray-100">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-600">Audits aujourd'hui</span>
-                            <span className="text-xs font-medium text-gray-900">
-                              {user.usage.auditsToday || 0}/{getCurrentPlan().limits.auditsPerDay === 'unlimited' ? '∞' : getCurrentPlan().limits.auditsPerDay}
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
-                            <div 
-                              className="bg-blue-600 h-1.5 rounded-full" 
-                              style={{ 
-                                width: getCurrentPlan().limits.auditsPerDay === 'unlimited' 
-                                  ? '100%' 
-                                  : `${Math.min(100, ((user.usage.auditsToday || 0) / (getCurrentPlan().limits.auditsPerDay as number)) * 100)}%` 
-                              }}
-                            ></div>
-                          </div>
-                          <p className="text-xs text-gray-500">
-                            {getCurrentPlan().limits.auditsPerDay === 'unlimited' 
-                              ? 'Audits illimités' 
-                              : `${Math.max(0, (getCurrentPlan().limits.auditsPerDay as number) - (user.usage.auditsToday || 0))} audit${Math.max(0, (getCurrentPlan().limits.auditsPerDay as number) - (user.usage.auditsToday || 0)) > 1 ? 's' : ''} restant${Math.max(0, (getCurrentPlan().limits.auditsPerDay as number) - (user.usage.auditsToday || 0)) > 1 ? 's' : ''} aujourd'hui`
-                            }
-                          </p>
-                        </div>
-                      </div>
-
                       {/* Section déconnexion */}
                       <div className="border-t border-gray-100 py-2">
                         <button
