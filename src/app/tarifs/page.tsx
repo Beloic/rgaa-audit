@@ -83,7 +83,7 @@ export default function TarifsPage() {
 
       {/* Pricing Cards */}
       <section className="pb-20">
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center">
             {plans.map((plan) => {
               const isCurrentPlan = currentPlan?.id === plan.id;
@@ -92,7 +92,7 @@ export default function TarifsPage() {
               return (
                 <div
                   key={plan.id}
-                  className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 hover:shadow-2xl hover:scale-105 flex flex-col items-center justify-between ${
+                  className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 flex flex-col items-center justify-between ${
                     isPopular
                       ? 'border-blue-500 shadow-blue-100'
                       : 'border-gray-200'

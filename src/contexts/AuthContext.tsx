@@ -208,7 +208,8 @@ const PRICING_PLANS: PricingPlan[] = [
       'Gestion des audits',
       'Support prioritaire',
       'Historique illimité',
-      'Intégration directe dans vos systèmes'
+      'Intégration directe dans vos systèmes',
+      'Intégration API'
     ],
     limits: {
       auditsPerDay: 'unlimited',
