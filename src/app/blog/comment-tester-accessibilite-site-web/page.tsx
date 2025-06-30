@@ -1,5 +1,9 @@
 'use client';
 
+<<<<<<< HEAD
+=======
+import { useState } from 'react';
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
 import Link from 'next/link';
 import TopBar from '@/components/TopBar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -71,12 +75,21 @@ export default function TesterAccessibilitePage() {
                 Tester l'accessibilité de votre site web est une étape cruciale pour garantir une expérience inclusive. Cette démarche combine plusieurs approches complémentaires : audits automatisés, tests manuels et validation par des utilisateurs réels.
               </p>
               
+<<<<<<< HEAD
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
                 <div className="flex items-start">
                   <TestTube className="w-6 h-6 text-gray-600 mr-3 mt-1 flex-shrink-0" />
                   <div>
                     <p className="text-gray-800 font-medium mb-2">Approche progressive</p>
                     <p className="text-gray-700 text-sm">
+=======
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="flex items-start">
+                  <TestTube className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="text-blue-800 font-medium mb-2">Approche progressive</p>
+                    <p className="text-blue-700 text-sm">
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       Nous vous proposons une méthodologie en 5 étapes, des tests les plus simples aux plus approfondis. Chaque niveau apporte des informations précieuses pour améliorer votre site.
                     </p>
                   </div>
@@ -87,6 +100,7 @@ export default function TesterAccessibilitePage() {
             {/* Étape 1 */}
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+<<<<<<< HEAD
                 <span className="bg-gray-100 text-gray-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">1</span>
                 Tests automatisés rapides
               </h2>
@@ -252,6 +266,9 @@ export default function TesterAccessibilitePage() {
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <span className="bg-gray-100 text-gray-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">1</span>
+=======
+                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">1</span>
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                 Tests automatisés rapides
               </h2>
               
@@ -297,13 +314,21 @@ export default function TesterAccessibilitePage() {
             {/* Étape 2 */}
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+<<<<<<< HEAD
                 <span className="bg-gray-100 text-gray-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">2</span>
+=======
+                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">2</span>
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                 Navigation au clavier uniquement
               </h2>
               
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
                 <div className="flex items-start mb-4">
+<<<<<<< HEAD
                   <Keyboard className="w-6 h-6 text-gray-600 mr-3 mt-1 flex-shrink-0" />
+=======
+                  <Keyboard className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                   <div>
                     <p className="text-gray-700 leading-relaxed mb-4">
                       Testez votre site en utilisant uniquement le clavier. C'est le test manuel le plus révélateur et le plus facile à réaliser.
@@ -344,7 +369,11 @@ export default function TesterAccessibilitePage() {
             {/* Étape 3 */}
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+<<<<<<< HEAD
                 <span className="bg-gray-100 text-gray-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">3</span>
+=======
+                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">3</span>
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                 Test avec lecteur d'écran
               </h2>
               
@@ -390,7 +419,11 @@ export default function TesterAccessibilitePage() {
             {/* Étape 4 */}
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+<<<<<<< HEAD
                 <span className="bg-gray-100 text-gray-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">4</span>
+=======
+                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">4</span>
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                 Tests de perception et cognitive
               </h2>
               
@@ -410,9 +443,15 @@ export default function TesterAccessibilitePage() {
                     </ul>
                   </div>
                   
+<<<<<<< HEAD
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <h3 className="font-semibold text-gray-800 mb-3">Tests auditifs</h3>
                     <ul className="text-gray-700 space-y-1 text-sm">
+=======
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-blue-800 mb-3">Tests auditifs</h3>
+                    <ul className="text-blue-700 space-y-1 text-sm">
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       <li>• Vidéos : sous-titres présents et de qualité ?</li>
                       <li>• Audio : transcription disponible ?</li>
                       <li>• Alertes sonores : alternative visuelle ?</li>
@@ -436,13 +475,21 @@ export default function TesterAccessibilitePage() {
             {/* Étape 5 */}
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+<<<<<<< HEAD
                 <span className="bg-gray-100 text-gray-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">5</span>
+=======
+                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">5</span>
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                 Tests utilisateurs réels
               </h2>
               
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
                 <div className="flex items-start mb-4">
+<<<<<<< HEAD
                   <Users className="w-6 h-6 text-gray-600 mr-3 mt-1 flex-shrink-0" />
+=======
+                  <Users className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                   <div>
                     <p className="text-gray-700 leading-relaxed mb-4">
                       Les tests avec de vrais utilisateurs en situation de handicap sont l'étalon-or pour valider l'accessibilité réelle de votre site.
@@ -476,6 +523,7 @@ export default function TesterAccessibilitePage() {
               </div>
             </section>
 
+<<<<<<< HEAD
             {/* Checklist */}
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
@@ -492,13 +540,82 @@ export default function TesterAccessibilitePage() {
                     <ul className="text-gray-700 space-y-1 text-sm">
                       <li>□ Audit RGAA Audit réalisé</li>
                       <li>□ Score Lighthouse > 90</li>
+=======
+            {/* Outils spécialisés */}
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <Settings className="w-6 h-6 text-gray-600 mr-3" />
+                Outils et extensions utiles
+              </h2>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                  <h3 className="font-semibold text-gray-800 mb-4">Extensions navigateur</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-gray-700 text-sm">Colour Contrast Analyser</h4>
+                      <p className="text-gray-600 text-xs">Vérifie les ratios de contraste</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-700 text-sm">HeadingsMap</h4>
+                      <p className="text-gray-600 text-xs">Visualise la structure des titres</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-700 text-sm">WAVE</h4>
+                      <p className="text-gray-600 text-xs">Évaluation visuelle de l'accessibilité</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                  <h3 className="font-semibold text-gray-800 mb-4">Outils de simulation</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-gray-700 text-sm">Stark (Figma/Sketch)</h4>
+                      <p className="text-gray-600 text-xs">Simulation des déficiences visuelles</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-700 text-sm">No Coffee</h4>
+                      <p className="text-gray-600 text-xs">Extension pour simuler différents handicaps</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-700 text-sm">Funkify</h4>
+                      <p className="text-gray-600 text-xs">Simulateur complet de handicaps</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Checklist */}
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <CheckCircle className="w-6 h-6 text-blue-600 mr-3" />
+                Checklist de validation
+              </h2>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <p className="text-blue-800 mb-4 font-medium">Votre site est-il prêt ? Vérifiez ces points essentiels :</p>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold text-blue-700 mb-3">Tests automatisés ✓</h3>
+                    <ul className="text-blue-700 space-y-1 text-sm">
+                      <li>□ Audit RGAA Audit réalisé</li>
+                      <li>□ Score Lighthouse &gt; 90</li>
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       <li>□ Aucune erreur axe critique</li>
                     </ul>
                   </div>
                   
                   <div>
+<<<<<<< HEAD
                     <h3 className="font-semibold text-gray-700 mb-3">Tests manuels ✓</h3>
                     <ul className="text-gray-700 space-y-1 text-sm">
+=======
+                    <h3 className="font-semibold text-blue-700 mb-3">Tests manuels ✓</h3>
+                    <ul className="text-blue-700 space-y-1 text-sm">
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       <li>□ Navigation clavier complète</li>
                       <li>□ Test lecteur d'écran effectué</li>
                       <li>□ Zoom 200% fonctionnel</li>
@@ -506,8 +623,13 @@ export default function TesterAccessibilitePage() {
                   </div>
                   
                   <div>
+<<<<<<< HEAD
                     <h3 className="font-semibold text-gray-700 mb-3">Validation utilisateur ✓</h3>
                     <ul className="text-gray-700 space-y-1 text-sm">
+=======
+                    <h3 className="font-semibold text-blue-700 mb-3">Validation utilisateur ✓</h3>
+                    <ul className="text-blue-700 space-y-1 text-sm">
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       <li>□ Test avec utilisateurs handicapés</li>
                       <li>□ Feedback intégré</li>
                       <li>□ Améliorations implémentées</li>
@@ -515,8 +637,13 @@ export default function TesterAccessibilitePage() {
                   </div>
                   
                   <div>
+<<<<<<< HEAD
                     <h3 className="font-semibold text-gray-700 mb-3">Documentation ✓</h3>
                     <ul className="text-gray-700 space-y-1 text-sm">
+=======
+                    <h3 className="font-semibold text-blue-700 mb-3">Documentation ✓</h3>
+                    <ul className="text-blue-700 space-y-1 text-sm">
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
                       <li>□ Déclaration d'accessibilité</li>
                       <li>□ Plan d'amélioration</li>
                       <li>□ Contact accessibilité</li>
@@ -558,4 +685,8 @@ export default function TesterAccessibilitePage() {
       </main>
     </div>
   );
+<<<<<<< HEAD
 } 
+=======
+}
+>>>>>>> 9aabe477813cab8c339d85d797afeffbe5fea9e7
