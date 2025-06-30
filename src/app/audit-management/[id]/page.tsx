@@ -930,7 +930,6 @@ export default function AuditManagementPage() {
         activeSection="home" 
         onSectionChange={() => {}}
         onAnalyzeClick={() => {}}
-        className="z-50"
       />
 
       {/* Banner de vérification d'email */}
@@ -944,7 +943,6 @@ export default function AuditManagementPage() {
       <Sidebar 
         activeSection="history" 
         onSectionChange={() => {}}
-        className="z-50"
       />
 
       {/* Main Content */}
@@ -1040,7 +1038,7 @@ export default function AuditManagementPage() {
                 })}
               </div>
 
-              <DragOverlay zIndex={30}>
+              <DragOverlay>
                 {activeId ? (
                   <div className="bg-white rounded-lg border-2 border-blue-400 p-3 shadow-2xl opacity-95 rotate-2 scale-105 transition-transform">
                     {(() => {
