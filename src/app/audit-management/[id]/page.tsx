@@ -889,6 +889,15 @@ export default function AuditManagementPage() {
     };
   }, []);
 
+  // Handler pour le retour avec animation
+  const handleBack = () => {
+    setHideNav(false);
+    setShowContent(false);
+    setTimeout(() => {
+      router.push('/?section=history');
+    }, 500);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -954,7 +963,7 @@ export default function AuditManagementPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={() => router.push('/?section=history')}
+                  onClick={handleBack}
                   className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                   title="Retour à l'historique"
                 >
