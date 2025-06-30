@@ -377,37 +377,31 @@ export default function Statistics({}: StatisticsProps) {
         </div>
       </header>
 
-      {/* Cartes de statistiques principales */}
+      {/* Cartes de statistiques principales - Stripe style */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Total audits */}
-        <div className="relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-blue-100">
-          <div className="absolute top-4 right-4">
-            <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-200/60 shadow text-blue-700">
-              <BarChart3 className="w-7 h-7" />
-            </span>
-          </div>
-          <div className="text-4xl font-extrabold text-blue-900 mb-2">{stats.totalAudits}</div>
-          <div className="text-base text-blue-700 font-medium tracking-wide">{t.totalAudits}</div>
+        <div className="card flex flex-col items-center justify-center p-8 text-center">
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 text-blue-700 mb-3 shadow">
+            <BarChart3 className="w-8 h-8" />
+          </span>
+          <div className="text-4xl font-extrabold text-blue-900 mb-1" style={{fontFamily: 'Inter'}}> {stats.totalAudits} </div>
+          <div className="text-base text-blue-700 font-medium tracking-wide" style={{fontFamily: 'Inter'}}> {t.totalAudits} </div>
         </div>
         {/* Total violations */}
-        <div className="relative bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-orange-100">
-          <div className="absolute top-4 right-4">
-            <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-200/60 shadow text-orange-700">
-              <AlertTriangle className="w-7 h-7" />
-            </span>
-          </div>
-          <div className="text-4xl font-extrabold text-orange-900 mb-2">{stats.totalViolations}</div>
-          <div className="text-base text-orange-700 font-medium tracking-wide">{t.totalViolations}</div>
+        <div className="card flex flex-col items-center justify-center p-8 text-center">
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-700 mb-3 shadow">
+            <AlertTriangle className="w-8 h-8" />
+          </span>
+          <div className="text-4xl font-extrabold text-orange-900 mb-1" style={{fontFamily: 'Inter'}}> {stats.totalViolations} </div>
+          <div className="text-base text-orange-700 font-medium tracking-wide" style={{fontFamily: 'Inter'}}> {t.totalViolations} </div>
         </div>
         {/* Compliance rate */}
-        <div className="relative bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-purple-100">
-          <div className="absolute top-4 right-4">
-            <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-200/60 shadow text-purple-700">
-              <Award className="w-7 h-7" />
-            </span>
-          </div>
-          <div className="text-4xl font-extrabold text-purple-900 mb-2">{stats.complianceRate}%</div>
-          <div className="text-base text-purple-700 font-medium tracking-wide">{t.complianceRate}</div>
+        <div className="card flex flex-col items-center justify-center p-8 text-center">
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-purple-100 text-purple-700 mb-3 shadow">
+            <Award className="w-8 h-8" />
+          </span>
+          <div className="text-4xl font-extrabold text-purple-900 mb-1" style={{fontFamily: 'Inter'}}> {stats.complianceRate}% </div>
+          <div className="text-base text-purple-700 font-medium tracking-wide" style={{fontFamily: 'Inter'}}> {t.complianceRate} </div>
         </div>
       </div>
 
