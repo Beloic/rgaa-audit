@@ -163,7 +163,7 @@ export default function TarifsPage() {
                         if (plan.id === 'free') {
                           window.location.href = '/auth/register?plan=free';
                         } else if (plan.id === 'pro') {
-                          window.location.href = STRIPE_PRO_LINK;
+                          window.open(STRIPE_PRO_LINK, '_blank', 'noopener,noreferrer');
                         } else {
                           window.location.href = getContactMailto();
                         }
