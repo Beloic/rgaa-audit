@@ -44,53 +44,17 @@ export default function TarifsPage() {
     return `${price}€/mois`;
   };
 
-  const plans = PRICING_PLANS.filter(plan => plan.id === 'free' || plan.id === 'pro' || plan.id === 'enterprise').map(plan => {
-    if (plan.id === 'pro') {
-      return {
-        ...plan,
-        features: [
-          'Audits illimités',
-          'Gestion des audits',
-          'Tableau Kanban',
-          'Prise de note',
-          'Audit manuel',
-          'Support prioritaire',
-          'Historique illimité'
-        ]
-      };
-    }
-    if (plan.id === 'enterprise') {
-      return {
-        ...plan,
-        features: [
-          'Audits illimités',
-          'Gestion des audits',
-          'Tableau Kanban',
-          'Prise de note',
-          'Audit manuel',
-          'Support prioritaire',
-          'Historique illimité',
-          'Intégration directe dans vos systèmes'
-        ]
-      };
-    }
-    return plan;
-  });
+  const getContactMailto = () => 'mailto:hello@loicbernard.com';
+
+  const plans = PRICING_PLANS;
 
   const handleSelectPlan = (planId: string) => {
-    if (!isAuthenticated) {
-      window.location.href = `/auth/register?plan=${planId}`;
-      return;
-    }
     if (planId === 'free') {
-      alert('Fonctionnalité en cours de développement');
+      window.location.href = '/auth/register?plan=free';
       return;
     }
-    if (planId === 'enterprise') {
-      window.location.href = '/contact';
-      return;
-    }
-    alert(`Redirection vers le paiement pour le plan ${planId}`);
+    // Pour pro et entreprise, ouvrir l'email
+    window.location.href = getContactMailto();
   };
 
   return (
@@ -211,7 +175,7 @@ export default function TarifsPage() {
                       ) : (
                         <>
                           <span>
-                            {plan.id === 'free' ? 'Commencer gratuitement' : plan.id === 'pro' ? 'Passer au Pro' : 'Contacter les ventes'}
+                            {plan.id === 'free' ? 'Commencer gratuitement' : plan.id === 'pro' ? 'Demander le Pro' : 'Demander un devis'}
                           </span>
                           <ArrowRight className="w-4 h-4" />
                         </>
@@ -255,7 +219,7 @@ export default function TarifsPage() {
               <p className="text-gray-600">
                 Oui ! Nous offrons des réductions spéciales pour les étudiants, les associations 
                 et les organisations à but non lucratif. 
-                <Link href="/contact" className="text-blue-600 hover:text-blue-700 ml-1">
+                <Link href="mailto:hello@loicbernard.com" className="text-blue-600 hover:text-blue-700 ml-1">
                   Contactez-nous pour plus d'informations.
                 </Link>
               </p>
@@ -283,7 +247,7 @@ export default function TarifsPage() {
               <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
             <Link
-              href="/contact"
+              href="mailto:hello@loicbernard.com"
               className="inline-flex items-center px-6 py-3 border border-blue-300 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               Parler à un expert

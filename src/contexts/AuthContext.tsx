@@ -176,6 +176,9 @@ const PRICING_PLANS: PricingPlan[] = [
     description: 'Pour les professionnels sans limite',
     features: [
       'Audits illimités',
+      'Tableau Kanban et prise de note',
+      'Audit manuel',
+      'Gestion des audits',
       'Support prioritaire',
       'Historique illimité'
     ],
@@ -190,6 +193,33 @@ const PRICING_PLANS: PricingPlan[] = [
       whiteLabel: false
     },
     popular: true
+  },
+  {
+    id: 'enterprise',
+    name: 'Entreprise',
+    price: 0,
+    currency: 'EUR',
+    interval: 'month',
+    description: 'Pour les grandes équipes et intégrations avancées',
+    features: [
+      'Audits illimités',
+      'Tableau Kanban et prise de note',
+      'Audit manuel',
+      'Gestion des audits',
+      'Support prioritaire',
+      'Historique illimité',
+      'Intégration directe dans vos systèmes'
+    ],
+    limits: {
+      auditsPerDay: 'unlimited',
+      auditsPerMonth: 'unlimited',
+      teamMembers: 'unlimited',
+      storage: 'unlimited',
+      apiAccess: true,
+      prioritySupport: true,
+      customReports: true,
+      whiteLabel: true
+    }
   }
 ];
 
