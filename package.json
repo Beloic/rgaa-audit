@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@axe-core/puppeteer": "^4.10.2",
+    "@sparticuz/chromium": "^119.0.2",
+    "axe-core": "^4.10.3",
+    "axios": "^1.10.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
+    "puppeteer": "^24.10.2",
+    "puppeteer-core": "^21.5.1",
+    "react-to-print": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  }
+}
