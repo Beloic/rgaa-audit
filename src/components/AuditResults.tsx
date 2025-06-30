@@ -24,7 +24,8 @@ import {
   Info,
   X,
   ArrowUp,
-  MapPin
+  MapPin,
+  Cpu
 } from 'lucide-react';
 import { IMPACT_LEVELS, RGAA_LEVELS } from '@/lib/constants';
 import type { AuditResult, RGAAViolation } from '@/types/audit';
@@ -1205,6 +1206,34 @@ export default function AuditResults({ result, language, onNewAudit }: AuditResu
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Bloc de synthèse modernisé */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-8">
+        {/* Moteur d'analyse */}
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg p-8 flex flex-col items-center border border-purple-100">
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-purple-200/60 shadow text-purple-700 mb-3">
+            <Cpu className="w-8 h-8" />
+          </span>
+          <div className="text-lg font-bold text-purple-800 mb-1">{engineName}</div>
+          <div className="text-gray-500 text-sm">Moteur d'analyse</div>
+        </div>
+        {/* Violations détectées */}
+        <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl shadow-lg p-8 flex flex-col items-center border border-red-100">
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-200/60 shadow text-red-700 mb-3">
+            <AlertTriangle className="w-8 h-8" />
+          </span>
+          <div className="text-3xl font-extrabold text-red-800 mb-1">{result.totalViolations}</div>
+          <div className="text-gray-500 text-sm">violations détectées</div>
+        </div>
+        {/* Statut de conformité */}
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-lg p-8 flex flex-col items-center border border-orange-100">
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-orange-200/60 shadow text-orange-700 mb-3">
+            <Award className="w-8 h-8" />
+          </span>
+          <div className="text-lg font-bold text-orange-800 mb-1">{result.score >= 100 ? 'Conforme' : result.score >= 50 ? 'Partiellement conforme' : 'Non conforme'}</div>
+          <div className="text-gray-500 text-sm">Statut de conformité</div>
         </div>
       </div>
 
