@@ -1001,14 +1001,6 @@ export default function AuditManagementPage() {
                     </button>
                   );
                 })}
-                {/* Onglet Statistiques */}
-                <button
-                  onClick={() => { window.location.href = '/?section=statistics'; }}
-                  className="flex items-center pb-4 px-1 border-b-2 font-medium text-sm transition-colors text-gray-500 hover:text-blue-600 hover:border-blue-500"
-                >
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Statistiques
-                </button>
               </nav>
             </div>
           </div>
