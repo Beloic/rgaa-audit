@@ -237,10 +237,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Fonction pour rafraîchir les données utilisateur depuis la base
   const refreshUserData = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('🔄 Pas d\'utilisateur connecté, aucun rafraîchissement');
+      return;
+    }
+    
+    console.log(`🔄 Rafraîchissement des données pour ${user.email}`);
     
     try {
       if (USE_API) {
+        console.log('📡 Mode API activé - récupération depuis Supabase');
         // En mode API, récupérer les données depuis Supabase
         const response = await fetch('/api/user/refresh', {
           method: 'POST',
@@ -250,11 +256,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         if (response.ok) {
           const refreshedUser = await response.json();
+          console.log('📊 Données récupérées:', {
+            plan: refreshedUser.subscription?.plan,
+            status: refreshedUser.subscription?.status
+          });
           setUser(refreshedUser);
           localStorage.setItem('rgaa-user', JSON.stringify(refreshedUser));
           console.log('✅ Données utilisateur rafraîchies depuis Supabase');
+        } else {
+          console.error('❌ Erreur API refresh:', response.status, await response.text());
         }
       } else {
+        console.log('💾 Mode localStorage activé');
         // En mode localStorage, synchroniser avec les données persistantes
         const persistentUser = getUserByEmail(user.email);
         if (persistentUser) {
@@ -313,24 +326,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     if (!user) return;
 
-    const interval = setInterval(() => {
-      refreshUserData();
+    const interval = setInterval(async () => {
+      console.log('🔄 Rafraîchissement automatique (30s)');
+      await refreshUserData();
     }, 30000); // 30 secondes
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user?.email]); // Utiliser user.email comme dépendance pour éviter les loops
 
   // Rafraîchir lors du focus de la fenêtre (retour sur l'onglet)
   useEffect(() => {
     if (!user) return;
 
-    const handleFocus = () => {
-      refreshUserData();
+    const handleFocus = async () => {
+      console.log('🔄 Rafraîchissement au focus de la fenêtre');
+      await refreshUserData();
     };
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [user]);
+  }, [user?.email]); // Utiliser user.email comme dépendance
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
