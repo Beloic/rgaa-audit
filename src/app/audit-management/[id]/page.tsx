@@ -947,7 +947,7 @@ export default function AuditManagementPage() {
         <Sidebar activeSection="history" onSectionChange={() => {}} />
       </div>
       {/* Main Content animé */}
-      <main className={`ml-64 transition-all duration-500 ${showContent ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'}`}>
+      <main className={`w-full min-h-screen transition-all duration-500 ${showContent ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'}`}>
         {/* En-tête avec bouton de retour */}
         <header className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6 py-6">
