@@ -151,10 +151,11 @@ const PRICING_PLANS: PricingPlan[] = [
     description: 'Parfait pour découvrir l\'audit d\'accessibilité',
     features: [
       '3 audits par jour',
-      'Analyse RGAA, WAVE et Axe',
       'Rapports de base',
       'Support communautaire',
-      'Historique 30 jours'
+      'Historique 30 jours',
+      'Audit manuel',
+      'Gestion des audits'
     ],
     limits: {
       auditsPerDay: 3,
@@ -209,7 +210,8 @@ const PRICING_PLANS: PricingPlan[] = [
       'Support prioritaire',
       'Historique illimité',
       'Intégration directe dans vos systèmes',
-      'Intégration API'
+      'Intégration API',
+      'Travail en équipe'
     ],
     limits: {
       auditsPerDay: 'unlimited',
