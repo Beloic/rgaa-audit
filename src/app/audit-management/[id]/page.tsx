@@ -29,10 +29,10 @@ import { CSS } from '@dnd-kit/utilities';
 import type { AuditResult, ComparativeResult, RGAAViolation } from '@/types/audit';
 import ManualAuditPage from '@/components/ManualAuditPage';
 import { useAuth } from '@/contexts/AuthContext';
-import TopBar from '@/components/TopBar';
-import Sidebar from '@/components/Sidebar';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import RGAAReference from '@/components/RGAAReference';
+import TopBar from '@/components/TopBar';
+import Sidebar from '@/components/Sidebar';
 
 // Interface étendue pour les violations avec source
 interface ExtendedRGAAViolation extends RGAAViolation {
@@ -504,6 +504,9 @@ export default function AuditManagementPage() {
   // Référence pour les modales
   const modalRef = useRef<HTMLDivElement>(null);
 
+  // États pour la gestion de la visibilité de la navigation
+  const [hideNav, setHideNav] = useState(false);
+
   // Charger les données d'audit et de gestion
   useEffect(() => {
     const loadAuditData = () => {
@@ -876,6 +879,11 @@ export default function AuditManagementPage() {
     setShowManualForm(false);
   };
 
+  useEffect(() => {
+    setTimeout(() => setHideNav(true), 100); // Laisse le temps à l'animation de démarrer
+    return () => setHideNav(false);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -925,26 +933,14 @@ export default function AuditManagementPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Topbar Navigation */}
-      <TopBar 
-        activeSection="home" 
-        onSectionChange={() => {}}
-        onAnalyzeClick={() => {}}
-      />
-
-      {/* Banner de vérification d'email */}
-      <div className="ml-64 relative z-10">
-        <div className="px-6 pt-4">
-          <EmailVerificationBanner />
-        </div>
+      {/* Topbar Navigation animée */}
+      <div className={`transition-all duration-500 ${hideNav ? 'opacity-0 -translate-y-8 pointer-events-none' : 'opacity-100 translate-y-0'} sticky top-0 z-50`}>
+        <TopBar activeSection="home" onSectionChange={() => {}} onAnalyzeClick={() => {}} />
       </div>
-
-      {/* Sidebar */}
-      <Sidebar 
-        activeSection="history" 
-        onSectionChange={() => {}}
-      />
-
+      {/* Sidebar animée */}
+      <div className={`fixed left-0 top-16 h-[calc(100vh-4rem)] z-40 transition-all duration-500 ${hideNav ? 'opacity-0 -translate-x-20 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
+        <Sidebar activeSection="history" onSectionChange={() => {}} />
+      </div>
       {/* Main Content */}
       <main className="ml-64">
         {/* En-tête avec bouton de retour */}
