@@ -11,7 +11,7 @@ import {
   HeadphonesIcon, Key, Globe, Palette
 } from 'lucide-react';
 
-const STRIPE_PRO_LINK = 'https://buy.stripe.com/test_XXXXXXXXXXXX'; // Remplace par ton vrai lien Stripe
+const STRIPE_PRO_LINK = 'https://buy.stripe.com/4gMdR8eO9fIz4Pz8jP1oI01'; // Lien Stripe officiel
 
 export default function TarifsPage() {
   const { user, isAuthenticated, getCurrentPlan } = useAuth();
