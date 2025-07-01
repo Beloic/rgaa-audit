@@ -90,8 +90,6 @@ export default function TarifsPage() {
                     isPopular
                       ? 'border-blue-500 shadow-blue-100'
                       : 'border-gray-200'
-                  } ${
-                    isCurrentPlan ? 'ring-2 ring-green-500 ring-offset-2' : ''
                   }`}
                 >
                   {/* Badge populaire */}

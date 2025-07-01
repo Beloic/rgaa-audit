@@ -698,8 +698,13 @@ export default function AuditManagementPage() {
     
     if (over && active.id !== over.id) {
       const cardId = active.id as string;
-      const newStatus = over.id as KanbanCard['status'];
-      moveCard(cardId, newStatus);
+      let newStatus = over.id as string;
+      if (newStatus.startsWith('empty-')) {
+        newStatus = newStatus.replace('empty-', '');
+      }
+      if (["todo", "inprogress", "validated", "postponed"].includes(newStatus)) {
+        moveCard(cardId, newStatus as KanbanCard['status']);
+      }
     }
     
     setActiveId(null);
