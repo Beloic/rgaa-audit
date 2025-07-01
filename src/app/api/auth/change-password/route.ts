@@ -14,11 +14,15 @@ const mailjetClient = process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_
   : null;
 
 export async function POST(request: NextRequest) {
+  console.log('🔄 Demande de réinitialisation de mot de passe reçue');
+  
   try {
     const { email } = await request.json();
+    console.log('📧 Email reçu:', email);
 
     // Validation
     if (!email) {
+      console.log('❌ Email manquant');
       return NextResponse.json(
         { error: 'Email requis' },
         { status: 400 }
@@ -26,15 +30,19 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isValidEmail(email)) {
+      console.log('❌ Format email invalide:', email);
       return NextResponse.json(
         { error: 'Format d\'email invalide' },
         { status: 400 }
       );
     }
 
+    console.log('🔍 Recherche de l\'utilisateur...');
+    
     // Récupérer l'utilisateur
     const user = await getUserByEmail(email);
     if (!user) {
+      console.log('⚠️ Utilisateur non trouvé pour:', email);
       // Pour des raisons de sécurité, on ne révèle pas si l'email existe ou non
       return NextResponse.json({
         success: true,
@@ -42,22 +50,28 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    console.log('👤 Utilisateur trouvé:', user.email);
+
     // Générer le token de réinitialisation
     const resetToken = generatePasswordResetToken();
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1); // Le token expire dans 1 heure
+
+    console.log('🔑 Token généré:', resetToken.substring(0, 8) + '...');
 
     // Mettre à jour l'utilisateur avec le token
     user.passwordResetToken = resetToken;
     user.passwordResetExpiresAt = expiresAt.toISOString();
     user.passwordResetSentAt = new Date().toISOString();
 
+    console.log('💾 Sauvegarde du token en base...');
     await saveUser(user);
+    console.log('✅ Token sauvegardé avec succès');
 
     // Construire l'URL de réinitialisation
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/confirm-password-change?token=${resetToken}`;
 
-    // Template HTML pour l'email de réinitialisation
+    // Template HTML harmonisé avec la confirmation d'inscription
     const emailHTML = `
       <!DOCTYPE html>
       <html lang="fr">
@@ -71,52 +85,52 @@ export async function POST(request: NextRequest) {
           <tr>
             <td align="center" style="padding: 40px 20px;">
               <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
-                
-                <!-- Header -->
+                <!-- Header avec logo -->
                 <tr>
                   <td style="padding: 40px 40px 30px 40px; text-align: center; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
-                    <div style="display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                      <svg width="32" height="32" viewBox="0 0 24 24" style="margin-right: 8px;">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" 
-                              stroke="white" 
-                              stroke-width="2" 
-                              stroke-linecap="round" 
-                              stroke-linejoin="round" 
-                              fill="none"/>
-                      </svg>
-                      <span style="color: white; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">RGAA Audit</span>
-                    </div>
-                    <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin: 12px 0 0 0; font-weight: 500;">
-                      Plateforme d'audit d'accessibilité web
-                    </p>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td align="center">
+                          <div style="display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" style="margin-right: 8px;">
+                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" 
+                                    stroke="white" 
+                                    stroke-width="2" 
+                                    stroke-linecap="round" 
+                                    stroke-linejoin="round" 
+                                    fill="none"/>
+                            </svg>
+                            <span style="color: white; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">RGAA Audit</span>
+                          </div>
+                          <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin: 12px 0 0 0; font-weight: 500;">
+                            Plateforme d'audit d'accessibilité web
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
-                
-                <!-- Content -->
+                <!-- Main Content -->
                 <tr>
                   <td style="padding: 40px;">
                     <h2 style="margin: 0 0 24px 0; color: #1e293b; font-size: 24px; font-weight: 600;">
                       Réinitialisation de votre mot de passe
                     </h2>
-                    
                     <p style="margin: 0 0 20px 0; color: #334155; font-size: 16px; line-height: 1.6;">
                       Bonjour ${user.name},
                     </p>
-                    
                     <p style="margin: 0 0 20px 0; color: #334155; font-size: 16px; line-height: 1.6;">
                       Nous avons reçu une demande de réinitialisation de votre mot de passe pour votre compte RGAA Audit.
                     </p>
-                    
                     <p style="margin: 0 0 32px 0; color: #334155; font-size: 16px; line-height: 1.6;">
-                      Pour créer un nouveau mot de passe, cliquez sur le bouton ci-dessous :
+                      Pour créer un nouveau mot de passe, veuillez cliquer sur le bouton ci-dessous :
                     </p>
-                    
                     <!-- CTA Button -->
                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                       <tr>
                         <td align="center" style="padding: 32px 0;">
-                          <a href="${resetUrl}" 
-                             style="display: inline-block; padding: 18px 36px; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #ffffff; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 17px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4); letter-spacing: 0.3px;">
+                          <a href="${resetUrl}"
+                             style="display: inline-block; padding: 18px 36px; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #ffffff; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 17px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4); transition: all 0.2s ease; letter-spacing: 0.3px;">
                             🔑 Réinitialiser mon mot de passe
                           </a>
                         </td>
@@ -129,8 +143,7 @@ export async function POST(request: NextRequest) {
                         </td>
                       </tr>
                     </table>
-                    
-                    <!-- Important notice -->
+                    <!-- Informations importantes -->
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 40px 0;">
                       <tr>
                         <td style="padding: 24px; background: linear-gradient(135deg, #fef2f2 0%, #fef7f7 100%); border-radius: 12px; border: 1px solid #fecaca;">
@@ -151,8 +164,7 @@ export async function POST(request: NextRequest) {
                         </td>
                       </tr>
                     </table>
-                    
-                    <!-- Alternative link -->
+                    <!-- Lien alternatif -->
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 32px 0;">
                       <tr>
                         <td style="padding: 20px; background-color: #f8fafc; border-radius: 8px; border-left: 4px solid #e5e7eb;">
@@ -168,23 +180,69 @@ export async function POST(request: NextRequest) {
                         </td>
                       </tr>
                     </table>
-                    
-                    <p style="margin: 32px 0 0 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
-                      Cordialement,<br>
-                      L'équipe RGAA Audit
-                    </p>
-                    
                   </td>
                 </tr>
-                
-                <!-- Footer -->
+                <!-- Footer moderne -->
                 <tr>
-                  <td style="padding: 32px 40px; background-color: #f8fafc; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+                  <td style="padding: 36px 40px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-top: 1px solid #e2e8f0; border-radius: 0 0 12px 12px;">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 28px;">
+                      <tr>
+                        <td align="center">
+                          <p style="margin: 0 0 6px 0; color: #64748b; font-size: 16px; line-height: 1.4;">
+                            Cordialement,
+                          </p>
+                          <p style="margin: 0; color: #374151; font-size: 17px; font-weight: 700;">
+                            L'équipe RGAA Audit
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
+                      <tr>
+                        <td align="center" style="border-top: 1px solid #d1d5db; padding-top: 24px;">
+                          <div style="display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" style="margin-right: 6px;">
+                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" 
+                                    stroke="#64748b" 
+                                    stroke-width="2" 
+                                    stroke-linecap="round" 
+                                    stroke-linejoin="round" 
+                                    fill="none"/>
+                            </svg>
+                            <span style="color: #64748b; font-size: 13px; font-weight: 600;">RGAA Audit</span>
+                          </div>
+                          <p style="margin: 0; color: #64748b; font-size: 12px; line-height: 1.5;">
+                            Plateforme d'audit d'accessibilité web<br>
+                            Conformité RGAA • Outils automatisés • Expertise française
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 20px;">
+                      <tr>
+                        <td align="center">
+                          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/privacy" 
+                             style="color: #2563eb; text-decoration: none; font-size: 11px; margin: 0 8px; font-weight: 500;">
+                            Politique de confidentialité
+                          </a>
+                          <span style="color: #d1d5db; font-size: 11px;">•</span>
+                          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/terms" 
+                             style="color: #2563eb; text-decoration: none; font-size: 11px; margin: 0 8px; font-weight: 500;">
+                            Conditions d'utilisation
+                          </a>
+                          <span style="color: #d1d5db; font-size: 11px;">•</span>
+                          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/contact" 
+                             style="color: #2563eb; text-decoration: none; font-size: 11px; margin: 0 8px; font-weight: 500;">
+                            Contact
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                       <tr>
                         <td align="center">
                           <p style="margin: 0 0 8px 0; color: #9ca3af; font-size: 11px;">
-                            © ${new Date().getFullYear()} RGAA Audit - Plateforme d'audit d'accessibilité web
+                            © ${new Date().getFullYear()} 
                           </p>
                           <p style="margin: 0; color: #9ca3af; font-size: 10px; line-height: 1.4; font-style: italic;">
                             Email envoyé automatiquement suite à votre demande de réinitialisation.<br>
@@ -195,7 +253,6 @@ export async function POST(request: NextRequest) {
                     </table>
                   </td>
                 </tr>
-                
               </table>
             </td>
           </tr>
@@ -204,35 +261,11 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    // Version texte
-    const emailText = `
-Bonjour ${user.name},
-
-Nous avons reçu une demande de réinitialisation de votre mot de passe pour votre compte RGAA Audit.
-
-Pour créer un nouveau mot de passe, cliquez sur le lien suivant :
-${resetUrl}
-
-INFORMATIONS IMPORTANTES :
-- Ce lien expire dans 1 heure
-- Si vous n'avez pas demandé cette réinitialisation, ignorez cet email
-- Ce lien ne peut être utilisé qu'une seule fois
-
-Cordialement,
-L'équipe RGAA Audit
-
----
-RGAA Audit
-Plateforme d'audit d'accessibilité web
-France
-
-Cet email a été envoyé automatiquement suite à votre demande de réinitialisation.
-Si vous recevez cet email par erreur, veuillez l'ignorer.
-    `.trim();
-
-    // Envoyer l'email
+    // Envoyer l'email (ou simuler)
     if (mailjetClient) {
       try {
+        console.log('📤 Tentative d\'envoi via MailJet...');
+        
         const result = await mailjetClient
           .post('send', { version: 'v3.1' })
           .request({
@@ -249,8 +282,7 @@ Si vous recevez cet email par erreur, veuillez l'ignorer.
                   }
                 ],
                 Subject: 'Réinitialisation de votre mot de passe - RGAA Audit',
-                HTMLPart: emailHTML,
-                TextPart: emailText,
+                HtmlPart: emailHTML,
                 Headers: {
                   'X-Entity-Ref-ID': 'rgaa-audit-password-reset'
                 }
@@ -258,7 +290,7 @@ Si vous recevez cet email par erreur, veuillez l'ignorer.
             ]
           });
 
-        console.log('✅ Email de réinitialisation envoyé via MailJet:', {
+        console.log('✅ Email envoyé via MailJet:', {
           messageId: result.body.Messages[0].To[0].MessageID,
           email: email
         });
@@ -271,7 +303,6 @@ Si vous recevez cet email par erreur, veuillez l'ignorer.
 
       } catch (mailjetError) {
         console.error('❌ Erreur MailJet:', mailjetError);
-        // En cas d'erreur MailJet, on fallback vers la simulation
         console.log('⚠️ Utilisation du mode simulation suite à l\'erreur MailJet');
       }
     }
@@ -299,11 +330,14 @@ Si vous recevez cet email par erreur, veuillez l'ignorer.
     return NextResponse.json({
       success: true,
       message: 'Si votre adresse email existe dans notre base, vous recevrez un lien de réinitialisation.',
-      provider: 'simulation'
+      provider: 'simulation',
+      resetUrl: resetUrl // Pour le debug en développement
     });
 
   } catch (error) {
     console.error('❌ Erreur lors de la demande de réinitialisation:', error);
+    console.error('Stack trace:', error instanceof Error ? error.stack : 'Pas de stack trace disponible');
+    
     return NextResponse.json(
       { error: 'Erreur serveur lors de la demande de réinitialisation' },
       { status: 500 }
