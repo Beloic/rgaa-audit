@@ -171,24 +171,37 @@ export default function TarifsPage() {
                         </>
                       ) : (
                         <>
-                          <span>
-                            {plan.id === 'free' ? 'Commencer gratuitement' : 
-                             plan.id === 'pro' ? 'Passer au Pro' : 
-                             'Nous contacter'}
-                          </span>
-                          <ArrowRight className="w-4 h-4" />
+                          {plan.id === 'free' ? (
+                            <Link
+                              href="/auth/register"
+                              className="inline-flex items-center px-6 py-3 bg-white text-blue-600 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              Commencer gratuitement
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </Link>
+                          ) : plan.id === 'pro' ? (
+                            'Passer au Pro'
+                          ) : (
+                            <a
+                              href="mailto:hello@loicbernard.com"
+                              className="inline-flex items-center px-6 py-3 border border-blue-300 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors"
+                            >
+                              Nous contacter
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </a>
+                          )}
                         </>
                       )}
                     </button>
 
                     {plan.id === 'enterprise' && (
                       <div className="text-center mt-4">
-                        <Link 
-                          href="/contact"
+                        <a 
+                          href="mailto:hello@loicbernard.com"
                           className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                         >
                           Nous contacter
-                        </Link>
+                        </a>
                       </div>
                     )}
                   </div>
@@ -251,12 +264,12 @@ export default function TarifsPage() {
               Commencer gratuitement
               <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
-            <Link
-              href="/contact"
+            <a
+              href="mailto:hello@loicbernard.com"
               className="inline-flex items-center px-6 py-3 border border-blue-300 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               Nous contacter
-            </Link>
+            </a>
           </div>
         </div>
       </section>
