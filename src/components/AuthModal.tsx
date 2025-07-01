@@ -88,25 +88,17 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
     }
 
     try {
-      await register(registerForm.name, registerForm.email, registerForm.password);
+      await register(registerForm.email, registerForm.password, registerForm.name);
       setIsRegistrationSuccess(true);
-      
-      // Auto-fermeture après succès d'inscription
+      // Ne pas fermer le modal immédiatement, attendre 3 secondes
       setTimeout(() => {
         handleClose();
-      }, 5000);
-      
+      }, 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de l\'inscription');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleForgotPassword = () => {
-    // Fermer la modal et rediriger vers la page de réinitialisation
-    handleClose();
-    window.location.href = '/auth/change-password';
   };
 
   if (!isOpen) return null;
@@ -216,20 +208,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
 
           {/* Login Form */}
           {activeTab === 'login' && (
-            <form onSubmit={handleLogin} className="space-y-6" noValidate>
-              {error && (
-                <div className="rounded-md bg-red-50 p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <AlertCircle className="h-5 w-5 text-red-400" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-red-800">{error}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
+            <form onSubmit={handleLogin} className="space-y-6">
               <div>
                 <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">
                   Adresse email
@@ -240,7 +219,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
                   </div>
                   <input
                     id="login-email"
-                    type="text"
+                    type="email"
                     required
                     value={loginForm.email}
                     onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
@@ -291,7 +270,6 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
                 </label>
                 <button
                   type="button"
-                  onClick={handleForgotPassword}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
                   Mot de passe oublié ?
@@ -317,7 +295,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
 
           {/* Register Form */}
           {activeTab === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-6" noValidate>
+            <form onSubmit={handleRegister} className="space-y-6">
               <div>
                 <label htmlFor="register-name" className="block text-sm font-medium text-gray-700 mb-2">
                   Nom complet
@@ -348,7 +326,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
                   </div>
                   <input
                     id="register-email"
-                    type="text"
+                    type="email"
                     required
                     value={registerForm.email}
                     onChange={(e) => setRegisterForm(prev => ({ ...prev, email: e.target.value }))}

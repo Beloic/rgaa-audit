@@ -93,7 +93,7 @@ export default function ChangePasswordPage() {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+            <form onSubmit={handleSubmit} className="space-y-6">
               {status === 'error' && (
                 <div className="rounded-md bg-red-50 p-4">
                   <div className="flex">
@@ -118,7 +118,7 @@ export default function ChangePasswordPage() {
                   <input
                     id="email"
                     name="email"
-                    type="text"
+                    type="email"
                     autoComplete="email"
                     required
                     value={email}

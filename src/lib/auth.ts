@@ -34,15 +34,8 @@ export const generateSessionToken = (): string => {
 
 // Valider un email
 export const isValidEmail = (email: string): boolean => {
-  // Regex plus robuste pour la validation d'email
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-  
-  // Vérifications supplémentaires
-  if (!email || typeof email !== 'string') return false;
-  if (email.length > 254) return false; // RFC 5321 limite
-  if (email.includes('..')) return false; // Pas de points consécutifs
-  
-  return emailRegex.test(email.trim());
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 };
 
 // Valider un mot de passe

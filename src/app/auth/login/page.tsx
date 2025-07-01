@@ -75,7 +75,7 @@ function LoginContent() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Message d'erreur */}
             {error && (
               <div className="rounded-md bg-red-50 p-4">
@@ -102,7 +102,7 @@ function LoginContent() {
                 <input
                   id="email"
                   name="email"
-                  type="text"
+                  type="email"
                   autoComplete="email"
                   required
                   value={email}

@@ -293,15 +293,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (savedUser) {
           const userData = JSON.parse(savedUser);
           
-          // Vérifier que l'utilisateur n'a pas été explicitement déconnecté
-          const logoutFlag = localStorage.getItem('rgaa-explicit-logout');
-          if (logoutFlag) {
-            console.log('🚫 Utilisateur explicitement déconnecté, pas de rechargement automatique');
-            localStorage.removeItem('rgaa-explicit-logout');
-            localStorage.removeItem('rgaa-user');
-            return;
-          }
-          
           if (!USE_API) {
             // Mode localStorage - synchroniser avec les données persistantes
             const persistentUser = getUserByEmail(userData.email);
@@ -360,9 +351,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulation délai
-      
-      // Supprimer le flag de déconnexion explicite lors de la connexion
-      localStorage.removeItem('rgaa-explicit-logout');
       
       let authenticatedUser: User;
 
@@ -495,21 +483,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const logout = async () => {
-    console.log('🚪 Déconnexion en cours...');
-    
-    // Marquer la déconnexion comme explicite pour éviter la reconnexion automatique
-    localStorage.setItem('rgaa-explicit-logout', 'true');
-    
-    // Nettoyer complètement l'état et le localStorage
     setUser(null);
     localStorage.removeItem('rgaa-user');
-    
-    // Nettoyer aussi les données persistantes si mode localStorage
-    if (!USE_API && user) {
-      console.log('🧹 Nettoyage des données de session pour:', user.email);
-    }
-    
-    console.log('✅ Déconnexion terminée');
   };
 
   const updateUser = async (updates: Partial<User>) => {
