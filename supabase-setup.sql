@@ -19,6 +19,11 @@ CREATE TABLE IF NOT EXISTS users (
   email_verification_token VARCHAR(255),
   email_verification_sent_at TIMESTAMP WITH TIME ZONE,
   
+  -- Réinitialisation de mot de passe
+  password_reset_token VARCHAR(255),
+  password_reset_expires_at TIMESTAMP WITH TIME ZONE,
+  password_reset_sent_at TIMESTAMP WITH TIME ZONE,
+  
   -- Beta access
   beta_access_granted BOOLEAN DEFAULT FALSE,
   beta_access_granted_at TIMESTAMP WITH TIME ZONE,
@@ -50,6 +55,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- Index pour optimiser les recherches
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
+CREATE INDEX IF NOT EXISTS idx_users_password_reset_token ON users(password_reset_token);
 
 -- Trigger pour updated_at automatique
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -94,4 +100,11 @@ GRANT ALL ON users TO authenticated;
 COMMENT ON TABLE users IS 'Table des utilisateurs de l''application RGAA Audit';
 COMMENT ON COLUMN users.subscription_plan IS 'Plan d''abonnement: free, pro, enterprise';
 COMMENT ON COLUMN users.subscription_status IS 'Statut: trial, active, cancelled, expired';
-COMMENT ON COLUMN users.storage_used IS 'Stockage utilisé en MB'; 
+COMMENT ON COLUMN users.storage_used IS 'Stockage utilisé en MB';
+COMMENT ON COLUMN users.password_reset_token IS 'Token de réinitialisation de mot de passe';
+COMMENT ON COLUMN users.password_reset_expires_at IS 'Date d''expiration du token de réinitialisation';
+
+-- Mise à jour pour ajouter les colonnes manquantes si la table existe déjà
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_sent_at TIMESTAMP WITH TIME ZONE; 

@@ -30,6 +30,9 @@ interface SupabaseUser {
   email_verified: boolean;
   email_verification_token?: string;
   email_verification_sent_at?: string;
+  password_reset_token?: string;
+  password_reset_expires_at?: string;
+  password_reset_sent_at?: string;
   beta_access_granted: boolean;
   beta_access_granted_at?: string;
   beta_access_has_quit: boolean;
@@ -62,6 +65,9 @@ const supabaseUserToUser = (supabaseUser: SupabaseUser): UserType => ({
   emailVerified: supabaseUser.email_verified,
   emailVerificationToken: supabaseUser.email_verification_token,
   emailVerificationSentAt: supabaseUser.email_verification_sent_at,
+  passwordResetToken: supabaseUser.password_reset_token,
+  passwordResetExpiresAt: supabaseUser.password_reset_expires_at,
+  passwordResetSentAt: supabaseUser.password_reset_sent_at,
   betaAccess: {
     granted: supabaseUser.beta_access_granted,
     grantedAt: supabaseUser.beta_access_granted_at,
@@ -170,10 +176,14 @@ export const saveUser = async (user: UserType): Promise<void> => {
   try {
     const updateData = {
       name: user.name,
+      password: user.password,
       last_login_at: user.lastLoginAt,
       email_verified: user.emailVerified,
       email_verification_token: user.emailVerificationToken,
       email_verification_sent_at: user.emailVerificationSentAt,
+      password_reset_token: user.passwordResetToken,
+      password_reset_expires_at: user.passwordResetExpiresAt,
+      password_reset_sent_at: user.passwordResetSentAt,
       beta_access_granted: user.betaAccess?.granted || false,
       beta_access_granted_at: user.betaAccess?.grantedAt,
       beta_access_has_quit: user.betaAccess?.hasQuit || false,

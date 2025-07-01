@@ -33,11 +33,11 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   const { language } = useLanguage();
   const t = translations[language];
   const getButtonClasses = (section: string) => {
-    const baseClasses = "w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500";
+    const baseClasses = "w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 border";
     if (activeSection === section) {
-      return `${baseClasses} bg-blue-50 text-blue-700 border border-blue-200`;
+      return `${baseClasses} bg-blue-50 text-blue-700 border-blue-200`;
     }
-    return `${baseClasses} text-gray-700 hover:bg-gray-50 hover:text-gray-900`;
+    return `${baseClasses} text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-transparent`;
   };
 
   return (

@@ -9,6 +9,9 @@ export interface User {
   emailVerified: boolean;
   emailVerificationToken?: string;
   emailVerificationSentAt?: string;
+  passwordResetToken?: string;
+  passwordResetExpiresAt?: string;
+  passwordResetSentAt?: string;
   betaAccess: {
     granted: boolean;
     grantedAt?: string;

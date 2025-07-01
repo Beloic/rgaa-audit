@@ -16,6 +16,17 @@ export const generateVerificationToken = (): string => {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
 };
 
+// Générer un token de réinitialisation de mot de passe sécurisé
+export const generatePasswordResetToken = (): string => {
+  return crypto.randomBytes(32).toString('hex');
+};
+
+// Vérifier si un token de réinitialisation est encore valide
+export const isPasswordResetTokenValid = (expiresAt?: string): boolean => {
+  if (!expiresAt) return false;
+  return new Date(expiresAt) > new Date();
+};
+
 // Générer un token de session simple (en production, utiliser JWT)
 export const generateSessionToken = (): string => {
   return crypto.randomBytes(32).toString('hex');
