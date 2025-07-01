@@ -75,6 +75,14 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
+    // DEBUG: Afficher les données du formulaire
+    console.log('🔍 Données du formulaire avant envoi:', {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword
+    });
+
     if (!validateForm()) {
       return;
     }
@@ -82,6 +90,12 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
+      console.log('📤 Envoi vers register() avec:', {
+        email: formData.email,
+        password: formData.password,
+        name: formData.name
+      });
+      
       await register(formData.email, formData.password, formData.name);
       
       // Rediriger vers l'accueil ou page de vérification email
