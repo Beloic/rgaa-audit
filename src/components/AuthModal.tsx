@@ -216,7 +216,20 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
 
           {/* Login Form */}
           {activeTab === 'login' && (
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-6" noValidate>
+              {error && (
+                <div className="rounded-md bg-red-50 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <AlertCircle className="h-5 w-5 text-red-400" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-red-800">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">
                   Adresse email
@@ -304,7 +317,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
 
           {/* Register Form */}
           {activeTab === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-6">
+            <form onSubmit={handleRegister} className="space-y-6" noValidate>
               <div>
                 <label htmlFor="register-name" className="block text-sm font-medium text-gray-700 mb-2">
                   Nom complet
