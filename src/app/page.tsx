@@ -24,23 +24,16 @@ import {
   CheckCircle, 
   Award, 
   BookOpen, 
-  Heart, 
-  TrendingUp,
-  Scale,
-  Lightbulb,
   Globe,
   Eye,
   Headphones,
   MousePointer,
-  Accessibility,
   Brain,
   Clock,
   DollarSign,
   Search,
   ChevronDown,
-  ChevronUp,
-  Quote,
-  Star
+  ChevronUp
 } from 'lucide-react';
 
 // Composant FAQ
@@ -67,10 +60,6 @@ function FAQSection() {
     {
       question: "Quelle est la différence entre WAVE, Axe Core et le moteur RGAA ?",
       answer: "WAVE (WebAIM) excelle dans la détection des erreurs critiques avec une interface visuelle claire. Axe Core (Deque) offre une analyse plus approfondie avec des règles WCAG détaillées. Notre moteur RGAA est spécialement adapté aux critères français du RGAA 4.1. L'analyse comparative utilise les trois pour une couverture maximale."
-    },
-    {
-      question: "Est-ce que l'outil est gratuit ?",
-      answer: "Oui, notre outil est gratuit avec quelques limitations pour maintenir le service accessible à tous. Les utilisateurs non connectés peuvent effectuer 3 analyses par jour, et les utilisateurs connectés 10 analyses par jour. Pour des besoins professionnels intensifs, des options payantes sont disponibles."
     },
     {
       question: "Que faire après avoir identifié les problèmes ?",
@@ -484,48 +473,7 @@ export default function HomePage() {
                 </div>
               </section>
 
-              {/* Pourquoi l'accessibilité - Section informative */}
-              <section aria-labelledby="why-accessibility-heading" className="px-6 py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-                <div className="max-w-6xl mx-auto text-center">
-                  <h2 id="why-accessibility-heading" className="text-3xl md:text-4xl font-bold text-white mb-8">
-                    Pourquoi l'accessibilité numérique ?
-                  </h2>
-                  
-                  <div className="grid md:grid-cols-3 gap-8 mb-12">
-                    <div className="text-center">
-                      <Scale className="w-16 h-16 text-white/90 mx-auto mb-4" aria-hidden="true" />
-                      <h3 className="text-xl font-semibold text-white mb-3">Obligation légale</h3>
-                      <p className="text-blue-100">
-                                                 Depuis 2019, les sites publics et privés (+250 salariés) doivent être conformes au RGAA
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <Heart className="w-16 h-16 text-white/90 mx-auto mb-4" aria-hidden="true" />
-                      <h3 className="text-xl font-semibold text-white mb-3">Impact humain</h3>
-                      <p className="text-blue-100">
-                        12 millions de personnes en France ont un handicap. L'accessibilité les inclut dans le numérique
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <TrendingUp className="w-16 h-16 text-white/90 mx-auto mb-4" aria-hidden="true" />
-                      <h3 className="text-xl font-semibold text-white mb-3">Bénéfices business</h3>
-                      <p className="text-blue-100">
-                        Meilleur SEO, expérience utilisateur améliorée, marché élargi et image de marque renforcée
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="bg-white/10 backdrop-blur rounded-xl p-8 text-white max-w-4xl mx-auto">
-                    <Quote className="w-12 h-12 mx-auto mb-4 text-white/80" aria-hidden="true" />
-                    <blockquote className="text-lg md:text-xl italic mb-4">
-                      "La puissance du Web réside dans son universalité. L'accès pour tous, quel que soit le handicap, est un aspect essentiel."
-                    </blockquote>
-                    <cite className="font-semibold">— Tim Berners-Lee, Inventeur du Web</cite>
-                  </div>
-                </div>
-              </section>
-
-              {/* Types de handicaps - Section éducative */}
+                            {/* Types de handicaps - Section éducative */}
               <section aria-labelledby="disabilities-types-heading" className="px-6 py-20 bg-gray-50">
                 <div className="max-w-6xl mx-auto">
                   <h2 id="disabilities-types-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
@@ -579,16 +527,6 @@ export default function HomePage() {
                         <li>• Temps de lecture adapté</li>
                       </ul>
                     </article>
-                  </div>
-                  
-                  <div className="mt-12 text-center">
-                    <div className="bg-gradient-to-r from-orange-100 to-yellow-100 p-6 rounded-xl max-w-4xl mx-auto">
-                      <Lightbulb className="w-12 h-12 text-orange-600 mx-auto mb-4" aria-hidden="true" />
-                      <p className="text-gray-700 text-lg">
-                        <strong>Bon à savoir :</strong> L'accessibilité profite aussi aux seniors, aux personnes avec des connexions lentes, 
-                        aux utilisateurs mobiles, et améliore l'expérience pour tous !
-                      </p>
-                    </div>
                   </div>
                 </div>
               </section>
