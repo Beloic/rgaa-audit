@@ -104,8 +104,6 @@ export default function TarifsPage() {
                     isPopular
                       ? 'border-blue-500 shadow-blue-100'
                       : 'border-gray-200'
-                  } ${
-                    isCurrentPlan ? 'ring-2 ring-green-500 ring-offset-2' : ''
                   }`}
                 >
                   {/* Badge populaire */}
@@ -246,58 +244,6 @@ export default function TarifsPage() {
             </div>
 
             <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Puis-je changer de plan à tout moment ?
-              </h3>
-              <p className="text-gray-600">
-                Oui, vous pouvez passer à un plan supérieur ou inférieur à tout moment. 
-                Les changements prennent effet immédiatement et nous calculons la facturation au prorata.
-              </p>
-            </div>
-
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Que se passe-t-il si je dépasse ma limite d'audits ?
-              </h3>
-              <p className="text-gray-600">
-                Pour le plan gratuit, vous devrez attendre le lendemain pour effectuer de nouveaux audits. 
-                Nous vous notifierons lorsque vous approchez de votre limite et vous pourrez passer 
-                à un plan supérieur pour continuer immédiatement.
-              </p>
-            </div>
-
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Les coûts API sont-ils vraiment inclus ?
-              </h3>
-              <p className="text-gray-600">
-                Oui, absolument ! Tous nos plans payants incluent les coûts des APIs externes (WAVE, Axe Core). 
-                Vous n'avez aucun frais caché ou supplément à prévoir. C'est l'un de nos engagements 
-                pour une tarification transparente.
-              </p>
-            </div>
-
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Y a-t-il une période d'essai gratuite ?
-              </h3>
-              <p className="text-gray-600">
-                Le plan gratuit vous permet de tester nos fonctionnalités de base avec 3 audits par jour. 
-                Les plans payants incluent une garantie de remboursement de 30 jours sans question.
-              </p>
-            </div>
-
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Comment fonctionne la facturation annuelle ?
-              </h3>
-              <p className="text-gray-600">
-                La facturation annuelle vous fait économiser 20% par rapport au paiement mensuel. 
-                Vous payez une fois par an et bénéficiez d'une réduction automatique.
-              </p>
-            </div>
-
-            <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Proposez-vous des réductions pour les étudiants ou les associations ?
               </h3>
