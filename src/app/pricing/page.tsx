@@ -70,97 +70,12 @@ export default function PricingPage() {
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Tarification simple et
             <span className="text-blue-600"> transparente</span>
-            <span className="text-xs block mt-2 text-gray-500">Mise à jour: 2024-12-29</span>
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
             Choisissez le plan qui correspond à vos besoins. Commencez gratuitement, 
             évoluez quand vous voulez, annulez à tout moment.
           </p>
-
-          {/* Toggle Mensuel/Annuel */}
-          <div className="flex items-center justify-center space-x-4 mb-12">
-            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Mensuel
-            </span>
-            <button
-              onClick={() => setIsAnnual(!isAnnual)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                isAnnual ? 'bg-blue-600' : 'bg-gray-200'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isAnnual ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-            <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Annuel
-            </span>
-            {isAnnual && (
-              <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                -20%
-              </span>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Section explicative sur la consommation API */}
-      <section className="pb-16">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white mb-12">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-6">
-                <Server className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                Pourquoi des plans payants ?
-              </h2>
-              <p className="text-blue-100 text-lg mb-8 max-w-3xl mx-auto">
-                Notre plateforme utilise des services externes payants pour vous offrir la meilleure qualité d'audit d'accessibilité.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
-                <Database className="w-10 h-10 text-blue-200 mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">APIs Externes</h3>
-                <p className="text-blue-100 text-sm">
-                  Intégration avec WAVE, Axe Core et nos propres moteurs d'analyse avancés
-                </p>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
-                <Cpu className="w-10 h-10 text-blue-200 mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Puissance de calcul</h3>
-                <p className="text-blue-100 text-sm">
-                  Analyse en temps réel de vos pages web avec des algorithmes optimisés
-                </p>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
-                <TrendingUp className="w-10 h-10 text-blue-200 mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Infrastructure premium</h3>
-                <p className="text-blue-100 text-sm">
-                  Serveurs dédiés, sauvegardes automatiques et monitoring 24/7
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-8 bg-white/10 backdrop-blur rounded-xl p-6">
-              <div className="flex items-start space-x-4">
-                <AlertCircle className="w-6 h-6 text-blue-200 flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-semibold mb-2">Consommation de crédits</h4>
-                  <p className="text-blue-100 text-sm">
-                    Chaque audit consomme des crédits API auprès de nos partenaires (WebAIM, Deque Systems). 
-                    Nos tarifs reflètent ces coûts réels et nous permettent de maintenir un service de qualité professionnelle 
-                    accessible au plus grand nombre.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -305,16 +220,6 @@ export default function PricingPage() {
               );
             })}
           </div>
-
-          {/* Note sur la transparence des coûts */}
-          <div className="mt-12 bg-gray-50 rounded-xl p-6 text-center">
-            <h3 className="font-semibold text-gray-900 mb-2">Transparence totale sur nos coûts</h3>
-            <p className="text-gray-600 text-sm max-w-3xl mx-auto">
-              Contrairement à d'autres solutions, nous vous donnons accès aux meilleurs outils d'audit d'accessibilité 
-              (WAVE, Axe Core, moteur RGAA propriétaire) sans vous faire payer le prix fort. Nos tarifs couvrent 
-              uniquement les coûts réels d'infrastructure et d'APIs externes.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -333,12 +238,10 @@ export default function PricingPage() {
           <div className="space-y-8">
             <div className="border-b border-gray-200 pb-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Pourquoi proposez-vous des plans payants ?
+                Pourquoi la plateforme propose-t-elle des plans payants et comment sont calculés les tarifs ?
               </h3>
               <p className="text-gray-600">
-                Notre plateforme utilise des APIs externes payantes (WAVE de WebAIM, Axe Core de Deque Systems) 
-                et nécessite une infrastructure robuste pour traiter les audits en temps réel. Nos tarifs 
-                reflètent ces coûts réels et nous permettent de vous offrir le meilleur service possible.
+                RGAA Audit utilise des services externes payants (WAVE, Axe Core, moteur RGAA propriétaire) pour garantir la meilleure qualité d'audit d'accessibilité. Chaque audit consomme des crédits API auprès de partenaires comme WebAIM et Deque Systems. Nos tarifs couvrent uniquement les coûts réels d'infrastructure et d'API, sans surcoût caché, afin de garantir un service professionnel, fiable et transparent.
               </p>
             </div>
 
