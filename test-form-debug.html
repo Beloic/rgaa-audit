@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Debug - Formulaire Simple</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+        .result { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Debug - Formulaire Simple</h1>
+    
+    <form id="testForm" autocomplete="off">
+        <div class="form-group">
+            <label for="name">Nom :</label>
+            <input type="text" id="name" name="name" autocomplete="off" placeholder="Votre nom">
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email :</label>
+            <input type="text" id="email" name="email" autocomplete="off" placeholder="votre@email.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Mot de passe :</label>
+            <input type="text" id="password" name="password" autocomplete="off" placeholder="Votre mot de passe">
+        </div>
+        
+        <button type="submit">Tester</button>
+    </form>
+    
+    <div id="result" class="result" style="display: none;"></div>
+    
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <h3>📊 Données récupérées :</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+                
+                <h3>🔍 Analyse :</h3>
+                <p><strong>Nom:</strong> "${data.name}" (dans champ name)</p>
+                <p><strong>Email:</strong> "${data.email}" (dans champ email)</p>
+                <p><strong>Password:</strong> "${data.password}" (dans champ password)</p>
+                
+                <h3>✅ Test :</h3>
+                <p>${data.name === 'Test Debug' && data.email === 'hello@loicbernard.com' && data.password === 'test123456' ? 
+                    '✅ <strong style="color: green;">CORRECT</strong> - Les valeurs sont dans les bons champs' : 
+                    '❌ <strong style="color: red;">ERREUR</strong> - Les valeurs sont mélangées'}</p>
+            `;
+        });
+    </script>
+</body>
+</html> 

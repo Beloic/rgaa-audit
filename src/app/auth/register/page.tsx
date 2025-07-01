@@ -21,10 +21,15 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    console.log(`🔧 handleChange: champ "${e.target.name}" = "${e.target.value}"`);
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [e.target.name]: e.target.value
+      };
+      console.log('📋 Nouvel état formData:', newData);
+      return newData;
+    });
   };
 
   const getPasswordStrength = (password: string) => {
@@ -74,6 +79,19 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    console.log('🚀 SUBMIT - État formData final:', {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword
+    });
+    
+    console.log('📤 SUBMIT - Paramètres envoyés à register():', {
+      email: formData.email,
+      password: formData.password,
+      name: formData.name
+    });
 
     if (!validateForm()) {
       return;
