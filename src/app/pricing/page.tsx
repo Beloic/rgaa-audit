@@ -174,7 +174,7 @@ export default function PricingPage() {
                           <span>
                             {plan.id === 'free' ? 'Commencer gratuitement' : 
                              plan.id === 'pro' ? 'Passer au Pro' : 
-                             'Contacter les ventes'}
+                             'Nous contacter'}
                           </span>
                           <ArrowRight className="w-4 h-4" />
                         </>
@@ -187,7 +187,7 @@ export default function PricingPage() {
                           href="/contact"
                           className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                         >
-                          Ou contactez-nous pour un devis personnalisé
+                          Nous contacter
                         </Link>
                       </div>
                     )}

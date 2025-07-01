@@ -174,7 +174,7 @@ export default function TarifsPage() {
                           <span>
                             {plan.id === 'free' ? 'Commencer gratuitement' : 
                              plan.id === 'pro' ? 'Passer au Pro' : 
-                             'Contacter les ventes'}
+                             'Nous contacter'}
                           </span>
                           <ArrowRight className="w-4 h-4" />
                         </>
@@ -187,7 +187,7 @@ export default function TarifsPage() {
                           href="/contact"
                           className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                         >
-                          Ou contactez-nous pour un devis personnalisé
+                          Nous contacter
                         </Link>
                       </div>
                     )}
@@ -243,9 +243,6 @@ export default function TarifsPage() {
           <h2 className="text-3xl font-bold text-white mb-4">
             Prêt à améliorer l'accessibilité de vos sites ?
           </h2>
-          <p className="text-blue-100 text-lg mb-8">
-            Découvrez pourquoi RGAA Audit est le choix de référence pour l'audit d'accessibilité web professionnel.
-          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/auth/register"
