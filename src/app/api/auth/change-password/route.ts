@@ -222,17 +222,17 @@ export async function POST(request: NextRequest) {
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 20px;">
                       <tr>
                         <td align="center">
-                          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/privacy" 
+                          <a href="${baseUrl}/politique-confidentialite" 
                              style="color: #2563eb; text-decoration: none; font-size: 11px; margin: 0 8px; font-weight: 500;">
                             Politique de confidentialité
                           </a>
                           <span style="color: #d1d5db; font-size: 11px;">•</span>
-                          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/terms" 
+                          <a href="${baseUrl}/mentions-legales" 
                              style="color: #2563eb; text-decoration: none; font-size: 11px; margin: 0 8px; font-weight: 500;">
-                            Conditions d'utilisation
+                            Mentions légales
                           </a>
                           <span style="color: #d1d5db; font-size: 11px;">•</span>
-                          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/contact" 
+                          <a href="${baseUrl}/contact" 
                              style="color: #2563eb; text-decoration: none; font-size: 11px; margin: 0 8px; font-weight: 500;">
                             Contact
                           </a>
