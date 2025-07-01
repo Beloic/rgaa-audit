@@ -1,10 +1,10 @@
 'use client';
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function ConfirmPasswordChangePage() {
+function ConfirmPasswordChangeContent() {
   const [status, setStatus] = useState<'pending' | 'success' | 'error'>('pending');
   const [message, setMessage] = useState('');
   const router = useRouter();
@@ -46,5 +46,13 @@ export default function ConfirmPasswordChangePage() {
       {status === 'success' && <div className="text-green-600 font-semibold">{message}</div>}
       {status === 'error' && <div className="text-red-600 font-semibold">{message}</div>}
     </div>
+  );
+}
+
+export default function ConfirmPasswordChangePage() {
+  return (
+    <Suspense fallback={<div className="max-w-md mx-auto mt-20 text-center">Chargement...</div>}>
+      <ConfirmPasswordChangeContent />
+    </Suspense>
   );
 } 
