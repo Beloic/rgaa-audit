@@ -343,7 +343,7 @@ export default function Statistics({}: StatisticsProps) {
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* En-tête */}
       <header className="mb-8">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
+        <div className="bg-blue-50 rounded-2xl p-8 border border-blue-100">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 flex items-center mb-3">
@@ -380,7 +380,7 @@ export default function Statistics({}: StatisticsProps) {
       {/* Cartes de statistiques principales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Total audits */}
-        <div className="relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-blue-100">
+                  <div className="relative bg-blue-50 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-blue-100">
           <div className="absolute top-4 right-4">
             <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-200/60 shadow text-blue-700">
               <BarChart3 className="w-7 h-7" />
@@ -390,7 +390,7 @@ export default function Statistics({}: StatisticsProps) {
           <div className="text-base text-blue-700 font-medium tracking-wide">{t.totalAudits}</div>
         </div>
         {/* Total violations */}
-        <div className="relative bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-orange-100">
+                  <div className="relative bg-orange-50 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-orange-100">
           <div className="absolute top-4 right-4">
             <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-200/60 shadow text-orange-700">
               <AlertTriangle className="w-7 h-7" />
@@ -400,7 +400,7 @@ export default function Statistics({}: StatisticsProps) {
           <div className="text-base text-orange-700 font-medium tracking-wide">{t.totalViolations}</div>
         </div>
         {/* Compliance rate */}
-        <div className="relative bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-purple-100">
+                  <div className="relative bg-purple-50 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center border border-purple-100">
           <div className="absolute top-4 right-4">
             <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-200/60 shadow text-purple-700">
               <Award className="w-7 h-7" />

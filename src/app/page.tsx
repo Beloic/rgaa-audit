@@ -375,7 +375,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+          <div className="min-h-screen bg-blue-50">
         {/* Skip to main content link pour l'accessibilité */}
         <a 
           href="#main-content" 
@@ -420,7 +420,7 @@ export default function HomePage() {
                     <span className="text-gray-900">
                       {t('home.mainTitle')}
                     </span>
-                    <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">RGAA</span>
+                    <span className="text-blue-600">RGAA</span>
                   </h1>
                   <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
                     {t('home.mainDescription')}

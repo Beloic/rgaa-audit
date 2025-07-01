@@ -347,7 +347,7 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
                 </div>
                 <div className="w-full bg-blue-200 rounded-full h-2 overflow-hidden">
                   <div 
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${progress.progress}%` }}
                     role="progressbar"
                     aria-valuenow={progress.progress}
@@ -384,7 +384,7 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
               className={`w-full flex items-center justify-center px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                 isAnalyzing
                   ? 'bg-gray-400 text-white cursor-not-allowed focus:ring-gray-400'
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:from-blue-700 focus:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:ring-blue-500'
+                  : 'bg-blue-600 hover:bg-blue-700 focus:bg-blue-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:ring-blue-500'
               }`}
               aria-describedby={isAnalyzing ? "analyzing-status" : undefined}
             >

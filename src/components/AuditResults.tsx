@@ -700,7 +700,7 @@ function ViolationCard({ violation, language, index, engine }: ViolationCardProp
       </div>
       
       {/* Section recommandation collapsible */}
-      <div className="border-t border-gray-200 bg-gradient-to-r from-blue-50/30 to-indigo-50/30">
+                      <div className="border-t border-gray-200 bg-blue-50/30">
         <button
           onClick={() => setIsRecommendationOpen(!isRecommendationOpen)}
           className="w-full flex items-center justify-between p-4 hover:bg-blue-50/50 transition-colors"
@@ -810,7 +810,7 @@ function AccessibilityLevelCard({ result, language }: { result: AuditResult; lan
       color: 'bg-green-500',
       textColor: 'text-white',
       borderColor: 'border-green-600',
-      bgGradient: 'bg-gradient-to-r from-green-50 to-green-100',
+              bgGradient: 'bg-green-50',
       icon: '✅'
     },
     'A': {
@@ -821,7 +821,7 @@ function AccessibilityLevelCard({ result, language }: { result: AuditResult; lan
       color: 'bg-orange-500',
       textColor: 'text-white',
       borderColor: 'border-orange-600',
-      bgGradient: 'bg-gradient-to-r from-orange-50 to-orange-100',
+              bgGradient: 'bg-orange-50',
       icon: '⚠️'
     },
     'NONE': {
@@ -832,7 +832,7 @@ function AccessibilityLevelCard({ result, language }: { result: AuditResult; lan
       color: 'bg-red-500',
       textColor: 'text-white',
       borderColor: 'border-red-600',
-      bgGradient: 'bg-gradient-to-r from-red-50 to-red-100',
+              bgGradient: 'bg-red-50',
       icon: '❌'
     }
   };
@@ -886,31 +886,31 @@ function MetricCard({
 }) {
   const colorConfigs = {
     blue: {
-      header: 'bg-gradient-to-r from-blue-50 to-blue-100',
+              header: 'bg-blue-50',
       border: 'border-blue-200',
       text: 'text-blue-900',
       icon: 'text-blue-600'
     },
     green: {
-      header: 'bg-gradient-to-r from-green-50 to-green-100',
+              header: 'bg-green-50',
       border: 'border-green-200',
       text: 'text-green-900',
       icon: 'text-green-600'
     },
     red: {
-      header: 'bg-gradient-to-r from-red-50 to-red-100',
+              header: 'bg-red-50',
       border: 'border-red-200',
       text: 'text-red-900',
       icon: 'text-red-600'
     },
     orange: {
-      header: 'bg-gradient-to-r from-orange-50 to-orange-100',
+              header: 'bg-orange-50',
       border: 'border-orange-200',
       text: 'text-orange-900',
       icon: 'text-orange-600'
     },
     purple: {
-      header: 'bg-gradient-to-r from-purple-50 to-purple-100',
+              header: 'bg-purple-50',
       border: 'border-purple-200',
       text: 'text-purple-900',
       icon: 'text-purple-600'
@@ -1147,7 +1147,7 @@ export default function AuditResults({ result, language, onNewAudit }: AuditResu
       
       {/* Header Section - cohérent avec les autres blocs */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-8 py-6 border-b border-blue-200">
+                        <div className="bg-blue-50 px-8 py-6 border-b border-blue-200">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center min-w-0 flex-1">
               <Award className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" />
@@ -1240,7 +1240,7 @@ export default function AuditResults({ result, language, onNewAudit }: AuditResu
 
         {/* Par niveau RGAA */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 border-b border-blue-200">
+                          <div className="bg-blue-50 px-6 py-4 border-b border-blue-200">
             <h3 className="text-xl font-bold text-blue-900">{t.byLevel}</h3>
           </div>
           <div className="p-6 space-y-4">
@@ -1282,7 +1282,7 @@ export default function AuditResults({ result, language, onNewAudit }: AuditResu
       {/* Liste des violations détectées avec filtres */}
       {result.violations.length > 0 && (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-red-50 to-red-100 px-6 py-4 border-b border-red-200">
+                          <div className="bg-red-50 px-6 py-4 border-b border-red-200">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <h3 className="text-xl font-bold text-red-900 break-words min-w-0 flex-1">
                 {language === 'fr' ? 'Problèmes d\'accessibilité détectés' : 'Accessibility Issues Detected'}
