@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Test Validation Email</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .debug { background: #f8f9fa; border: 1px solid #dee2e6; color: #495057; margin-top: 10px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug - Test Validation Email</h1>
+    <p>Ce test permet de vérifier directement l'API d'inscription.</p>
+    
+    <form id="testForm">
+        <div class="form-group">
+            <label for="email">Email à tester :</label>
+            <input type="text" id="email" value="hello@loicbernard.com" placeholder="email@example.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="name">Nom :</label>
+            <input type="text" id="name" value="Test Debug" placeholder="Nom complet">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" value="test123456" placeholder="Minimum 6 caractères">
+        </div>
+        
+        <div class="form-group">
+            <label for="apiUrl">URL de l'API :</label>
+            <select id="apiUrl">
+                <option value="https://rgaa-audit.vercel.app/api/auth/register">Production (Vercel)</option>
+                <option value="http://localhost:3000/api/auth/register">Local (Port 3000)</option>
+                <option value="/api/auth/register">Relatif (Même domaine)</option>
+            </select>
+        </div>
+        
+        <button type="submit">🚀 Tester l'inscription</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+            const password = document.getElementById('password').value;
+            const apiUrl = document.getElementById('apiUrl').value;
+            const resultDiv = document.getElementById('result');
+            
+            // Afficher les données envoyées
+            const requestData = { email, name, password };
+            
+            resultDiv.innerHTML = `
+                <div class="debug">
+                    <strong>📤 Requête envoyée :</strong>
+                    <pre>URL: ${apiUrl}
+Données: ${JSON.stringify(requestData, null, 2)}</pre>
+                </div>
+                <div class="debug">⏳ En cours d'envoi...</div>
+            `;
+            
+            try {
+                const startTime = Date.now();
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const responseTime = Date.now() - startTime;
+                const data = await response.json();
+                
+                const statusClass = response.ok ? 'success' : 'error';
+                const statusIcon = response.ok ? '✅' : '❌';
+                
+                resultDiv.innerHTML = `
+                    <div class="${statusClass}">
+                        <strong>${statusIcon} Réponse (${response.status}) :</strong>
+                        <p>${data.message || data.error || 'Pas de message'}</p>
+                    </div>
+                    <div class="debug">
+                        <strong>📋 Détails techniques :</strong>
+                        <pre>Status: ${response.status} ${response.statusText}
+Temps: ${responseTime}ms
+Content-Type: ${response.headers.get('content-type')}
+
+Réponse complète:
+${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Erreur réseau :</strong>
+                        <p>${error.message}</p>
+                    </div>
+                    <div class="debug">
+                        <strong>🔍 Détails de l'erreur :</strong>
+                        <pre>${error.stack || error.toString()}</pre>
+                    </div>
+                `;
+            }
+        });
+        
+        // Test de validation côté client
+        function testEmailValidation(email) {
+            const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+            
+            const checks = {
+                'Non vide': !!email && typeof email === 'string',
+                'Longueur ≤ 254': email.length <= 254,
+                'Pas de points consécutifs': !email.includes('..'),
+                'Regex RFC 5322': emailRegex.test(email.trim())
+            };
+            
+            return checks;
+        }
+        
+        // Test automatique au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            const email = document.getElementById('email').value;
+            const validation = testEmailValidation(email);
+            
+            console.log('🧪 Validation email côté client:', validation);
+            console.log('✅ Email valide:', Object.values(validation).every(Boolean));
+        });
+    </script>
+</body>
+</html> 
