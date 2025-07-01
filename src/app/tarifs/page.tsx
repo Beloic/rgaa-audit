@@ -223,9 +223,9 @@ export default function TarifsPage() {
               <p className="text-gray-600">
                 Oui ! Nous offrons des réductions spéciales pour les étudiants, les associations 
                 et les organisations à but non lucratif. 
-                <Link href="/contact" className="text-blue-600 hover:text-blue-700 ml-1">
+                <a href="mailto:hello@loicbernard.com" className="text-blue-600 hover:text-blue-700 ml-1">
                   Contactez-nous pour plus d'informations.
-                </Link>
+                </a>
               </p>
             </div>
           </div>
