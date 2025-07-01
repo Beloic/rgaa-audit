@@ -33,7 +33,7 @@ export default function PricingPage() {
   };
 
   const formatPrice = (price: number) => {
-    if (price === 0) return 'Gratuit';
+    if (price === 0) return '0€/mois';
     const finalPrice = isAnnual ? Math.round(price * 10) : price; // -20% si annuel
     return `${finalPrice}€`;
   };
@@ -82,16 +82,6 @@ export default function PricingPage() {
       {/* Pricing Cards */}
       <section className="pb-20">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Des plans adaptés à tous vos besoins
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Du développeur indépendant à la grande entreprise, trouvez le plan qui vous convient. 
-              Tous les plans incluent les mêmes fonctionnalités de base avec des limites adaptées.
-            </p>
-          </div>
-
           <div className="grid md:grid-cols-3 gap-8">
             {PRICING_PLANS.map((plan) => {
               const isCurrentPlan = currentPlan?.id === plan.id;
@@ -144,18 +134,6 @@ export default function PricingPage() {
                       {isAnnual && plan.price > 0 && (
                         <div className="text-sm text-green-600 font-medium">
                           Économisez {Math.round(plan.price * 2.4)}€ par an
-                        </div>
-                      )}
-
-                      {/* Indicateur de coût API */}
-                      {plan.id !== 'free' && (
-                        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                          <div className="flex items-center justify-center space-x-2">
-                            <CreditCard className="w-4 h-4 text-blue-600" />
-                            <span className="text-blue-800 text-xs font-medium">
-                              Inclut les coûts API externes
-                            </span>
-                          </div>
                         </div>
                       )}
                     </div>
