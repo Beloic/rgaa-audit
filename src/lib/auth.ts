@@ -41,4 +41,38 @@ export const isValidEmail = (email: string): boolean => {
 // Valider un mot de passe
 export const isValidPassword = (password: string): boolean => {
   return password.length >= 6; // Minimum 6 caractères
+};
+
+// Nettoyer les tokens expirés (utilitaire pour maintenance)
+export const cleanupExpiredTokens = async () => {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.log('⚠️ Configuration Supabase manquante pour le nettoyage');
+      return;
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        password_reset_token: null,
+        password_reset_expires_at: null,
+        password_reset_sent_at: null
+      })
+      .lt('password_reset_expires_at', new Date().toISOString())
+      .not('password_reset_token', 'is', null);
+    
+    if (error) {
+      console.error('❌ Erreur lors du nettoyage des tokens:', error);
+    } else {
+      console.log('🧹 Tokens expirés nettoyés:', data?.length || 0);
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors du nettoyage:', error);
+  }
 }; 

@@ -69,7 +69,8 @@ export async function POST(request: NextRequest) {
     console.log('✅ Token sauvegardé avec succès');
 
     // Construire l'URL de réinitialisation
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/confirm-password-change?token=${resetToken}`;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const resetUrl = `${baseUrl}/auth/confirm-password-change?token=${resetToken}`;
 
     // Template HTML harmonisé avec la confirmation d'inscription
     const emailHTML = `
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
               <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
                 <!-- Header avec logo -->
                 <tr>
-                  <td style="padding: 40px 40px 30px 40px; text-align: center; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                  <td style="padding: 40px 40px 30px 40px; text-align: center; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                       <tr>
                         <td align="center">
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
                       <tr>
                         <td align="center" style="padding: 32px 0;">
                           <a href="${resetUrl}"
-                             style="display: inline-block; padding: 18px 36px; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #ffffff; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 17px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4); transition: all 0.2s ease; letter-spacing: 0.3px;">
+                             style="display: inline-block; padding: 18px 36px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 17px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4); transition: all 0.2s ease; letter-spacing: 0.3px;">
                             🔑 Réinitialiser mon mot de passe
                           </a>
                         </td>
@@ -146,19 +147,19 @@ export async function POST(request: NextRequest) {
                     <!-- Informations importantes -->
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 40px 0;">
                       <tr>
-                        <td style="padding: 24px; background: linear-gradient(135deg, #fef2f2 0%, #fef7f7 100%); border-radius: 12px; border: 1px solid #fecaca;">
-                          <p style="margin: 0 0 16px 0; color: #b91c1c; font-size: 15px; font-weight: 700;">
+                        <td style="padding: 24px; background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%); border-radius: 12px; border: 1px solid #bfdbfe;">
+                          <p style="margin: 0 0 16px 0; color: #1e40af; font-size: 15px; font-weight: 700;">
                             ⚠️ Informations importantes
                           </p>
-                          <div style="color: #991b1b; font-size: 14px; line-height: 1.6;">
+                          <div style="color: #1e40af; font-size: 14px; line-height: 1.6;">
                             <p style="margin: 0 0 8px 0;">
-                              <strong>🕐 Validité :</strong> Ce lien expire dans <strong>1 heure</strong>
+                              <strong>⏰ Expiration :</strong> Ce lien est valide pendant <strong>1 heure</strong>
                             </p>
                             <p style="margin: 0 0 8px 0;">
-                              <strong>🛡️ Sécurité :</strong> Si vous n'avez pas demandé cette réinitialisation, ignorez cet email
+                              <strong>🔒 Sécurité :</strong> Si vous n'avez pas demandé cette réinitialisation, ignorez cet email
                             </p>
                             <p style="margin: 0;">
-                              <strong>🔒 Accès :</strong> Ce lien ne peut être utilisé qu'une seule fois
+                              <strong>✨ Usage unique :</strong> Ce lien ne peut être utilisé qu'une seule fois
                             </p>
                           </div>
                         </td>
