@@ -32,9 +32,10 @@ export default function TarifsPage() {
     return <Check className="w-4 h-4 text-green-600" />;
   };
 
-  const formatPrice = (price: number) => {
-    if (price === 0) return '0€/mois';
-    const finalPrice = isAnnual ? Math.round(price * 10) : price; // -20% si annuel
+  const formatPrice = (plan: any) => {
+    if (plan.id === 'enterprise') return 'sur devis';
+    if (plan.price === 0) return '0€/mois';
+    const finalPrice = isAnnual ? Math.round(plan.price * 10) : plan.price;
     return `${finalPrice}€`;
   };
 
@@ -128,9 +129,9 @@ export default function TarifsPage() {
                       
                       <div className="mb-4">
                         <span className="text-4xl font-bold text-gray-900">
-                          {formatPrice(plan.price)}
+                          {formatPrice(plan)}
                         </span>
-                        {plan.price > 0 && (
+                        {plan.price > 0 && plan.id !== 'enterprise' && (
                           <span className="text-gray-500 text-sm">
                             /{isAnnual ? 'an' : 'mois'}
                           </span>
