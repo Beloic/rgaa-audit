@@ -413,7 +413,25 @@ async function runComparativeAnalysis(url: string): Promise<ComparativeResult> {
   // Trouver les violations communes
   const commonViolations = findCommonViolations(successfulResults);
   const uniqueViolations = removeDuplicateViolations(commonViolations);
-  
+
+  // Générer les violations spécifiques à chaque moteur
+  const engineSpecificViolations: {
+    wave: RGAAViolation[];
+    axe: RGAAViolation[];
+    rgaa: RGAAViolation[];
+  } = {
+    wave: [],
+    axe: [],
+    rgaa: []
+  };
+
+  successfulResults.forEach(result => {
+    const specificViolations = result.result.violations.filter(violation => 
+      !commonViolations.some(common => violationsAreSimilar(violation, common))
+    );
+    engineSpecificViolations[result.engine] = specificViolations;
+  });
+
   // Déterminer le moteur le plus fiable
   const mostReliableEngine = determineMostReliableEngine(successfulResults, uniqueViolations);
   
@@ -442,9 +460,11 @@ async function runComparativeAnalysis(url: string): Promise<ComparativeResult> {
   return {
     url,
     timestamp: new Date(),
-    engineResults,
+    engines: engineResults,
     summary,
     totalUniqueViolations: uniqueViolations.length,
+    commonViolations,
+    engineSpecificViolations,
     violations: uniqueViolations,
     violationsByImpact: groupByImpact(uniqueViolations),
     violationsByLevel: groupByLevel(uniqueViolations)

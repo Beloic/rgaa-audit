@@ -65,6 +65,9 @@ export interface ComparativeResult {
     axe: RGAAViolation[];
     rgaa: RGAAViolation[];
   };
+  violations: RGAAViolation[]; // Toutes les violations uniques
+  violationsByImpact: { low: number; medium: number; high: number; critical: number };
+  violationsByLevel: { A: number; AA: number; AAA: number };
   summary: {
     bestScore: number;
     worstScore: number;
