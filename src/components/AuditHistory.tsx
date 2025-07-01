@@ -302,10 +302,10 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
 
               {/* Corps avec métriques et détails */}
               <div className="px-6 py-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
                   {/* Moteur d'analyse utilisé */}
-                  <div className="flex flex-col items-center justify-center p-0">
-                    <div className="bg-purple-50 border border-purple-100 rounded-xl shadow w-full py-6 flex flex-col items-center mb-2">
+                  <div className="flex flex-col items-center justify-center p-0 h-full">
+                    <div className="bg-purple-50 border border-purple-100 rounded-xl shadow w-full py-6 flex flex-col items-center mb-2 h-full">
                       <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-purple-200/60 text-purple-700 mb-2">
                         {getEngineIcon(audit.engine, "w-6 h-6")}
                       </span>
@@ -314,16 +314,16 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
                     <span className="text-xs text-gray-500 mt-1">Moteur d'analyse</span>
                   </div>
                   {/* Violations */}
-                  <div className="flex flex-col items-center justify-center p-0">
-                    <div className="bg-red-50 border border-red-100 rounded-xl shadow w-full py-6 flex flex-col items-center mb-2">
+                  <div className="flex flex-col items-center justify-center p-0 h-full">
+                    <div className="bg-red-50 border border-red-100 rounded-xl shadow w-full py-6 flex flex-col items-center mb-2 h-full">
                       <span className="text-2xl font-extrabold text-red-700 mb-1" style={{fontFamily: 'inherit'}}>{audit.totalViolations}</span>
                       <span className="text-xs font-medium text-red-600" style={{fontFamily: 'inherit'}}>violations</span>
                     </div>
                     <span className="text-xs text-gray-500 mt-1">Violations détectées</span>
                   </div>
                   {/* Statut de conformité */}
-                  <div className="flex flex-col items-center justify-center p-0">
-                    <div className={`rounded-xl shadow w-full py-6 flex flex-col items-center mb-2 border ${
+                  <div className="flex flex-col items-center justify-center p-0 h-full">
+                    <div className={`rounded-xl shadow w-full py-6 flex flex-col items-center mb-2 border h-full ${
                       audit.score >= 100 
                         ? 'bg-green-50 border-green-100' 
                         : audit.score >= 50 
