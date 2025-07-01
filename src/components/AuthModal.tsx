@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Eye, EyeOff, Mail, Lock, User, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
   const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false);
   
   const { login, register } = useAuth();
+  const router = useRouter();
 
   // Formulaire de connexion
   const [loginForm, setLoginForm] = useState({
@@ -99,6 +101,11 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    handleClose();
+    router.push('/auth/change-password');
   };
 
   if (!isOpen) return null;
@@ -270,6 +277,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
                 </label>
                 <button
                   type="button"
+                  onClick={handleForgotPassword}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
                   Mot de passe oublié ?
