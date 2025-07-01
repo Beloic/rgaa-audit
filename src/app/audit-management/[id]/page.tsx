@@ -468,7 +468,7 @@ export default function AuditManagementPage() {
   // États pour la gestion des données
   const [auditData, setAuditData] = useState<AuditResult | ComparativeResult | null>(null);
   const [management, setManagement] = useState<AuditManagement | null>(null);
-  const [activeTab, setActiveTab] = useState<'kanban' | 'notes' | 'dashboard' | 'manual' | 'guide' | 'rgaa'>('kanban');
+  const [activeTab, setActiveTab] = useState<'kanban' | 'notes' | 'manual' | 'guide' | 'rgaa'>('kanban');
   const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -977,7 +977,6 @@ export default function AuditManagementPage() {
                 {[
                   { id: 'kanban', label: 'Tableau Kanban', icon: Kanban },
                   { id: 'notes', label: 'Notes', icon: FileText },
-                  { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                   { id: 'manual', label: 'Audit manuel', icon: User },
                   { id: 'guide', label: 'Guide d\'audit manuel', icon: Lightbulb },
                   { id: 'rgaa', label: 'Référentiel RGAA', icon: BookOpen },
@@ -1122,14 +1121,14 @@ export default function AuditManagementPage() {
 
               {/* Liste des notes */}
               <div className="space-y-4">
-                {management.notes.length === 0 ? (
+                {management.notes.filter(note => note && note.id && note.content).length === 0 ? (
                   <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                     <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune note</h3>
                     <p className="text-gray-500">Commencez par ajouter une note ci-dessus.</p>
                   </div>
                 ) : (
-                  management.notes.map(note => {
+                  management.notes.filter(note => note && note.id && note.content).map(note => {
                     const isEditing = editingNote === note.id;
                     const noteStyle = note.color ? noteColorStyles[note.color] : { bg: 'bg-white', border: 'border-gray-200', accent: 'bg-gray-500' };
                     
@@ -1260,102 +1259,6 @@ export default function AuditManagementPage() {
                     );
                   })
                 )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'dashboard' && (
-            <div className="space-y-8">
-              {/* Graphique de progression */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-6">Progression de l'audit</h3>
-                
-                <div className="space-y-4">
-                  {/* Barre de progression globale */}
-                  <div>
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>Progression globale</span>
-                      <span>{Math.round((stats.validated / stats.total) * 100)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${(stats.validated / stats.total) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Répartition par statut */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-                    {Object.entries(statusConfig).map(([status, config]) => {
-                      const count = stats[status as keyof typeof stats];
-                      const percentage = Math.round((count / stats.total) * 100);
-                      
-                      return (
-                        <div key={status} className="text-center">
-                          <div className={`text-2xl font-bold mb-1 ${config.textColor}`}>
-                            {count}
-                          </div>
-                          <div className="text-sm text-gray-500 mb-2">{config.title}</div>
-                          <div className="text-xs text-gray-400">{percentage}%</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* Statistiques détaillées */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Répartition par priorité */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Répartition par priorité</h4>
-                  <div className="space-y-3">
-                    {Object.entries(priorityColors).map(([priority, colorClass]) => {
-                      const count = (management?.kanbanCards && Array.isArray(management.kanbanCards))
-                        ? management.kanbanCards.filter(card => card.priority === priority).length
-                        : 0;
-                      const percentage = stats.total ? Math.round((count / stats.total) * 100) : 0;
-                      
-                      return (
-                        <div key={priority} className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <span className={`px-2 py-1 rounded-full text-xs border ${colorClass}`}>
-                              {priority}
-                            </span>
-                            <span className="ml-3 text-sm text-gray-600">{count} violations</span>
-                          </div>
-                          <span className="text-sm text-gray-500">{percentage}%</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Activité récente */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Activité récente</h4>
-                  <div className="space-y-3">
-                    {(management?.kanbanCards && Array.isArray(management.kanbanCards) ? management.kanbanCards : [])
-                      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-                      .slice(0, 5)
-                      .map(card => (
-                        <div key={card.id} className="flex items-center space-x-3 text-sm">
-                          <div className={`w-2 h-2 rounded-full ${
-                            card.status === 'validated' ? 'bg-green-500' :
-                            card.status === 'inprogress' ? 'bg-blue-500' :
-                            card.status === 'postponed' ? 'bg-orange-500' : 'bg-gray-500'
-                          }`} />
-                          <span className="text-gray-600">
-                            Critère {card.violation.criterion} déplacé vers {statusConfig[card.status].title}
-                          </span>
-                          <span className="text-gray-400 text-xs">
-                            {new Date(card.updatedAt).toLocaleDateString('fr-FR')}
-                          </span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
               </div>
             </div>
           )}
