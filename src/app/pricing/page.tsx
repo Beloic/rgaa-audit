@@ -70,6 +70,7 @@ export default function PricingPage() {
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Tarification simple et
             <span className="text-blue-600"> transparente</span>
+            <span className="text-xs block mt-2 text-gray-500">Mise à jour: 2024-12-29</span>
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
