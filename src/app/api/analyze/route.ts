@@ -1133,7 +1133,43 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
     console.log(`🌐 Le rapport WAVE reste ouvert dans Chrome pour consultation manuelle.`);
     
     // Convertir les résultats WAVE en format RGAA
-    const violations = parseWaveResults(JSON.stringify(waveResults));
+    const rgaaViolations: RGAAViolation[] = [];
+    
+    // Convertir les erreurs WAVE
+    if (waveResults.errors && Array.isArray(waveResults.errors)) {
+      waveResults.errors.forEach((error: any, index: number) => {
+        rgaaViolations.push({
+          ruleId: `wave-error-${index + 1}`,
+          criterion: mapWaveToRGAA(error.type || 'accessibility_error'),
+          level: 'A' as const,
+          impact: determineImpact(error.type || 'accessibility_error'),
+          description: error.description || `Erreur d'accessibilité WAVE #${index + 1}`,
+          element: error.selector || `wave-error-${index + 1}`,
+          recommendation: generateRecommendation(error.type || 'accessibility_error'),
+          context: error.context || error.raw_text || 'Erreur détectée par WAVE'
+        });
+      });
+    }
+    
+    // Convertir les alertes WAVE
+    if (waveResults.alerts && Array.isArray(waveResults.alerts)) {
+      waveResults.alerts.forEach((alert: any, index: number) => {
+        rgaaViolations.push({
+          ruleId: `wave-alert-${index + 1}`,
+          criterion: mapWaveToRGAA(alert.type || 'accessibility_alert'),
+          level: 'AA' as const,
+          impact: 'medium' as const,
+          description: alert.description || `Alerte d'accessibilité WAVE #${index + 1}`,
+          element: alert.selector || `wave-alert-${index + 1}`,
+          recommendation: generateRecommendation(alert.type || 'accessibility_alert'),
+          context: alert.context || alert.raw_text || 'Alerte détectée par WAVE'
+        });
+      });
+    }
+    
+    console.log(`📊 Conversion terminée: ${rgaaViolations.length} violations RGAA créées à partir de WAVE`);
+    console.log(`   - Erreurs: ${waveResults.errors?.length || 0}`);
+    console.log(`   - Alertes: ${waveResults.alerts?.length || 0}`);
     
     // Laisser l'onglet/navigateur ouvert pour consultation manuelle
     if (!isProduction) {
@@ -1143,7 +1179,7 @@ async function launchWaveAnalysis(url: string): Promise<RGAAViolation[]> {
       console.log(`📋 Rapport WAVE généré (mode production - pas d'interface visuelle).`);
     }
     
-    return violations;
+    return rgaaViolations;
     
   } catch (error) {
     console.error('❌ Erreur lors de l\'analyse WAVE:', error);
@@ -1556,17 +1592,28 @@ function mapWaveToRGAA(waveType: string): string {
     'link_empty': '6.1',
     'button_empty': '7.1',
     'language_missing': '8.3',
+    'accessibility_error': '1.1',
+    'accessibility_alert': '6.1',
+    'wave_accessibility_error': '1.1',
+    'wave_accessibility_alert': '6.1',
+    'general_error': '1.1',
+    'general_alert': '6.1',
+    'heading_possible': '9.1',
+    'link_redundant': '6.1',
+    'image_alt_suspicious': '1.1'
   };
   return mapping[waveType] || '1.1';
 }
 
 // Déterminer l'impact selon le type d'erreur WAVE
 function determineImpact(waveType: string): 'low' | 'medium' | 'high' | 'critical' {
-  const criticalTypes = ['alt_missing', 'label_missing'];
-  const highTypes = ['heading_skipped', 'link_empty', 'language_missing'];
+  const criticalTypes = ['alt_missing', 'label_missing', 'language_missing', 'accessibility_error', 'wave_accessibility_error', 'general_error'];
+  const highTypes = ['heading_skipped', 'link_empty', 'button_empty', 'contrast'];
+  const mediumTypes = ['heading_possible', 'link_redundant', 'image_alt_suspicious', 'accessibility_alert', 'wave_accessibility_alert', 'general_alert'];
   
   if (criticalTypes.includes(waveType)) return 'critical';
   if (highTypes.includes(waveType)) return 'high';
+  if (mediumTypes.includes(waveType)) return 'medium';
   return 'medium';
 }
 
@@ -1580,8 +1627,17 @@ function generateRecommendation(waveType: string): string {
     'link_empty': 'Ajouter un texte descriptif au lien',
     'button_empty': 'Ajouter un texte ou aria-label au bouton',
     'language_missing': 'Ajouter l\'attribut lang à l\'élément html',
+    'accessibility_error': 'Corriger ce problème d\'accessibilité critique détecté par WAVE',
+    'accessibility_alert': 'Examiner et corriger cette alerte d\'accessibilité détectée par WAVE',
+    'wave_accessibility_error': 'Consulter le rapport WAVE pour plus de détails sur cette erreur',
+    'wave_accessibility_alert': 'Consulter le rapport WAVE pour plus de détails sur cette alerte',
+    'general_error': 'Corriger les erreurs d\'accessibilité identifiées par WAVE',
+    'general_alert': 'Examiner les alertes d\'accessibilité identifiées par WAVE',
+    'heading_possible': 'Vérifier si cet élément devrait être un titre',
+    'link_redundant': 'Éviter les liens redondants ou clarifier leur destination',
+    'image_alt_suspicious': 'Vérifier la pertinence du texte alternatif de l\'image'
   };
-  return recommendations[waveType] || 'Corriger ce problème d\'accessibilité';
+  return recommendations[waveType] || 'Corriger ce problème d\'accessibilité selon les recommandations WAVE';
 }
 
 // Calculer le score basé sur les violations WAVE
@@ -1719,26 +1775,16 @@ async function launchRGAAAnalysis(url: string): Promise<RGAAViolation[]> {
         defaultViewport: { width: 1920, height: 1080 }
       });
     } else {
-      // Configuration locale
+      // Configuration locale simplifiée pour éviter spawn ETXTBSY
       browser = await puppeteer.default.launch({
-        headless: true, // Mode headless strict
+        headless: true,
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--disable-gpu',
-          '--disable-web-security',
-          '--disable-features=VizDisplayCompositor',
-          '--hide-scrollbars',
-          '--mute-audio'
+          '--disable-web-security'
         ],
-        timeout: 45000,
-        ...(process.platform === 'darwin' ? { 
-          executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' 
-        } : {})
+        timeout: 30000
       });
     }
 
