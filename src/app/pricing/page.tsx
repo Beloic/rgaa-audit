@@ -244,8 +244,7 @@ export default function PricingPage() {
             Prêt à améliorer l'accessibilité de vos sites ?
           </h2>
           <p className="text-blue-100 text-lg mb-8">
-            Rejoignez des milliers de développeurs qui font confiance à RGAA Audit 
-            pour auditer l'accessibilité de leurs sites web.
+            Découvrez pourquoi RGAA Audit est le choix de référence pour l'audit d'accessibilité web professionnel.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -259,7 +258,7 @@ export default function PricingPage() {
               href="/contact"
               className="inline-flex items-center px-6 py-3 border border-blue-300 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Parler à un expert
+              Nous contacter
             </Link>
           </div>
         </div>
