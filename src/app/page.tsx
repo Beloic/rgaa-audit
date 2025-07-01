@@ -15,7 +15,128 @@ import Footer from '@/components/Footer';
 import type { AuditRequest, AuditResult, ComparativeResult, AnalysisProgress } from '@/types/audit';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 
-import { Shield, Zap, Target, Users, AlertTriangle } from 'lucide-react';
+import { 
+  Shield, 
+  Zap, 
+  Target, 
+  Users, 
+  AlertTriangle, 
+  CheckCircle, 
+  Award, 
+  BookOpen, 
+  Heart, 
+  TrendingUp,
+  Scale,
+  Lightbulb,
+  Globe,
+  Eye,
+  Headphones,
+  MousePointer,
+  Accessibility,
+  Brain,
+  Clock,
+  DollarSign,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  Quote,
+  Star
+} from 'lucide-react';
+
+// Composant FAQ
+function FAQSection() {
+  const [openItems, setOpenItems] = useState<number[]>([]);
+
+  const toggleItem = (index: number) => {
+    setOpenItems(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
+  };
+
+  const faqItems = [
+    {
+      question: "Qu'est-ce que le RGAA et pourquoi est-il important ?",
+      answer: "Le RGAA (Référentiel Général d'Amélioration de l'Accessibilité) est le standard français pour l'accessibilité numérique. Il est obligatoire pour les sites publics et les entreprises de plus de 250 salariés depuis 2019. Il garantit que votre site est accessible à tous les utilisateurs, y compris ceux en situation de handicap."
+    },
+    {
+      question: "Cet outil détecte-t-il tous les problèmes d'accessibilité ?",
+      answer: "Non, comme tous les outils automatisés, notre plateforme détecte environ 30% des problèmes d'accessibilité. Les 70% restants nécessitent un audit manuel par un expert. Cependant, notre outil vous donne une excellente base de départ et identifie les erreurs les plus courantes et critiques."
+    },
+    {
+      question: "Quelle est la différence entre WAVE, Axe Core et le moteur RGAA ?",
+      answer: "WAVE (WebAIM) excelle dans la détection des erreurs critiques avec une interface visuelle claire. Axe Core (Deque) offre une analyse plus approfondie avec des règles WCAG détaillées. Notre moteur RGAA est spécialement adapté aux critères français du RGAA 4.1. L'analyse comparative utilise les trois pour une couverture maximale."
+    },
+    {
+      question: "Est-ce que l'outil est gratuit ?",
+      answer: "Oui, notre outil est gratuit avec quelques limitations pour maintenir le service accessible à tous. Les utilisateurs non connectés peuvent effectuer 3 analyses par jour, et les utilisateurs connectés 10 analyses par jour. Pour des besoins professionnels intensifs, des options payantes sont disponibles."
+    },
+    {
+      question: "Que faire après avoir identifié les problèmes ?",
+      answer: "Une fois les problèmes identifiés, consultez nos guides de correction détaillés pour chaque type d'erreur. Nous recommandons de prioriser les erreurs critiques (en rouge) puis les alertes (en orange). N'hésitez pas à utiliser notre référentiel RGAA intégré pour comprendre les critères spécifiques."
+    },
+    {
+      question: "L'outil fonctionne-t-il sur tous les types de sites ?",
+      answer: "Notre outil analyse les sites web publics accessibles via une URL. Il fonctionne sur la plupart des sites (statiques, CMS, e-commerce, etc.) mais peut avoir des limitations sur les sites nécessitant une authentification ou utilisant beaucoup de JavaScript côté client."
+    }
+  ];
+
+  return (
+    <section aria-labelledby="faq-heading" className="px-6 py-20 bg-white">
+      <div className="max-w-4xl mx-auto">
+        <h2 id="faq-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
+          Questions fréquentes
+        </h2>
+        <p className="text-xl text-gray-600 text-center mb-12">
+          Tout ce que vous devez savoir sur l'audit d'accessibilité
+        </p>
+        
+        <div className="space-y-4">
+          {faqItems.map((item, index) => (
+            <article key={index} className="border border-gray-200 rounded-lg">
+              <button
+                onClick={() => toggleItem(index)}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded-lg transition-colors"
+                aria-expanded={openItems.includes(index)}
+                aria-controls={`faq-answer-${index}`}
+              >
+                <h3 className="font-semibold text-gray-900 pr-4">{item.question}</h3>
+                {openItems.includes(index) ? (
+                  <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" aria-hidden="true" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" aria-hidden="true" />
+                )}
+              </button>
+              {openItems.includes(index) && (
+                <div id={`faq-answer-${index}`} className="px-6 pb-4">
+                  <p className="text-gray-600">{item.answer}</p>
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+        
+        <div className="mt-12 text-center">
+          <div className="bg-blue-50 p-6 rounded-xl">
+            <BookOpen className="w-12 h-12 text-blue-600 mx-auto mb-4" aria-hidden="true" />
+            <h3 className="font-semibold text-gray-900 mb-2">Besoin d'aide supplémentaire ?</h3>
+            <p className="text-gray-600 mb-4">
+              Consultez notre section blog pour des guides détaillés sur l'accessibilité web.
+            </p>
+            <a 
+              href="/blog" 
+              className="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700 focus:text-blue-700 focus:outline-none focus:underline"
+            >
+              Accéder au blog
+              <Search className="w-4 h-4 ml-2" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function HomePage() {
   const { language, t } = useLanguage();
@@ -360,6 +481,243 @@ export default function HomePage() {
                     <h3 className="font-semibold text-gray-900 mb-2 text-center">Limites de l'automatisation</h3>
                     <p className="text-gray-600 text-center">Cet outil détecte environ 30% des problèmes d'accessibilité. Un guide d'analyse manuelle est disponible pour une conformité complète</p>
                   </article>
+                </div>
+              </section>
+
+              {/* Pourquoi l'accessibilité - Section informative */}
+              <section aria-labelledby="why-accessibility-heading" className="px-6 py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+                <div className="max-w-6xl mx-auto text-center">
+                  <h2 id="why-accessibility-heading" className="text-3xl md:text-4xl font-bold text-white mb-8">
+                    Pourquoi l'accessibilité numérique ?
+                  </h2>
+                  
+                  <div className="grid md:grid-cols-3 gap-8 mb-12">
+                    <div className="text-center">
+                      <Scale className="w-16 h-16 text-white/90 mx-auto mb-4" aria-hidden="true" />
+                      <h3 className="text-xl font-semibold text-white mb-3">Obligation légale</h3>
+                      <p className="text-blue-100">
+                                                 Depuis 2019, les sites publics et privés (+250 salariés) doivent être conformes au RGAA
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <Heart className="w-16 h-16 text-white/90 mx-auto mb-4" aria-hidden="true" />
+                      <h3 className="text-xl font-semibold text-white mb-3">Impact humain</h3>
+                      <p className="text-blue-100">
+                        12 millions de personnes en France ont un handicap. L'accessibilité les inclut dans le numérique
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <TrendingUp className="w-16 h-16 text-white/90 mx-auto mb-4" aria-hidden="true" />
+                      <h3 className="text-xl font-semibold text-white mb-3">Bénéfices business</h3>
+                      <p className="text-blue-100">
+                        Meilleur SEO, expérience utilisateur améliorée, marché élargi et image de marque renforcée
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/10 backdrop-blur rounded-xl p-8 text-white max-w-4xl mx-auto">
+                    <Quote className="w-12 h-12 mx-auto mb-4 text-white/80" aria-hidden="true" />
+                    <blockquote className="text-lg md:text-xl italic mb-4">
+                      "La puissance du Web réside dans son universalité. L'accès pour tous, quel que soit le handicap, est un aspect essentiel."
+                    </blockquote>
+                    <cite className="font-semibold">— Tim Berners-Lee, Inventeur du Web</cite>
+                  </div>
+                </div>
+              </section>
+
+              {/* Types de handicaps - Section éducative */}
+              <section aria-labelledby="disabilities-types-heading" className="px-6 py-20 bg-gray-50">
+                <div className="max-w-6xl mx-auto">
+                  <h2 id="disabilities-types-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
+                    À qui s'adresse l'accessibilité ?
+                  </h2>
+                  <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
+                    L'accessibilité numérique bénéficie à toutes les personnes, avec ou sans handicap
+                  </p>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                      <Eye className="w-12 h-12 text-red-600 mb-4" aria-hidden="true" />
+                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps visuels</h3>
+                      <p className="text-gray-600 text-sm mb-4">Cécité, malvoyance, daltonisme</p>
+                      <ul className="text-sm text-gray-500 space-y-1">
+                        <li>• Lecteurs d'écran</li>
+                        <li>• Contrastes élevés</li>
+                        <li>• Alternatives textuelles</li>
+                      </ul>
+                    </article>
+                    
+                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                      <Headphones className="w-12 h-12 text-blue-600 mb-4" aria-hidden="true" />
+                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps auditifs</h3>
+                      <p className="text-gray-600 text-sm mb-4">Surdité, malentendance</p>
+                      <ul className="text-sm text-gray-500 space-y-1">
+                        <li>• Sous-titres</li>
+                        <li>• Langue des signes</li>
+                        <li>• Transcriptions</li>
+                      </ul>
+                    </article>
+                    
+                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                      <MousePointer className="w-12 h-12 text-green-600 mb-4" aria-hidden="true" />
+                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps moteurs</h3>
+                      <p className="text-gray-600 text-sm mb-4">Paralysie, amputations, tremblements</p>
+                      <ul className="text-sm text-gray-500 space-y-1">
+                        <li>• Navigation au clavier</li>
+                        <li>• Zones de clic étendues</li>
+                        <li>• Commande vocale</li>
+                      </ul>
+                    </article>
+                    
+                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                      <Brain className="w-12 h-12 text-purple-600 mb-4" aria-hidden="true" />
+                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps cognitifs</h3>
+                      <p className="text-gray-600 text-sm mb-4">Dyslexie, TDAH, troubles de la mémoire</p>
+                      <ul className="text-sm text-gray-500 space-y-1">
+                        <li>• Contenu simplifié</li>
+                        <li>• Navigation claire</li>
+                        <li>• Temps de lecture adapté</li>
+                      </ul>
+                    </article>
+                  </div>
+                  
+                  <div className="mt-12 text-center">
+                    <div className="bg-gradient-to-r from-orange-100 to-yellow-100 p-6 rounded-xl max-w-4xl mx-auto">
+                      <Lightbulb className="w-12 h-12 text-orange-600 mx-auto mb-4" aria-hidden="true" />
+                      <p className="text-gray-700 text-lg">
+                        <strong>Bon à savoir :</strong> L'accessibilité profite aussi aux seniors, aux personnes avec des connexions lentes, 
+                        aux utilisateurs mobiles, et améliore l'expérience pour tous !
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Outils et méthodes - Section pratique */}
+              <section aria-labelledby="tools-methods-heading" className="px-6 py-20">
+                <div className="max-w-6xl mx-auto">
+                  <h2 id="tools-methods-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
+                    Outils et méthodes d'audit
+                  </h2>
+                  <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
+                    Notre plateforme combine plusieurs approches pour une analyse complète
+                  </p>
+                  
+                  <div className="grid lg:grid-cols-3 gap-12">
+                    {/* WAVE */}
+                    <article className="text-center">
+                      <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Globe className="w-10 h-10 text-blue-600" aria-hidden="true" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4">WAVE (WebAIM)</h3>
+                      <p className="text-gray-600 mb-4">
+                        Outil de référence développé par WebAIM pour détecter les erreurs d'accessibilité courantes.
+                      </p>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-semibold text-gray-900 mb-2">Points forts :</h4>
+                        <ul className="text-sm text-gray-600 text-left space-y-1">
+                          <li>• Détection des erreurs critiques</li>
+                          <li>• Interface visuelle claire</li>
+                          <li>• Alerts et features identifiées</li>
+                        </ul>
+                      </div>
+                    </article>
+                    
+                    {/* Axe Core */}
+                    <article className="text-center">
+                      <div className="bg-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Target className="w-10 h-10 text-purple-600" aria-hidden="true" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Axe Core (Deque)</h3>
+                      <p className="text-gray-600 mb-4">
+                        Moteur d'analyse moderne et performant, utilisé par de nombreux outils professionnels.
+                      </p>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-semibold text-gray-900 mb-2">Points forts :</h4>
+                        <ul className="text-sm text-gray-600 text-left space-y-1">
+                          <li>• Analyse approfondie et précise</li>
+                          <li>• Règles WCAG détaillées</li>
+                          <li>• Suggestions de correction</li>
+                        </ul>
+                      </div>
+                    </article>
+                    
+                    {/* RGAA Engine */}
+                    <article className="text-center">
+                      <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Shield className="w-10 h-10 text-green-600" aria-hidden="true" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Moteur RGAA</h3>
+                      <p className="text-gray-600 mb-4">
+                        Notre moteur exclusif adapté aux spécificités du référentiel français RGAA 4.1.
+                      </p>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-semibold text-gray-900 mb-2">Points forts :</h4>
+                        <ul className="text-sm text-gray-600 text-left space-y-1">
+                          <li>• Conformité RGAA 4.1</li>
+                          <li>• Critères français spécifiques</li>
+                          <li>• Rapports détaillés</li>
+                        </ul>
+                      </div>
+                    </article>
+                  </div>
+                  
+                  <div className="mt-16 bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-xl">
+                    <div className="text-center">
+                      <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" aria-hidden="true" />
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Analyse comparative</h3>
+                      <p className="text-gray-600 max-w-3xl mx-auto">
+                        Utilisez l'option "Tous les moteurs" pour obtenir une vue d'ensemble et comparer les résultats des trois outils. 
+                        Chaque moteur ayant ses spécificités, cette approche garantit une couverture maximale des problèmes d'accessibilité.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* FAQ Section */}
+              <FAQSection />
+
+              {/* Call to Action final */}
+              <section aria-labelledby="cta-heading" className="px-6 py-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600">
+                <div className="max-w-4xl mx-auto text-center">
+                  <h2 id="cta-heading" className="text-3xl md:text-4xl font-bold text-white mb-6">
+                    Prêt à rendre votre site accessible ?
+                  </h2>
+                  <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
+                    Commencez dès maintenant votre audit d'accessibilité et rejoignez les entreprises qui construisent un web inclusif.
+                  </p>
+                  <button
+                    onClick={() => {
+                      const formElement = document.getElementById('audit-form-home');
+                      if (formElement) {
+                        formElement.scrollIntoView({ behavior: 'smooth' });
+                        const firstInput = formElement.querySelector('input') as HTMLElement;
+                        if (firstInput) {
+                          setTimeout(() => firstInput.focus(), 500);
+                        }
+                      }
+                    }}
+                    className="bg-white text-purple-600 font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-white/30"
+                  >
+                    <Zap className="w-5 h-5 inline mr-2" aria-hidden="true" />
+                    Analyser mon site maintenant
+                  </button>
+                  
+                  <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-white/90">
+                    <div className="flex items-center justify-center space-x-2">
+                      <Clock className="w-5 h-5" aria-hidden="true" />
+                      <span>Analyse en 30 secondes</span>
+                    </div>
+                    <div className="flex items-center justify-center space-x-2">
+                      <CheckCircle className="w-5 h-5" aria-hidden="true" />
+                      <span>Gratuit et sans inscription</span>
+                    </div>
+                    <div className="flex items-center justify-center space-x-2">
+                      <Shield className="w-5 h-5" aria-hidden="true" />
+                      <span>Conforme RGAA 4.1</span>
+                    </div>
+                  </div>
                 </div>
               </section>
             </>
