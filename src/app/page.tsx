@@ -18,19 +18,13 @@ import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import { 
   Shield, 
   Zap, 
-  Target, 
   Users, 
   AlertTriangle, 
-  CheckCircle, 
-  Award, 
   BookOpen, 
-  Globe,
   Eye,
   Headphones,
   MousePointer,
   Brain,
-  Clock,
-  DollarSign,
   Search,
   ChevronDown,
   ChevronUp
@@ -531,133 +525,10 @@ export default function HomePage() {
                 </div>
               </section>
 
-              {/* Outils et méthodes - Section pratique */}
-              <section aria-labelledby="tools-methods-heading" className="px-6 py-20">
-                <div className="max-w-6xl mx-auto">
-                  <h2 id="tools-methods-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
-                    Outils et méthodes d'audit
-                  </h2>
-                  <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-                    Notre plateforme combine plusieurs approches pour une analyse complète
-                  </p>
-                  
-                  <div className="grid lg:grid-cols-3 gap-12">
-                    {/* WAVE */}
-                    <article className="text-center">
-                      <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Globe className="w-10 h-10 text-blue-600" aria-hidden="true" />
-                      </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">WAVE (WebAIM)</h3>
-                      <p className="text-gray-600 mb-4">
-                        Outil de référence développé par WebAIM pour détecter les erreurs d'accessibilité courantes.
-                      </p>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-gray-900 mb-2">Points forts :</h4>
-                        <ul className="text-sm text-gray-600 text-left space-y-1">
-                          <li>• Détection des erreurs critiques</li>
-                          <li>• Interface visuelle claire</li>
-                          <li>• Alerts et features identifiées</li>
-                        </ul>
-                      </div>
-                    </article>
-                    
-                    {/* Axe Core */}
-                    <article className="text-center">
-                      <div className="bg-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Target className="w-10 h-10 text-purple-600" aria-hidden="true" />
-                      </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Axe Core (Deque)</h3>
-                      <p className="text-gray-600 mb-4">
-                        Moteur d'analyse moderne et performant, utilisé par de nombreux outils professionnels.
-                      </p>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-gray-900 mb-2">Points forts :</h4>
-                        <ul className="text-sm text-gray-600 text-left space-y-1">
-                          <li>• Analyse approfondie et précise</li>
-                          <li>• Règles WCAG détaillées</li>
-                          <li>• Suggestions de correction</li>
-                        </ul>
-                      </div>
-                    </article>
-                    
-                    {/* RGAA Engine */}
-                    <article className="text-center">
-                      <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Shield className="w-10 h-10 text-green-600" aria-hidden="true" />
-                      </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Moteur RGAA</h3>
-                      <p className="text-gray-600 mb-4">
-                        Notre moteur exclusif adapté aux spécificités du référentiel français RGAA 4.1.
-                      </p>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-gray-900 mb-2">Points forts :</h4>
-                        <ul className="text-sm text-gray-600 text-left space-y-1">
-                          <li>• Conformité RGAA 4.1</li>
-                          <li>• Critères français spécifiques</li>
-                          <li>• Rapports détaillés</li>
-                        </ul>
-                      </div>
-                    </article>
-                  </div>
-                  
-                  <div className="mt-16 bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-xl">
-                    <div className="text-center">
-                      <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" aria-hidden="true" />
-                      <h3 className="text-xl font-semibold text-gray-900 mb-4">Analyse comparative</h3>
-                      <p className="text-gray-600 max-w-3xl mx-auto">
-                        Utilisez l'option "Tous les moteurs" pour obtenir une vue d'ensemble et comparer les résultats des trois outils. 
-                        Chaque moteur ayant ses spécificités, cette approche garantit une couverture maximale des problèmes d'accessibilité.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
               {/* FAQ Section */}
               <FAQSection />
 
-              {/* Call to Action final */}
-              <section aria-labelledby="cta-heading" className="px-6 py-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600">
-                <div className="max-w-4xl mx-auto text-center">
-                  <h2 id="cta-heading" className="text-3xl md:text-4xl font-bold text-white mb-6">
-                    Prêt à rendre votre site accessible ?
-                  </h2>
-                  <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
-                    Commencez dès maintenant votre audit d'accessibilité et rejoignez les entreprises qui construisent un web inclusif.
-                  </p>
-                  <button
-                    onClick={() => {
-                      const formElement = document.getElementById('audit-form-home');
-                      if (formElement) {
-                        formElement.scrollIntoView({ behavior: 'smooth' });
-                        const firstInput = formElement.querySelector('input') as HTMLElement;
-                        if (firstInput) {
-                          setTimeout(() => firstInput.focus(), 500);
-                        }
-                      }
-                    }}
-                    className="bg-white text-purple-600 font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-white/30"
-                  >
-                    <Zap className="w-5 h-5 inline mr-2" aria-hidden="true" />
-                    Analyser mon site maintenant
-                  </button>
-                  
-                  <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-white/90">
-                    <div className="flex items-center justify-center space-x-2">
-                      <Clock className="w-5 h-5" aria-hidden="true" />
-                      <span>Analyse en 30 secondes</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-2">
-                      <CheckCircle className="w-5 h-5" aria-hidden="true" />
-                      <span>Gratuit et sans inscription</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-2">
-                      <Shield className="w-5 h-5" aria-hidden="true" />
-                      <span>Conforme RGAA 4.1</span>
-                    </div>
-                  </div>
-                </div>
-              </section>
+
             </>
           )}
 
