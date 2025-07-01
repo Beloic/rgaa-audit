@@ -90,28 +90,13 @@ const apiLogin = async (email: string, password: string): Promise<User> => {
 };
 
 const apiRegister = async (email: string, password: string, name: string): Promise<User> => {
-  const requestBody = { email, password, name };
-  
-  // DEBUG: Afficher la requête exacte
-  console.log('🚀 apiRegister() - Requête envoyée:', {
-    url: '/api/auth/register',
-    method: 'POST',
-    body: requestBody
-  });
-  
   const response = await fetch('/api/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestBody)
+    body: JSON.stringify({ email, password, name })
   });
 
   const data = await response.json();
-  
-  console.log('📥 apiRegister() - Réponse reçue:', {
-    status: response.status,
-    ok: response.ok,
-    data
-  });
   
   if (!response.ok) {
     throw new Error(data.error || 'Erreur d\'inscription');
@@ -419,20 +404,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const register = async (email: string, password: string, name: string) => {
     setIsLoading(true);
-    
-    // DEBUG: Afficher les paramètres reçus
-    console.log('🎯 AuthContext.register() appelé avec:', {
-      email,
-      password,
-      name
-    });
-    
     try {
       let newUser: User;
 
       if (USE_API) {
         // Utiliser l'API
-        console.log('📡 Appel apiRegister() avec:', { email, password, name });
         newUser = await apiRegister(email, password, name);
       } else {
         // Utiliser localStorage

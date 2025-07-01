@@ -75,14 +75,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
-    // DEBUG: Afficher les données du formulaire
-    console.log('🔍 Données du formulaire avant envoi:', {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword
-    });
-
     if (!validateForm()) {
       return;
     }
@@ -90,12 +82,6 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      console.log('📤 Envoi vers register() avec:', {
-        email: formData.email,
-        password: formData.password,
-        name: formData.name
-      });
-      
       await register(formData.email, formData.password, formData.name);
       
       // Rediriger vers l'accueil ou page de vérification email
@@ -128,7 +114,7 @@ export default function RegisterPage() {
 
         {/* Form Card */}
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate autoComplete="off">
             {/* Message d'erreur */}
             {error && (
               <div className="rounded-md bg-red-50 p-4">
@@ -156,7 +142,7 @@ export default function RegisterPage() {
                   id="name"
                   name="name"
                   type="text"
-                  autoComplete="name"
+                  autoComplete="off"
                   required
                   value={formData.name}
                   onChange={handleChange}
@@ -180,7 +166,7 @@ export default function RegisterPage() {
                   id="email"
                   name="email"
                   type="text"
-                  autoComplete="email"
+                  autoComplete="off"
                   required
                   value={formData.email}
                   onChange={handleChange}
@@ -204,7 +190,7 @@ export default function RegisterPage() {
                   id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
+                  autoComplete="off"
                   required
                   value={formData.password}
                   onChange={handleChange}
@@ -256,7 +242,7 @@ export default function RegisterPage() {
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
+                  autoComplete="off"
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
