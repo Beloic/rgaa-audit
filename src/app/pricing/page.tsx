@@ -46,8 +46,14 @@ export default function PricingPage() {
     }
 
     if (planId === 'free') {
-      // Downgrade vers gratuit
-      alert('Fonctionnalité en cours de développement');
+      // Rediriger vers l'inscription
+      window.location.href = '/auth/register';
+      return;
+    }
+
+    if (planId === 'enterprise') {
+      // Ouvrir l'e-mail
+      window.location.href = 'mailto:hello@loicbernard.com';
       return;
     }
 
@@ -171,39 +177,15 @@ export default function PricingPage() {
                         </>
                       ) : (
                         <>
-                          {plan.id === 'free' ? (
-                            <Link
-                              href="/auth/register"
-                              className="inline-flex items-center px-6 py-3 bg-white text-blue-600 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-                            >
-                              Commencer gratuitement
-                              <ArrowRight className="w-4 h-4 ml-2" />
-                            </Link>
-                          ) : plan.id === 'pro' ? (
-                            'Passer au Pro'
-                          ) : (
-                            <a
-                              href="mailto:hello@loicbernard.com"
-                              className="inline-flex items-center px-6 py-3 border border-blue-300 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors"
-                            >
-                              Nous contacter
-                              <ArrowRight className="w-4 h-4 ml-2" />
-                            </a>
-                          )}
+                          <span>
+                            {plan.id === 'free' ? 'Commencer gratuitement' : 
+                             plan.id === 'pro' ? 'Passer au Pro' : 
+                             'Nous contacter'}
+                          </span>
+                          <ArrowRight className="w-4 h-4" />
                         </>
                       )}
                     </button>
-
-                    {plan.id === 'enterprise' && (
-                      <div className="text-center mt-4">
-                        <a 
-                          href="mailto:hello@loicbernard.com"
-                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                        >
-                          Nous contacter
-                        </a>
-                      </div>
-                    )}
                   </div>
                 </div>
               );
@@ -256,9 +238,6 @@ export default function PricingPage() {
           <h2 className="text-3xl font-bold text-white mb-8">
             Prêt à améliorer l'accessibilité de vos sites ?
           </h2>
-          <p className="text-blue-100 text-lg mb-8">
-            Découvrez pourquoi RGAA Audit est le choix de référence pour l'audit d'accessibilité web professionnel.
-          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/auth/register"
