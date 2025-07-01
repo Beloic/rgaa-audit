@@ -1,6 +1,6 @@
 'use client';
 
-import { Monitor, FileCheck, BookOpen, Clock, BarChart3 } from 'lucide-react';
+import { Monitor, FileCheck, BookOpen, Clock, BarChart3, Accessibility } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const translations = {
@@ -9,6 +9,7 @@ const translations = {
     intelligentAnalysis: 'Analyse intelligente',
     rgaaReference: 'Référentiel RGAA',
     auditHistory: 'Gestion des audits',
+    disabilitySimulator: 'Simulateur d\'Handicap',
     versionAlpha: 'VERSION ALPHA',
     bugReport: 'Il est probable que vous rencontriez des bugs, merci de bien vouloir les remonter :',
     reportBug: 'Signaler un bug'
@@ -18,6 +19,7 @@ const translations = {
     intelligentAnalysis: 'Intelligent Analysis',
     rgaaReference: 'RGAA Reference',
     auditHistory: 'History',
+    disabilitySimulator: 'Disability Simulator',
     versionAlpha: 'ALPHA VERSION',
     bugReport: 'You may encounter bugs, please report them:',
     reportBug: 'Report a bug'
@@ -25,8 +27,8 @@ const translations = {
 };
 
 interface SidebarProps {
-  activeSection: 'statistics' | 'analyze' | 'rgaa-reference' | 'history';
-  onSectionChange: (section: 'statistics' | 'analyze' | 'rgaa-reference' | 'history') => void;
+  activeSection: 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator';
+  onSectionChange: (section: 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator') => void;
 }
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
@@ -59,6 +61,15 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         >
           <Clock className="w-5 h-5" aria-hidden="true" />
           <span className="font-medium">{t.auditHistory}</span>
+        </button>
+
+        <button
+          onClick={() => onSectionChange('disability-simulator')}
+          className={getButtonClasses('disability-simulator')}
+          aria-current={activeSection === 'disability-simulator' ? 'page' : undefined}
+        >
+          <Accessibility className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">{t.disabilitySimulator}</span>
         </button>
         
         {/*

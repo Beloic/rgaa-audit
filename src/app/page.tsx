@@ -14,6 +14,7 @@ import AuditHistory, { saveAuditToHistory } from '@/components/AuditHistory';
 import Footer from '@/components/Footer';
 import type { AuditRequest, AuditResult, ComparativeResult, AnalysisProgress } from '@/types/audit';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
+import SimulateurHandicap from '@/app/simulateur-handicap/page';
 
 import { 
   Shield, 
@@ -133,15 +134,15 @@ export default function HomePage() {
     message: 'En attente...',
     progress: 0
   });
-  const [activeSection, setActiveSection] = useState<'home' | 'statistics' | 'analyze' | 'rgaa-reference' | 'history'>('home');
+  const [activeSection, setActiveSection] = useState<'home' | 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator'>('home');
 
   // Détecter les paramètres URL pour changer de section automatiquement
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const section = urlParams.get('section');
     
-    if (section && ['statistics', 'analyze', 'rgaa-reference', 'history'].includes(section)) {
-      setActiveSection(section as 'statistics' | 'analyze' | 'rgaa-reference' | 'history');
+    if (section && ['statistics', 'analyze', 'rgaa-reference', 'history', 'disability-simulator'].includes(section)) {
+      setActiveSection(section as 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator');
     } else if (window.location.pathname === '/' && !section) {
       // Si on est sur la page d'accueil sans paramètre, rester sur home
       setActiveSection('home');
@@ -187,7 +188,7 @@ export default function HomePage() {
   };
 
   // Fonction pour gérer les changements de section de la sidebar
-  const handleSidebarSectionChange = (section: 'statistics' | 'analyze' | 'rgaa-reference' | 'history') => {
+  const handleSidebarSectionChange = (section: 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator') => {
     setActiveSection(section);
     
     // Réinitialiser les résultats si on revient sur analyser et qu'il n'y a pas d'analyse en cours
@@ -386,7 +387,7 @@ export default function HomePage() {
 
         {/* Topbar Navigation */}
         <TopBar 
-          activeSection={activeSection === 'history' || activeSection === 'statistics' ? 'home' : activeSection} 
+          activeSection={activeSection === 'history' || activeSection === 'statistics' || activeSection === 'disability-simulator' ? 'home' : activeSection} 
           onSectionChange={handleTopBarSectionChange}
           onAnalyzeClick={handleAnalyzeClick}
         />
@@ -594,6 +595,11 @@ export default function HomePage() {
                 onResumeAudit={handleResumeAudit}
               />
             </div>
+          )}
+
+          {/* Page Simulateur d'Handicap */}
+          {activeSection === 'disability-simulator' && (
+            <SimulateurHandicap />
           )}
 
         </main>
