@@ -215,6 +215,14 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                       {/* Section déconnexion */}
                       <div className="border-t border-gray-100 py-2">
                         <button
+                          onClick={() => { setIsUserMenuOpen(false); window.location.href = '/auth/change-password'; }}
+                          className="w-full px-4 py-2.5 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center space-x-3 transition-colors"
+                        >
+                          <span className="font-medium">Changer mon mot de passe</span>
+                        </button>
+                      </div>
+                      <div className="border-t border-gray-100 py-2">
+                        <button
                           onClick={handleLogout}
                           disabled={isLoggingOut}
                           className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
