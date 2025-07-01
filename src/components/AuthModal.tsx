@@ -240,7 +240,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
                   </div>
                   <input
                     id="login-email"
-                    type="email"
+                    type="text"
                     required
                     value={loginForm.email}
                     onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
@@ -348,7 +348,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
                   </div>
                   <input
                     id="register-email"
-                    type="email"
+                    type="text"
                     required
                     value={registerForm.email}
                     onChange={(e) => setRegisterForm(prev => ({ ...prev, email: e.target.value }))}
