@@ -88,17 +88,25 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
     }
 
     try {
-      await register(registerForm.email, registerForm.password, registerForm.name);
+      await register(registerForm.name, registerForm.email, registerForm.password);
       setIsRegistrationSuccess(true);
-      // Ne pas fermer le modal immédiatement, attendre 3 secondes
+      
+      // Auto-fermeture après succès d'inscription
       setTimeout(() => {
         handleClose();
-      }, 3000);
+      }, 5000);
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de l\'inscription');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    // Fermer la modal et rediriger vers la page de réinitialisation
+    handleClose();
+    window.location.href = '/auth/change-password';
   };
 
   if (!isOpen) return null;
@@ -270,6 +278,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
                 </label>
                 <button
                   type="button"
+                  onClick={handleForgotPassword}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
                   Mot de passe oublié ?
