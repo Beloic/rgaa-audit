@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, LogOut, ChevronDown } from 'lucide-react';
+import { Shield, LogOut, User, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import AuthModal from '@/components/AuthModal';
 
@@ -22,6 +22,7 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Écouter les événements d'ouverture de la modal d'authentification
   useEffect(() => {
@@ -45,25 +46,8 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
     return pathname.startsWith(path);
   };
 
-  const getLinkClasses = (path: string) => {
-    const baseClasses = "font-medium transition-colors focus:outline-none focus:underline";
-    if (isActive(path)) {
-      return `${baseClasses} text-blue-600 hover:text-blue-700 focus:text-blue-700`;
-    }
-    return `${baseClasses} text-gray-600 hover:text-gray-900 focus:text-gray-900`;
-  };
-
-  const getSectionClasses = (section: string) => {
-    const baseClasses = "font-medium transition-colors focus:outline-none focus:underline cursor-pointer";
-    if (activeSection === section) {
-      return `${baseClasses} text-blue-600 hover:text-blue-700 focus:text-blue-700`;
-    }
-    return `${baseClasses} text-gray-600 hover:text-gray-900 focus:text-gray-900`;
-  };
-
-
-
   const handleSectionClick = (section: 'home' | 'analyze' | 'rgaa-reference') => {
+    setIsMobileMenuOpen(false);
     if (section === 'analyze' && onAnalyzeClick) {
       onAnalyzeClick();
     } else if (onSectionChange) {
@@ -80,11 +64,13 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
   const handleLoginClick = () => {
     setAuthModalTab('login');
     setIsAuthModalOpen(true);
+    setIsMobileMenuOpen(false);
   };
 
   const handleRegisterClick = () => {
     setAuthModalTab('register');
     setIsAuthModalOpen(true);
+    setIsMobileMenuOpen(false);
   };
 
   const handleLogout = async () => {
@@ -92,6 +78,7 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
     try {
       await authLogout();
       setIsUserMenuOpen(false);
+      setIsMobileMenuOpen(false);
     } catch (error) {
       console.error('Erreur de déconnexion:', error);
     } finally {
@@ -101,185 +88,273 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
 
   return (
     <>
-      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" role="navigation" aria-label="Navigation principale">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
+      <header className="bg-white">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+          {/* Logo */}
+          <div className="flex lg:flex-1">
             <div 
               onClick={() => handleSectionClick('home')}
-              className="flex items-center space-x-2 flex-shrink-0 cursor-pointer"
+              className="-m-1.5 p-1.5 cursor-pointer"
             >
-              <Shield className="w-6 h-6 text-blue-600" aria-hidden="true" />
-              <span className="text-lg font-bold text-gray-900">RGAA Audit</span>
-            </div>
-            
-            {/* Menu Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <span 
-                onClick={() => handleSectionClick('home')}
-                className={getSectionClasses('home')}
-                aria-current={activeSection === 'home' ? 'page' : undefined}
-              >
-                Accueil
-              </span>
-              <span 
-                onClick={() => handleSectionClick('analyze')}
-                className={getSectionClasses('analyze')}
-                aria-current={activeSection === 'analyze' ? 'page' : undefined}
-              >
-                Analyser
-              </span>
-              <Link 
-                href="/blog"
-                className={getLinkClasses('/blog')}
-                aria-current={isActive('/blog') ? 'page' : undefined}
-              >
-                Blog
-              </Link>
-              <Link 
-                href="/tarifs"
-                className={getLinkClasses('/tarifs')}
-                aria-current={isActive('/tarifs') ? 'page' : undefined}
-              >
-                Tarifs
-              </Link>
-              <Link 
-                href="/quiz"
-                className={getLinkClasses('/quiz')}
-                aria-current={isActive('/quiz') ? 'page' : undefined}
-              >
-                Quiz
-              </Link>
-            </div>
-
-            {/* Actions utilisateur */}
-            <div className="flex items-center space-x-4 flex-shrink-0">
-              {/* Sélecteur de langue */}
-              <label htmlFor="language-select-topbar" className="sr-only">Choisir la langue</label>
-              <div className="relative">
-                <select 
-                  id="language-select-topbar"
-                  value={language} 
-                  onChange={(e) => setLanguage(e.target.value as 'fr' | 'en')}
-                  className="appearance-none border border-gray-300 rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer min-w-0"
-                  aria-label="Sélection de la langue"
-                >
-                  <option value="fr">🇫🇷 Français</option>
-                  <option value="en">🇬🇧 English</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                  <span className="text-gray-400 text-sm">▼</span>
-                </div>
-              </div>
-
-              {/* Actions d'authentification */}
-              {isAuthenticated && user ? (
-                /* Menu utilisateur connecté */
-                <div className="relative">
-                  <button
-                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-gray-900 focus:text-gray-900 transition-colors rounded-lg hover:bg-gray-50 focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    aria-label="Menu utilisateur"
-                  >
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">
-                        {user.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <span className="hidden sm:inline text-sm font-medium">{user.name}</span>
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-
-                  {/* Menu déroulant */}
-                  {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
-                      {/* Section utilisateur */}
-                      <div className="px-4 py-3">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white text-sm font-semibold">
-                              {user.name.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">{user.name}</p>
-                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                            <p className="text-xs text-blue-600 mt-1 flex items-center">
-                              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1"></span>
-                              Plan {getCurrentPlan().name}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Section déconnexion */}
-                      <div className="border-t border-gray-100 py-2">
-                        <button
-                          onClick={() => { setIsUserMenuOpen(false); window.location.href = '/auth/change-password'; }}
-                          className="w-full px-4 py-2.5 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center space-x-3 transition-colors"
-                        >
-                          <span className="font-medium">Changer mon mot de passe</span>
-                        </button>
-                      </div>
-                      <div className="border-t border-gray-100 py-2">
-                        <button
-                          onClick={handleLogout}
-                          disabled={isLoggingOut}
-                          className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          <span className="font-medium">{isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                /* Boutons d'authentification pour utilisateurs non connectés */
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={handleLoginClick}
-                    className="text-gray-700 hover:text-gray-900 focus:text-gray-900 px-3 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-gray-50 focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    Se connecter
-                  </button>
-                  <button
-                    onClick={handleRegisterClick}
-                    className="bg-blue-600 text-white px-4 py-2 text-sm font-medium rounded-lg hover:bg-blue-700 focus:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                  >
-                    S'inscrire
-                  </button>
-                </div>
-              )}
-
-              {/* Menu mobile */}
-              <div className="md:hidden flex-shrink-0">
-                <button 
-                  className="text-gray-600 hover:text-gray-900 focus:text-gray-900 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  aria-label="Menu mobile"
-                >
-                  <span className="text-xl">☰</span>
-                </button>
+              <span className="sr-only">RGAA Audit</span>
+              <div className="flex items-center space-x-2">
+                <Shield className="h-8 w-8 text-blue-600" aria-hidden="true" />
+                <span className="text-xl font-bold text-gray-900">RGAA Audit</span>
               </div>
             </div>
           </div>
-        </div>
-      </nav>
 
-      {/* Modal d'authentification */}
-      <AuthModal
+          {/* Mobile menu button */}
+          <div className="flex lg:hidden">
+            <button
+              type="button"
+              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <span className="sr-only">Open main menu</span>
+              <Menu className="h-6 w-6" aria-hidden="true" />
+            </button>
+          </div>
+
+          {/* Desktop navigation */}
+          <div className="hidden lg:flex lg:gap-x-12">
+            <button
+              onClick={() => handleSectionClick('home')}
+              className={`text-sm font-semibold leading-6 ${
+                activeSection === 'home' ? 'text-blue-600' : 'text-gray-900'
+              } hover:text-blue-600 transition-colors`}
+            >
+              Accueil
+            </button>
+            <button
+              onClick={() => handleSectionClick('analyze')}
+              className={`text-sm font-semibold leading-6 ${
+                activeSection === 'analyze' ? 'text-blue-600' : 'text-gray-900'
+              } hover:text-blue-600 transition-colors`}
+            >
+              Analyser
+            </button>
+            <Link
+              href="/blog"
+              className={`text-sm font-semibold leading-6 ${
+                isActive('/blog') ? 'text-blue-600' : 'text-gray-900'
+              } hover:text-blue-600 transition-colors`}
+            >
+              Blog
+            </Link>
+            <Link
+              href="/tarifs"
+              className={`text-sm font-semibold leading-6 ${
+                isActive('/tarifs') ? 'text-blue-600' : 'text-gray-900'
+              } hover:text-blue-600 transition-colors`}
+            >
+              Tarifs
+            </Link>
+            <Link
+              href="/quiz"
+              className={`text-sm font-semibold leading-6 ${
+                isActive('/quiz') ? 'text-blue-600' : 'text-gray-900'
+              } hover:text-blue-600 transition-colors`}
+            >
+              Quiz
+            </Link>
+          </div>
+
+          {/* Right side actions */}
+          <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-x-6">
+            {/* Language selector */}
+            <select 
+              value={language} 
+              onChange={(e) => setLanguage(e.target.value as 'fr' | 'en')}
+              className="text-sm font-semibold text-gray-900 border-0 bg-transparent focus:ring-0 cursor-pointer"
+            >
+              <option value="fr">🇫🇷 FR</option>
+              <option value="en">🇬🇧 EN</option>
+            </select>
+
+            {isAuthenticated && user ? (
+              /* User menu */
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-x-2 text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+                >
+                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                    <span className="text-xs font-medium text-white">
+                      {user.name?.charAt(0).toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                  <span className="hidden sm:block">{user.name}</span>
+                </button>
+
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm text-gray-900 font-medium">{user.name}</p>
+                      <p className="text-sm text-gray-500">{user.email}</p>
+                      <div className="mt-1">
+                                               <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                         {getCurrentPlan()?.name || 'Gratuit'} - {getRemainingAudits()} audits restants
+                       </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <div className="flex items-center gap-x-2">
+                        <LogOut className="h-4 w-4" />
+                        {isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Auth buttons */
+              <div className="flex items-center gap-x-4">
+                <button
+                  onClick={handleLoginClick}
+                  className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600 transition-colors"
+                >
+                  Se connecter
+                </button>
+                <button
+                  onClick={handleRegisterClick}
+                  className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                >
+                  S'inscrire
+                </button>
+              </div>
+            )}
+          </div>
+        </nav>
+
+        {/* Mobile menu */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden" role="dialog" aria-modal="true">
+            <div className="fixed inset-0 z-50 bg-white">
+              <div className="flex items-center justify-between p-6">
+                <div 
+                  onClick={() => handleSectionClick('home')}
+                  className="-m-1.5 p-1.5 cursor-pointer"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Shield className="h-8 w-8 text-blue-600" aria-hidden="true" />
+                    <span className="text-xl font-bold text-gray-900">RGAA Audit</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="-m-2.5 rounded-md p-2.5 text-gray-700"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span className="sr-only">Close menu</span>
+                  <X className="h-6 w-6" aria-hidden="true" />
+                </button>
+              </div>
+              <div className="space-y-2 px-6 py-6">
+                <button
+                  onClick={() => handleSectionClick('home')}
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
+                  Accueil
+                </button>
+                <button
+                  onClick={() => handleSectionClick('analyze')}
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
+                  Analyser
+                </button>
+                <Link
+                  href="/blog"
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Blog
+                </Link>
+                <Link
+                  href="/tarifs"
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Tarifs
+                </Link>
+                <Link
+                  href="/quiz"
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Quiz
+                </Link>
+              </div>
+              <div className="border-t border-gray-200 px-6 py-6">
+                {isAuthenticated && user ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-x-3">
+                      <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
+                        <span className="text-sm font-medium text-white">
+                          {user.name?.charAt(0).toUpperCase() || 'U'}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                        <p className="text-sm text-gray-500">{user.email}</p>
+                      </div>
+                    </div>
+                                         <div className="mt-2">
+                       <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                         {getCurrentPlan()?.name || 'Gratuit'} - {getRemainingAudits()} audits restants
+                       </span>
+                     </div>
+                    <button
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                      className="flex w-full items-center gap-x-2 rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <LogOut className="h-5 w-5" />
+                      {isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <button
+                      onClick={handleLoginClick}
+                      className="block w-full rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                    >
+                      Se connecter
+                    </button>
+                    <button
+                      onClick={handleRegisterClick}
+                      className="block w-full rounded-md bg-blue-600 px-3 py-2 text-base font-semibold text-white shadow-sm hover:bg-blue-500"
+                    >
+                      S'inscrire
+                    </button>
+                  </div>
+                )}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <select 
+                    value={language} 
+                    onChange={(e) => setLanguage(e.target.value as 'fr' | 'en')}
+                    className="block w-full rounded-md border-gray-300 text-base font-semibold text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="en">🇬🇧 English</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Auth Modal */}
+      <AuthModal 
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         defaultTab={authModalTab}
       />
-
-      {/* Overlay pour fermer le menu utilisateur */}
-      {isUserMenuOpen && (
-        <div 
-          className="fixed inset-0 z-40"
-          onClick={() => setIsUserMenuOpen(false)}
-        />
-      )}
     </>
   );
 }

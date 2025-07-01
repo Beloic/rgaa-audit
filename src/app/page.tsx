@@ -66,58 +66,53 @@ function FAQSection() {
   ];
 
   return (
-    <section aria-labelledby="faq-heading" className="px-6 py-20 bg-white">
-      <div className="max-w-4xl mx-auto">
-        <h2 id="faq-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
-          Questions fréquentes
-        </h2>
-        <p className="text-xl text-gray-600 text-center mb-12">
-          Tout ce que vous devez savoir sur l'audit d'accessibilité
-        </p>
-        
-        <div className="space-y-4">
-          {faqItems.map((item, index) => (
-            <article key={index} className="border border-gray-200 rounded-lg">
-              <button
-                onClick={() => toggleItem(index)}
-                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded-lg transition-colors"
-                aria-expanded={openItems.includes(index)}
-                aria-controls={`faq-answer-${index}`}
-              >
-                <h3 className="font-semibold text-gray-900 pr-4">{item.question}</h3>
+    <dl className="mt-10 space-y-6 divide-y divide-gray-900/10">
+      {faqItems.map((item, index) => (
+        <div key={index} className="pt-6">
+          <dt>
+            <button
+              onClick={() => toggleItem(index)}
+              className="flex w-full items-start justify-between text-left text-gray-900"
+              aria-expanded={openItems.includes(index)}
+              aria-controls={`faq-answer-${index}`}
+            >
+              <span className="text-base font-semibold leading-7">{item.question}</span>
+              <span className="ml-6 flex h-7 items-center">
                 {openItems.includes(index) ? (
-                  <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" aria-hidden="true" />
+                  <ChevronUp className="h-6 w-6" aria-hidden="true" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" aria-hidden="true" />
+                  <ChevronDown className="h-6 w-6" aria-hidden="true" />
                 )}
-              </button>
-              {openItems.includes(index) && (
-                <div id={`faq-answer-${index}`} className="px-6 pb-4">
-                  <p className="text-gray-600">{item.answer}</p>
-                </div>
-              )}
-            </article>
-          ))}
+              </span>
+            </button>
+          </dt>
+          {openItems.includes(index) && (
+            <dd id={`faq-answer-${index}`} className="mt-2 pr-12">
+              <p className="text-base leading-7 text-gray-600">{item.answer}</p>
+            </dd>
+          )}
         </div>
-        
-        <div className="mt-12 text-center">
-          <div className="bg-blue-50 p-6 rounded-xl">
-            <BookOpen className="w-12 h-12 text-blue-600 mx-auto mb-4" aria-hidden="true" />
-            <h3 className="font-semibold text-gray-900 mb-2">Besoin d'aide supplémentaire ?</h3>
-            <p className="text-gray-600 mb-4">
-              Consultez notre section blog pour des guides détaillés sur l'accessibilité web.
-            </p>
+      ))}
+      <div className="pt-6">
+        <div className="rounded-2xl bg-gray-50 p-6">
+          <div className="flex items-center gap-x-3">
+            <BookOpen className="h-6 w-6 text-blue-600" aria-hidden="true" />
+            <h3 className="text-base font-semibold leading-7 text-gray-900">Besoin d'aide supplémentaire ?</h3>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-gray-600">
+            Consultez notre section blog pour des guides détaillés sur l'accessibilité web.
+          </p>
+          <div className="mt-4">
             <a 
               href="/blog" 
-              className="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700 focus:text-blue-700 focus:outline-none focus:underline"
+              className="text-sm font-semibold leading-6 text-blue-600 hover:text-blue-500"
             >
-              Accéder au blog
-              <Search className="w-4 h-4 ml-2" aria-hidden="true" />
+              Accéder au blog <span aria-hidden="true">→</span>
             </a>
           </div>
         </div>
       </div>
-    </section>
+    </dl>
   );
 }
 
@@ -335,12 +330,12 @@ export default function HomePage() {
     setProgress({ step: 'idle', message: t('ui.waiting'), progress: 0 });
     
     // Scroll vers le formulaire avec focus pour l'accessibilité
-    const formElement = document.getElementById('audit-form');
+    const formElement = document.getElementById('audit-form-home');
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth' });
-      const firstInput = formElement.querySelector('input, select, textarea') as HTMLElement;
+      const firstInput = formElement.querySelector('input') as HTMLElement;
       if (firstInput) {
-        firstInput.focus();
+        setTimeout(() => firstInput.focus(), 500);
       }
     }
   };
@@ -375,7 +370,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
         {/* Skip to main content link pour l'accessibilité */}
         <a 
           href="#main-content" 
@@ -407,146 +402,57 @@ export default function HomePage() {
         )}
 
         {/* Main Content */}
-        <main id="main-content" className={`${activeSection !== 'home' ? 'ml-64' : ''} relative z-10`}>
+        <main id="main-content" className={`${activeSection !== 'home' ? 'ml-64' : ''} relative`}>
           
           {/* Page d'accueil */}
           {activeSection === 'home' && (
             <>
-              {/* Hero Section */}
-              <div className="relative">
-                {/* Hero Content */}
-                <header className="text-center px-6 py-20 max-w-4xl mx-auto">
-                  <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-                    <span className="text-gray-900">
-                      {t('home.mainTitle')}
-                    </span>
-                    <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">RGAA</span>
-                  </h1>
-                  <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
-                    {t('home.mainDescription')}
-                  </p>
-                </header>
-              </div>
-
-              {/* Formulaire d'audit sur la page d'accueil */}
-              <section id="audit-form-home" className={`px-6 max-w-4xl mx-auto ${isAnalyzing ? "mb-8" : "mb-20"}`} aria-labelledby="audit-form-home-heading">
-                <h2 id="audit-form-home-heading" className="sr-only">Formulaire d'audit d'accessibilité</h2>
-                <AuditForm
-                  onAuditStart={handleAuditStart}
-                  progress={progress}
-                  isAnalyzing={isAnalyzing}
-                  analysisError={error}
-                />
-              </section>
-
-              {/* Features - sur la page d'accueil */}
-              <section aria-labelledby="features-heading" className="px-6 pb-20 max-w-6xl mx-auto">
-                <h2 id="features-heading" className="sr-only">Fonctionnalités principales</h2>
-                
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                  <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
-                    <Zap className="w-12 h-12 text-blue-600 mb-4" aria-hidden="true" />
-                    <h3 className="font-semibold text-gray-900 mb-2 text-center">Analyse semi-automatique</h3>
-                    <p className="text-gray-600 text-center">Analyse rapide avec WAVE, Axe Core et le moteur RGAA exclusif. Aucune intelligence artificielle n'est utilisée.</p>
-                  </article>
-                  <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
-                    <Shield className="w-12 h-12 text-purple-600 mb-4" aria-hidden="true" />
-                    <h3 className="font-semibold text-gray-900 mb-2 text-center">Conformité légale</h3>
-                    <p className="text-gray-600 text-center">Respect des standards RGAA 4.1 et WCAG 2.1 pour votre mise en conformité réglementaire</p>
-                  </article>
-                  <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
-                    <Users className="w-12 h-12 text-green-600 mb-4" aria-hidden="true" />
-                    <h3 className="font-semibold text-gray-900 mb-2 text-center">Impact social</h3>
-                    <p className="text-gray-600 text-center">Rendez votre site accessible à tous, y compris aux 12 millions de personnes en situation de handicap en France</p>
-                  </article>
-                  <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
-                    <AlertTriangle className="w-12 h-12 text-orange-600 mb-4" aria-hidden="true" />
-                    <h3 className="font-semibold text-gray-900 mb-2 text-center">Limites de l'automatisation</h3>
-                    <p className="text-gray-600 text-center">Cet outil détecte environ 30% des problèmes d'accessibilité. Un guide d'analyse manuelle est disponible pour une conformité complète</p>
-                  </article>
-                </div>
-              </section>
-
-                            {/* Types de handicaps - Section éducative */}
-              <section aria-labelledby="disabilities-types-heading" className="px-6 py-20 bg-gray-50">
-                <div className="max-w-6xl mx-auto">
-                  <h2 id="disabilities-types-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
-                    À qui s'adresse l'accessibilité ?
-                  </h2>
-                  <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-                    L'accessibilité numérique bénéficie à toutes les personnes, avec ou sans handicap
-                  </p>
-                  
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                      <Eye className="w-12 h-12 text-red-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps visuels</h3>
-                      <p className="text-gray-600 text-sm mb-4">Cécité, malvoyance, daltonisme</p>
-                      <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Lecteurs d'écran</li>
-                        <li>• Contrastes élevés</li>
-                        <li>• Alternatives textuelles</li>
-                      </ul>
-                    </article>
-                    
-                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                      <Headphones className="w-12 h-12 text-blue-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps auditifs</h3>
-                      <p className="text-gray-600 text-sm mb-4">Surdité, malentendance</p>
-                      <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Sous-titres</li>
-                        <li>• Langue des signes</li>
-                        <li>• Transcriptions</li>
-                      </ul>
-                    </article>
-                    
-                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                      <MousePointer className="w-12 h-12 text-green-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps moteurs</h3>
-                      <p className="text-gray-600 text-sm mb-4">Paralysie, amputations, tremblements</p>
-                      <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Navigation au clavier</li>
-                        <li>• Zones de clic étendues</li>
-                        <li>• Commande vocale</li>
-                      </ul>
-                    </article>
-                    
-                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                      <Brain className="w-12 h-12 text-purple-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps cognitifs</h3>
-                      <p className="text-gray-600 text-sm mb-4">Dyslexie, TDAH, troubles de la mémoire</p>
-                      <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Contenu simplifié</li>
-                        <li>• Navigation claire</li>
-                        <li>• Temps de lecture adapté</li>
-                      </ul>
-                    </article>
+              {/* Hero Section - Inspiré de Salient */}
+              <div className="relative overflow-hidden bg-white py-24 sm:py-32">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                  <div className="mx-auto max-w-2xl text-center">
+                    <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+                      Audit d'accessibilité {' '}
+                      <span className="text-blue-600">RGAA</span> simplifié
+                    </h1>
+                    <p className="mt-6 text-lg leading-8 text-gray-600">
+                      Analysez votre site web en quelques secondes et identifiez les problèmes d'accessibilité. 
+                      Conforme aux standards RGAA 4.1 et WCAG 2.1.
+                    </p>
+                    <div className="mt-10 flex items-center justify-center gap-x-6">
+                      <button
+                        onClick={() => {
+                          const formElement = document.getElementById('audit-form-home');
+                          if (formElement) {
+                            formElement.scrollIntoView({ behavior: 'smooth' });
+                            const firstInput = formElement.querySelector('input') as HTMLElement;
+                            if (firstInput) {
+                              setTimeout(() => firstInput.focus(), 500);
+                            }
+                          }
+                        }}
+                        className="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                      >
+                        Analyser maintenant
+                      </button>
+                      <a href="/blog" className="text-sm font-semibold leading-6 text-gray-900">
+                        En savoir plus <span aria-hidden="true">→</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </section>
+              </div>
 
-              {/* FAQ Section */}
-              <FAQSection />
-
-
-            </>
-          )}
-
-          {/* Page Statistiques */}
-          {activeSection === 'statistics' && (
-            <div className="min-h-screen">
-              <Statistics />
-            </div>
-          )}
-
-          {/* Page Analyser */}
-          {activeSection === 'analyze' && (
-            <>
-              {/* Formulaire d'audit - visible seulement quand il n'y a pas de résultats */}
-              {!auditResult && !comparativeResult && (
-                <section id="audit-form" className="px-6 min-h-[calc(100vh-4rem)] flex items-center justify-center" aria-labelledby="audit-form-heading">
-                  <div className="w-full max-w-4xl mx-auto">
-                    <h2 id="audit-form-heading" className="sr-only">Formulaire d'audit d'accessibilité</h2>
+              {/* Formulaire d'audit - Design Salient */}
+              <section id="audit-form-home" className="py-24 sm:py-32 bg-gray-50" aria-labelledby="audit-form-home-heading">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                  <div className="mx-auto max-w-2xl">
+                    <h2 id="audit-form-home-heading" className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">
+                      Analyser votre site Web
+                    </h2>
+                    <p className="text-lg leading-8 text-gray-600 text-center mb-12">
+                      Entrez l'URL de votre site pour commencer l'audit d'accessibilité
+                    </p>
                     <AuditForm
                       onAuditStart={handleAuditStart}
                       progress={progress}
@@ -554,42 +460,236 @@ export default function HomePage() {
                       analysisError={error}
                     />
                   </div>
+                </div>
+              </section>
+
+              {/* Features - Style Salient */}
+              <section className="py-24 sm:py-32">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                  <div className="mx-auto max-w-2xl lg:text-center">
+                    <h2 className="text-base font-semibold leading-7 text-blue-600">Fonctionnalités</h2>
+                    <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                      Tout ce dont vous avez besoin pour l'accessibilité
+                    </p>
+                    <p className="mt-6 text-lg leading-8 text-gray-600">
+                      Notre plateforme combine plusieurs moteurs d'analyse pour vous donner une vue complète 
+                      des problèmes d'accessibilité de votre site.
+                    </p>
+                  </div>
+                  <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
+                    <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
+                      <div className="relative pl-16">
+                        <dt className="text-base font-semibold leading-7 text-gray-900">
+                          <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
+                            <Zap className="h-6 w-6 text-white" aria-hidden="true" />
+                          </div>
+                          Analyse semi-automatique
+                        </dt>
+                        <dd className="mt-2 text-base leading-7 text-gray-600">
+                          Analyse rapide avec WAVE, Axe Core et le moteur RGAA exclusif. Aucune intelligence artificielle n'est utilisée.
+                        </dd>
+                      </div>
+                      <div className="relative pl-16">
+                        <dt className="text-base font-semibold leading-7 text-gray-900">
+                          <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
+                            <Shield className="h-6 w-6 text-white" aria-hidden="true" />
+                          </div>
+                          Conformité légale
+                        </dt>
+                        <dd className="mt-2 text-base leading-7 text-gray-600">
+                          Respect des standards RGAA 4.1 et WCAG 2.1 pour votre mise en conformité réglementaire.
+                        </dd>
+                      </div>
+                      <div className="relative pl-16">
+                        <dt className="text-base font-semibold leading-7 text-gray-900">
+                          <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
+                            <Users className="h-6 w-6 text-white" aria-hidden="true" />
+                          </div>
+                          Impact social
+                        </dt>
+                        <dd className="mt-2 text-base leading-7 text-gray-600">
+                          Rendez votre site accessible à tous, y compris aux 12 millions de personnes en situation de handicap en France.
+                        </dd>
+                      </div>
+                      <div className="relative pl-16">
+                        <dt className="text-base font-semibold leading-7 text-gray-900">
+                          <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
+                            <AlertTriangle className="h-6 w-6 text-white" aria-hidden="true" />
+                          </div>
+                          Limites de l'automatisation
+                        </dt>
+                        <dd className="mt-2 text-base leading-7 text-gray-600">
+                          Cet outil détecte environ 30% des problèmes d'accessibilité. Un guide d'analyse manuelle est disponible pour une conformité complète.
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+              </section>
+
+              {/* Types de handicaps - Style Salient */}
+              <section className="bg-gray-50 py-24 sm:py-32">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                  <div className="mx-auto max-w-2xl lg:text-center">
+                    <h2 className="text-base font-semibold leading-7 text-blue-600">Accessibilité</h2>
+                    <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                      À qui s'adresse l'accessibilité ?
+                    </p>
+                    <p className="mt-6 text-lg leading-8 text-gray-600">
+                      L'accessibilité numérique bénéficie à toutes les personnes, avec ou sans handicap.
+                    </p>
+                  </div>
+                  <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+                    <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-4">
+                      <div className="flex flex-col">
+                        <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+                          <Eye className="h-5 w-5 flex-none text-blue-600" aria-hidden="true" />
+                          Handicaps visuels
+                        </dt>
+                        <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                          <p className="flex-auto">Cécité, malvoyance, daltonisme</p>
+                          <div className="mt-6">
+                            <ul className="text-sm text-gray-500 space-y-1">
+                              <li>• Lecteurs d'écran</li>
+                              <li>• Contrastes élevés</li>
+                              <li>• Alternatives textuelles</li>
+                            </ul>
+                          </div>
+                        </dd>
+                      </div>
+                      <div className="flex flex-col">
+                        <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+                          <Headphones className="h-5 w-5 flex-none text-blue-600" aria-hidden="true" />
+                          Handicaps auditifs
+                        </dt>
+                        <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                          <p className="flex-auto">Surdité, malentendance</p>
+                          <div className="mt-6">
+                            <ul className="text-sm text-gray-500 space-y-1">
+                              <li>• Sous-titres</li>
+                              <li>• Langue des signes</li>
+                              <li>• Transcriptions</li>
+                            </ul>
+                          </div>
+                        </dd>
+                      </div>
+                      <div className="flex flex-col">
+                        <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+                          <MousePointer className="h-5 w-5 flex-none text-blue-600" aria-hidden="true" />
+                          Handicaps moteurs
+                        </dt>
+                        <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                          <p className="flex-auto">Paralysie, amputations, tremblements</p>
+                          <div className="mt-6">
+                            <ul className="text-sm text-gray-500 space-y-1">
+                              <li>• Navigation au clavier</li>
+                              <li>• Zones de clic étendues</li>
+                              <li>• Commande vocale</li>
+                            </ul>
+                          </div>
+                        </dd>
+                      </div>
+                      <div className="flex flex-col">
+                        <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+                          <Brain className="h-5 w-5 flex-none text-blue-600" aria-hidden="true" />
+                          Handicaps cognitifs
+                        </dt>
+                        <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                          <p className="flex-auto">Dyslexie, TDAH, troubles de la mémoire</p>
+                          <div className="mt-6">
+                            <ul className="text-sm text-gray-500 space-y-1">
+                              <li>• Contenu simplifié</li>
+                              <li>• Navigation claire</li>
+                              <li>• Temps de lecture adapté</li>
+                            </ul>
+                          </div>
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+              </section>
+
+              {/* FAQ Section - Style Salient */}
+              <section className="py-24 sm:py-32">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                  <div className="mx-auto max-w-4xl divide-y divide-gray-900/10">
+                    <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900">Questions fréquentes</h2>
+                    <FAQSection />
+                  </div>
+                </div>
+              </section>
+
+            </>
+          )}
+
+          {/* Page Statistiques */}
+          {activeSection === 'statistics' && (
+            <div className="min-h-screen bg-white">
+              <Statistics />
+            </div>
+          )}
+
+          {/* Page Analyser */}
+          {activeSection === 'analyze' && (
+            <div className="bg-white">
+              {/* Formulaire d'audit - visible seulement quand il n'y a pas de résultats */}
+              {!auditResult && !comparativeResult && (
+                <section id="audit-form" className="py-24 sm:py-32" aria-labelledby="audit-form-heading">
+                  <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <div className="mx-auto max-w-2xl">
+                      <h2 id="audit-form-heading" className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">
+                        Analyser votre site Web
+                      </h2>
+                      <AuditForm
+                        onAuditStart={handleAuditStart}
+                        progress={progress}
+                        isAnalyzing={isAnalyzing}
+                        analysisError={error}
+                      />
+                    </div>
+                  </div>
                 </section>
               )}
 
               {/* Résultats d'audit - si disponibles */}
               {auditResult && (
-                <section id="audit-results" className="px-6 max-w-6xl mx-auto pt-8">
-                  <AuditResults 
-                    result={auditResult} 
-                    language={language}
-                    onNewAudit={handleNewAudit}
-                  />
+                <section id="audit-results" className="py-8">
+                  <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <AuditResults 
+                      result={auditResult} 
+                      language={language}
+                      onNewAudit={handleNewAudit}
+                    />
+                  </div>
                 </section>
               )}
 
               {/* Résultats comparatifs - si disponibles */}
               {comparativeResult && (
-                <section id="audit-results" className="px-6 max-w-7xl mx-auto pt-8">
-                  <ComparativeTable 
-                    result={comparativeResult} 
-                    language={language}
-                    onEngineClick={handleEngineClick}
-                  />
+                <section id="audit-results" className="py-8">
+                  <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <ComparativeTable 
+                      result={comparativeResult} 
+                      language={language}
+                      onEngineClick={handleEngineClick}
+                    />
+                  </div>
                 </section>
               )}
-
-            </>
+            </div>
           )}
 
           {/* Page Référentiel RGAA */}
           {activeSection === 'rgaa-reference' && (
-            <RGAAReference />
+            <div className="bg-white">
+              <RGAAReference />
+            </div>
           )}
 
           {/* Page Historique */}
           {activeSection === 'history' && (
-            <div className="min-h-screen">
+            <div className="min-h-screen bg-white">
               <AuditHistory 
                 onResumeAudit={handleResumeAudit}
               />
