@@ -6,7 +6,8 @@ import TopBar from '@/components/TopBar';
 import Footer from '@/components/Footer';
 import { useAuth, PRICING_PLANS } from '@/contexts/AuthContext';
 import { 
-  Check, Crown, Zap, Shield, Star, ArrowRight, Sparkles, Building2
+  Check, Crown, Zap, Shield, Star, ArrowRight, Sparkles, Building2, 
+  Server, Database, Cpu, TrendingUp, AlertCircle, CreditCard
 } from 'lucide-react';
 
 export default function PricingPage() {
@@ -55,7 +56,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-blue-50">
       <TopBar />
 
       {/* Hero Section */}
@@ -105,9 +106,76 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Section explicative sur la consommation API */}
+      <section className="pb-16">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white mb-12">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-6">
+                <Server className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                Pourquoi des plans payants ?
+              </h2>
+              <p className="text-blue-100 text-lg mb-8 max-w-3xl mx-auto">
+                Notre plateforme utilise des services externes payants pour vous offrir la meilleure qualité d'audit d'accessibilité.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+                <Database className="w-10 h-10 text-blue-200 mx-auto mb-4" />
+                <h3 className="font-semibold mb-2">APIs Externes</h3>
+                <p className="text-blue-100 text-sm">
+                  Intégration avec WAVE, Axe Core et nos propres moteurs d'analyse avancés
+                </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+                <Cpu className="w-10 h-10 text-blue-200 mx-auto mb-4" />
+                <h3 className="font-semibold mb-2">Puissance de calcul</h3>
+                <p className="text-blue-100 text-sm">
+                  Analyse en temps réel de vos pages web avec des algorithmes optimisés
+                </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+                <TrendingUp className="w-10 h-10 text-blue-200 mx-auto mb-4" />
+                <h3 className="font-semibold mb-2">Infrastructure premium</h3>
+                <p className="text-blue-100 text-sm">
+                  Serveurs dédiés, sauvegardes automatiques et monitoring 24/7
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 bg-white/10 backdrop-blur rounded-xl p-6">
+              <div className="flex items-start space-x-4">
+                <AlertCircle className="w-6 h-6 text-blue-200 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-semibold mb-2">Consommation de crédits</h4>
+                  <p className="text-blue-100 text-sm">
+                    Chaque audit consomme des crédits API auprès de nos partenaires (WebAIM, Deque Systems). 
+                    Nos tarifs reflètent ces coûts réels et nous permettent de maintenir un service de qualité professionnelle 
+                    accessible au plus grand nombre.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Cards */}
       <section className="pb-20">
         <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Des plans adaptés à tous vos besoins
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Du développeur indépendant à la grande entreprise, trouvez le plan qui vous convient. 
+              Tous les plans incluent les mêmes fonctionnalités de base avec des limites adaptées.
+            </p>
+          </div>
+
           <div className="grid md:grid-cols-3 gap-8">
             {PRICING_PLANS.map((plan) => {
               const isCurrentPlan = currentPlan?.id === plan.id;
@@ -133,8 +201,6 @@ export default function PricingPage() {
                       </div>
                     </div>
                   )}
-
-
 
                   <div className="p-8">
                     {/* Header du plan */}
@@ -164,6 +230,18 @@ export default function PricingPage() {
                       {isAnnual && plan.price > 0 && (
                         <div className="text-sm text-green-600 font-medium">
                           Économisez {Math.round(plan.price * 2.4)}€ par an
+                        </div>
+                      )}
+
+                      {/* Indicateur de coût API */}
+                      {plan.id !== 'free' && (
+                        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="flex items-center justify-center space-x-2">
+                            <CreditCard className="w-4 h-4 text-blue-600" />
+                            <span className="text-blue-800 text-xs font-medium">
+                              Inclut les coûts API externes
+                            </span>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -226,6 +304,16 @@ export default function PricingPage() {
               );
             })}
           </div>
+
+          {/* Note sur la transparence des coûts */}
+          <div className="mt-12 bg-gray-50 rounded-xl p-6 text-center">
+            <h3 className="font-semibold text-gray-900 mb-2">Transparence totale sur nos coûts</h3>
+            <p className="text-gray-600 text-sm max-w-3xl mx-auto">
+              Contrairement à d'autres solutions, nous vous donnons accès aux meilleurs outils d'audit d'accessibilité 
+              (WAVE, Axe Core, moteur RGAA propriétaire) sans vous faire payer le prix fort. Nos tarifs couvrent 
+              uniquement les coûts réels d'infrastructure et d'APIs externes.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -244,6 +332,17 @@ export default function PricingPage() {
           <div className="space-y-8">
             <div className="border-b border-gray-200 pb-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Pourquoi proposez-vous des plans payants ?
+              </h3>
+              <p className="text-gray-600">
+                Notre plateforme utilise des APIs externes payantes (WAVE de WebAIM, Axe Core de Deque Systems) 
+                et nécessite une infrastructure robuste pour traiter les audits en temps réel. Nos tarifs 
+                reflètent ces coûts réels et nous permettent de vous offrir le meilleur service possible.
+              </p>
+            </div>
+
+            <div className="border-b border-gray-200 pb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Puis-je changer de plan à tout moment ?
               </h3>
               <p className="text-gray-600">
@@ -257,8 +356,20 @@ export default function PricingPage() {
                 Que se passe-t-il si je dépasse ma limite d'audits ?
               </h3>
               <p className="text-gray-600">
-                Nous vous notifierons lorsque vous approchez de votre limite. 
-                Vous pouvez soit attendre le mois suivant, soit passer à un plan supérieur pour continuer.
+                Pour le plan gratuit, vous devrez attendre le lendemain pour effectuer de nouveaux audits. 
+                Nous vous notifierons lorsque vous approchez de votre limite et vous pourrez passer 
+                à un plan supérieur pour continuer immédiatement.
+              </p>
+            </div>
+
+            <div className="border-b border-gray-200 pb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Les coûts API sont-ils vraiment inclus ?
+              </h3>
+              <p className="text-gray-600">
+                Oui, absolument ! Tous nos plans payants incluent les coûts des APIs externes (WAVE, Axe Core). 
+                Vous n'avez aucun frais caché ou supplément à prévoir. C'est l'un de nos engagements 
+                pour une tarification transparente.
               </p>
             </div>
 
@@ -267,8 +378,8 @@ export default function PricingPage() {
                 Y a-t-il une période d'essai gratuite ?
               </h3>
               <p className="text-gray-600">
-                Le plan gratuit vous permet de tester nos fonctionnalités de base. 
-                Les plans payants incluent une garantie de remboursement de 30 jours.
+                Le plan gratuit vous permet de tester nos fonctionnalités de base avec 3 audits par jour. 
+                Les plans payants incluent une garantie de remboursement de 30 jours sans question.
               </p>
             </div>
 
@@ -277,7 +388,7 @@ export default function PricingPage() {
                 Comment fonctionne la facturation annuelle ?
               </h3>
               <p className="text-gray-600">
-                La facturation annuelle vous fait économiser 20%. 
+                La facturation annuelle vous fait économiser 20% par rapport au paiement mensuel. 
                 Vous payez une fois par an et bénéficiez d'une réduction automatique.
               </p>
             </div>
