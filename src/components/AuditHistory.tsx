@@ -9,12 +9,15 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface HistoricalAudit {
   id: string;
+  user_email: string;
   url: string;
   timestamp: string;
   score: number;
-  totalViolations: number;
+  total_violations: number;
   result: AuditResult | ComparativeResult;
   engine: 'wave' | 'axe' | 'rgaa' | 'all';
+  created_at: string;
+  updated_at: string;
 }
 
 interface AuditHistoryProps {
@@ -316,7 +319,7 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
                   {/* Violations */}
                   <div className="flex flex-col items-center justify-center p-0 h-full">
                     <div className="bg-red-50 border border-red-100 rounded-xl shadow w-full py-6 flex flex-col items-center justify-center mb-2 h-full">
-                      <span className="text-2xl font-extrabold text-red-700 mb-1" style={{fontFamily: 'inherit'}}>{audit.totalViolations}</span>
+                      <span className="text-2xl font-extrabold text-red-700 mb-1" style={{fontFamily: 'inherit'}}>{audit.total_violations}</span>
                       <span className="text-xs font-medium text-red-600" style={{fontFamily: 'inherit'}}>violations</span>
                     </div>
                     <span className="text-xs text-gray-500 mt-1">Violations détectées</span>
@@ -404,7 +407,7 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">
-                      {audits.reduce((acc, audit) => acc + audit.totalViolations, 0)}
+                      {audits.reduce((acc, audit) => acc + audit.total_violations, 0)}
                     </div>
                     <div className="text-sm text-gray-500">Violations totales</div>
                   </div>
@@ -602,12 +605,15 @@ export const saveAuditToHistory = (result: AuditResult | ComparativeResult, engi
 
     const newAudit: HistoricalAudit = {
       id: Date.now().toString(),
+      user_email: userEmail || '',
       url: result.url || 'URL inconnue',
       timestamp: new Date().toISOString(),
       score: score,
-      totalViolations: totalViolations,
+      total_violations: totalViolations,
       result,
-      engine
+      engine,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
 
     // Debug pour vérifier les valeurs

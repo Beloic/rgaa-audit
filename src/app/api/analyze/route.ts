@@ -5,6 +5,7 @@ import { getUserByEmail, saveUser } from '@/lib/supabase-auth';
 export const maxDuration = 300; // 5 minutes
 import type { AuditResult, RGAAViolation, EngineResult, ComparativeResult } from '@/types/audit';
 import { incrementUserAuditCount } from '@/lib/audit-utils';
+import { saveAuditToDatabase } from '@/lib/audit-history';
 
 // Types pour les plans de tarification
 interface PlanLimits {
@@ -217,6 +218,18 @@ export async function POST(request: NextRequest) {
           console.error('❌ Erreur lors de l\'incrémentation automatique:', error);
         }
       }
+
+      // Sauvegarder l'audit comparatif dans l'historique côté serveur
+      if (userData?.email) {
+        try {
+          console.log('💾 Sauvegarde automatique de l\'audit comparatif en base...');
+          await saveAuditToDatabase(comparativeResult, 'all', userData.email);
+          console.log('✅ Audit comparatif sauvegardé automatiquement en base');
+        } catch (error) {
+          console.error('❌ Erreur lors de la sauvegarde automatique comparative en base:', error);
+          // Ne pas faire échouer l'analyse si la sauvegarde échoue
+        }
+      }
       
       return NextResponse.json({ 
         ...comparativeResult, 
@@ -270,6 +283,18 @@ export async function POST(request: NextRequest) {
         console.log('✅ Compteur incrémenté automatiquement après analyse simple');
       } catch (error) {
         console.error('❌ Erreur lors de l\'incrémentation automatique:', error);
+      }
+    }
+
+    // Sauvegarder l'audit dans l'historique côté serveur
+    if (userData?.email) {
+      try {
+        console.log('💾 Sauvegarde automatique de l\'audit en base...');
+        await saveAuditToDatabase(result, engine, userData.email);
+        console.log('✅ Audit sauvegardé automatiquement en base');
+      } catch (error) {
+        console.error('❌ Erreur lors de la sauvegarde automatique en base:', error);
+        // Ne pas faire échouer l'analyse si la sauvegarde échoue
       }
     }
 
