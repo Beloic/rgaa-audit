@@ -355,6 +355,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
                   <input
                     id="register-password"
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
                     required
                     value={registerForm.password}
                     onChange={(e) => setRegisterForm(prev => ({ ...prev, password: e.target.value }))}
@@ -386,6 +387,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', prese
                   <input
                     id="register-confirm-password"
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
                     required
                     value={registerForm.confirmPassword}
                     onChange={(e) => setRegisterForm(prev => ({ ...prev, confirmPassword: e.target.value }))}

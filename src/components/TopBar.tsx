@@ -162,7 +162,7 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
             >
               <Shield className="w-6 h-6 text-blue-600" aria-hidden="true" />
               <span className="text-lg font-bold text-gray-900">RGAA Audit</span>
-              <span className="hidden sm:inline ml-2 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-xs font-bold border border-orange-300 align-middle">ALPHA</span>
+              <span className="hidden sm:inline ml-2 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-xs font-bold border border-orange-300">ALPHA</span>
             </div>
             
             {/* Menu Navigation Desktop */}
