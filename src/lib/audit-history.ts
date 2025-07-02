@@ -56,6 +56,15 @@ export async function saveAuditToDatabase(
     score = Math.round(score);
 
     // Insérer en base
+    console.log('🔍 Tentative d\'insertion avec les données:', {
+      user_email: userEmail,
+      url: result.url || 'URL inconnue',
+      timestamp: result.timestamp || new Date().toISOString(),
+      score: score,
+      total_violations: totalViolations,
+      engine: engine
+    });
+
     const { data, error } = await supabase
       .from('audit_accessibility_history')
       .insert({
@@ -71,7 +80,12 @@ export async function saveAuditToDatabase(
       .single();
 
     if (error) {
-      console.error('❌ Erreur lors de la sauvegarde en base:', error);
+      console.error('❌ Erreur lors de la sauvegarde en base:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
       return null;
     }
 
