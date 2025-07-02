@@ -3,6 +3,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEffect } from 'react';
 import BetaProtection from '@/components/BetaProtection';
+import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
 
   return (
     <BetaProtection>
+      <EmailVerificationBanner />
       {children}
     </BetaProtection>
   );
