@@ -940,9 +940,16 @@ export default function AuditResults({ result, language, onNewAudit, updatedUser
   // État pour le filtre par catégorie uniquement
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'images' | 'forms' | 'navigation' | 'structure' | 'colors' | 'multimedia'>('all');
   const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const [hasIncrementedAudit, setHasIncrementedAudit] = useState(false);
   
-  // Incrémenter le compteur d'audits après affichage des résultats
+  // Incrémenter le compteur d'audits après affichage des résultats (une seule fois)
   useEffect(() => {
+    // Empêcher les appels multiples avec un flag
+    if (hasIncrementedAudit) {
+      console.log('🚫 Incrémentation déjà effectuée pour cette analyse, ignoré');
+      return;
+    }
+
     const incrementAuditCounter = async () => {
       try {
         // Utiliser les données fraîches de l'API analyze si disponibles, sinon le localStorage
@@ -986,6 +993,8 @@ export default function AuditResults({ result, language, onNewAudit, updatedUser
               auditsToday: data.updatedUserData.usage?.auditsToday,
               auditsTotal: data.updatedUserData.usage?.auditsTotal
             });
+            // Marquer comme incrémenté pour éviter les doublons
+            setHasIncrementedAudit(true);
           }
         } else {
           console.error('❌ Erreur lors de l\'incrémentation:', await response.text());
@@ -997,7 +1006,7 @@ export default function AuditResults({ result, language, onNewAudit, updatedUser
 
     // Incrémenter immédiatement après le montage du composant (affichage des résultats)
     incrementAuditCounter();
-  }, [updatedUserData]); // Dépendre de updatedUserData
+  }, [updatedUserData]); // Pas besoin d'inclure hasIncrementedAudit pour éviter les boucles
   
   // Détecter le scroll pour afficher le bouton de retour en haut
   useEffect(() => {
