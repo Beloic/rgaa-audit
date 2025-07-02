@@ -187,33 +187,11 @@ export async function POST(request: NextRequest) {
           
           // Sauvegarder dans la base de données TOUJOURS
           try {
-            console.log(`💾 Tentative de sauvegarde pour ${userData.email} avec auditsToday: ${updatedUserData.usage?.auditsToday}`);
             await saveUser(updatedUserData);
-            console.log(`✅ Données utilisateur sauvegardées en base pour ${userData.email}`);
-            
-            // Vérification immédiate que la sauvegarde a fonctionné
-            const verifiedUser = await getUserByEmail(userData.email);
-            if (verifiedUser) {
-              console.log(`🔍 Vérification sauvegarde - auditsToday en base: ${verifiedUser.usage?.auditsToday}`);
-            }
+            console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
           } catch (error) {
-            console.error(`❌ ERREUR CRITIQUE sauvegarde base de données pour ${userData.email}:`, error);
-            console.error(`   Type d'erreur:`, error instanceof Error ? error.name : typeof error);
-            console.error(`   Message d'erreur:`, error instanceof Error ? error.message : String(error));
-            console.error(`   Stack trace:`, error instanceof Error ? error.stack : 'N/A');
-            
-            // En cas d'erreur de sauvegarde, on retourne une erreur au lieu de continuer
-            return NextResponse.json(
-              { error: 'Erreur de sauvegarde des données utilisateur. Veuillez réessayer.' },
-              { 
-                status: 500,
-                headers: {
-                  'Access-Control-Allow-Origin': '*',
-                  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                }
-              }
-            );
+            console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
+            // Ne pas bloquer l'audit même si la sauvegarde échoue
           }
           
           console.log(`✅ Audit comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsToday}/${planLimits.auditsPerDay} audits aujourd'hui`);
@@ -232,33 +210,11 @@ export async function POST(request: NextRequest) {
           
           // Sauvegarder dans la base de données
           try {
-            console.log(`💾 Tentative de sauvegarde (plan illimité) pour ${userData.email}`);
             await saveUser(updatedUserData);
-            console.log(`✅ Données utilisateur sauvegardées en base pour ${userData.email}`);
-            
-            // Vérification immédiate que la sauvegarde a fonctionné
-            const verifiedUser = await getUserByEmail(userData.email);
-            if (verifiedUser) {
-              console.log(`🔍 Vérification sauvegarde - auditsTotal en base: ${verifiedUser.usage?.auditsTotal}`);
-            }
+            console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
           } catch (error) {
-            console.error(`❌ ERREUR CRITIQUE sauvegarde base de données pour ${userData.email}:`, error);
-            console.error(`   Type d'erreur:`, error instanceof Error ? error.name : typeof error);
-            console.error(`   Message d'erreur:`, error instanceof Error ? error.message : String(error));
-            console.error(`   Stack trace:`, error instanceof Error ? error.stack : 'N/A');
-            
-            // En cas d'erreur de sauvegarde, on retourne une erreur au lieu de continuer
-            return NextResponse.json(
-              { error: 'Erreur de sauvegarde des données utilisateur. Veuillez réessayer.' },
-              { 
-                status: 500,
-                headers: {
-                  'Access-Control-Allow-Origin': '*',
-                  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                }
-              }
-            );
+            console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
+            // Ne pas bloquer l'audit même si la sauvegarde échoue
           }
         }
       } else {
