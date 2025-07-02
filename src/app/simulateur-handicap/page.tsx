@@ -627,62 +627,64 @@ export default function SimulateurHandicap() {
           )}
         </div>
       </div>
+      {/* Style global sliders + curseur normal pendant tremblements */}
+      <style jsx global>{`
+        input[type="range"].slider-bar {
+          background: linear-gradient(to right, #d1d5db 0%, #d1d5db 100%);
+          height: 0.5rem;
+          border-radius: 0.5rem;
+        }
+        input[type="range"].slider-bar::-webkit-slider-runnable-track {
+          background: #d1d5db;
+          height: 0.5rem;
+          border-radius: 0.5rem;
+        }
+        input[type="range"].slider-bar::-webkit-slider-thumb {
+          background: #2563eb;
+          border: 2px solid #fff;
+          width: 1.25rem;
+          height: 1.25rem;
+          border-radius: 9999px;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+          -webkit-appearance: none;
+          appearance: none;
+          margin-top: -0.375rem;
+        }
+        input[type="range"].slider-bar:focus::-webkit-slider-thumb {
+          outline: 2px solid #2563eb;
+          outline-offset: 2px;
+        }
+        input[type="range"].slider-bar::-moz-range-thumb {
+          background: #2563eb;
+          border: 2px solid #fff;
+          width: 1.25rem;
+          height: 1.25rem;
+          border-radius: 9999px;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+        input[type="range"].slider-bar::-ms-thumb {
+          background: #2563eb;
+          border: 2px solid #fff;
+          width: 1.25rem;
+          height: 1.25rem;
+          border-radius: 9999px;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+        input[type="range"].slider-bar::-ms-fill-lower {
+          background: #d1d5db;
+          border-radius: 0.5rem;
+        }
+        input[type="range"].slider-bar::-ms-fill-upper {
+          background: #d1d5db;
+          border-radius: 0.5rem;
+        }
+        input[type="range"].slider-bar:focus {
+          outline: none;
+        }
+        body[style*="transform"] {
+          cursor: default !important;
+        }
+      `}</style>
     </div>
   );
-}
-
-// Ajout du style global pour les sliders
-<style jsx global>{`
-  input[type="range"].slider-bar {
-    background: linear-gradient(to right, #d1d5db 0%, #d1d5db 100%);
-    height: 0.5rem;
-    border-radius: 0.5rem;
-  }
-  input[type="range"].slider-bar::-webkit-slider-runnable-track {
-    background: #d1d5db;
-    height: 0.5rem;
-    border-radius: 0.5rem;
-  }
-  input[type="range"].slider-bar::-webkit-slider-thumb {
-    background: #2563eb;
-    border: 2px solid #fff;
-    width: 1.25rem;
-    height: 1.25rem;
-    border-radius: 9999px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-    -webkit-appearance: none;
-    appearance: none;
-    margin-top: -0.375rem;
-  }
-  input[type="range"].slider-bar:focus::-webkit-slider-thumb {
-    outline: 2px solid #2563eb;
-    outline-offset: 2px;
-  }
-  input[type="range"].slider-bar::-moz-range-thumb {
-    background: #2563eb;
-    border: 2px solid #fff;
-    width: 1.25rem;
-    height: 1.25rem;
-    border-radius: 9999px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-  }
-  input[type="range"].slider-bar::-ms-thumb {
-    background: #2563eb;
-    border: 2px solid #fff;
-    width: 1.25rem;
-    height: 1.25rem;
-    border-radius: 9999px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-  }
-  input[type="range"].slider-bar::-ms-fill-lower {
-    background: #d1d5db;
-    border-radius: 0.5rem;
-  }
-  input[type="range"].slider-bar::-ms-fill-upper {
-    background: #d1d5db;
-    border-radius: 0.5rem;
-  }
-  input[type="range"].slider-bar:focus {
-    outline: none;
-  }
-`}</style> 
+} 
