@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier et incrémenter le compteur d'audits AVANT l'analyse (sauf pour les utilisateurs bêta)
+    // Vérifier les limites AVANT l'analyse (sans incrémenter)
     if (userData) {
       const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
       
@@ -140,24 +140,24 @@ export async function POST(request: NextRequest) {
         const planLimits = getPlanLimits(userData.subscription?.plan || 'free');
         console.log(`📊 Limites du plan ${userData.subscription?.plan || 'free'}:`, planLimits);
         
-        // Vérifier la limite quotidienne
+        // Vérifier la limite quotidienne (sans incrémenter)
         if (planLimits.auditsPerDay !== 'unlimited') {
           const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
           const lastAuditDate = userData.usage.lastAuditDate ? new Date(userData.usage.lastAuditDate).toISOString().split('T')[0] : null;
           
           console.log(`📅 Vérification date:`, { today, lastAuditDate });
           
-          // Si c'est un nouveau jour, réinitialiser le compteur quotidien
+          // Si c'est un nouveau jour, réinitialiser le compteur quotidien pour la vérification
           const auditsToday = lastAuditDate === today ? (userData.usage.auditsToday || 0) + 1 : 1;
           
-          console.log(`📈 Calcul audits aujourd'hui:`, {
+          console.log(`📈 Vérification limites:`, {
             isNewDay: lastAuditDate !== today,
             currentAuditsToday: userData.usage.auditsToday || 0,
-            newAuditsToday: auditsToday,
+            projectedAuditsToday: auditsToday,
             limit: planLimits.auditsPerDay
           });
           
-          // Vérifier si la limite quotidienne est dépassée
+          // Vérifier si la limite quotidienne serait dépassée
           if (auditsToday > planLimits.auditsPerDay) {
             console.log(`🚫 LIMITE ATTEINTE pour ${userData.email}: ${auditsToday}/${planLimits.auditsPerDay}`);
             return NextResponse.json(
@@ -173,65 +173,16 @@ export async function POST(request: NextRequest) {
             );
           }
           
-          // Mettre à jour les données utilisateur AVANT l'analyse
-          updatedUserData = {
-            ...userData,
-            usage: {
-              ...userData.usage,
-              auditsToday,
-              auditsThisMonth: userData.usage.auditsThisMonth + 1,
-              auditsTotal: userData.usage.auditsTotal + 1,
-              lastAuditDate: new Date().toISOString()
-            }
-          };
-          
-          // Sauvegarder dans la base de données TOUJOURS
-          try {
-            console.log(`🔄 Avant sauvegarde - auditsToday: ${updatedUserData.usage?.auditsToday}, auditsTotal: ${updatedUserData.usage?.auditsTotal}`);
-            await saveUser(updatedUserData);
-            console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
-            
-            // Vérification immédiate après sauvegarde
-            const verifiedUser = await getUserByEmail(userData.email);
-            if (verifiedUser) {
-              console.log(`✅ Vérification post-sauvegarde - auditsToday en base: ${verifiedUser.usage?.auditsToday}, auditsTotal: ${verifiedUser.usage?.auditsTotal}`);
-            } else {
-              console.log(`❌ Impossible de vérifier l'utilisateur après sauvegarde`);
-            }
-          } catch (error) {
-            console.error(`❌ ERREUR CRITIQUE sauvegarde pour ${userData.email}:`, error);
-            console.error(`   Message d'erreur complet:`, error instanceof Error ? error.message : String(error));
-            // Ne pas bloquer l'audit mais logger l'erreur
-          }
-          
-          console.log(`✅ Audit comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsToday}/${planLimits.auditsPerDay} audits aujourd'hui`);
+          console.log(`✅ Limite OK pour ${userData.email}: ${auditsToday}/${planLimits.auditsPerDay} audits`);
         } else {
           console.log(`♾️ Plan illimité pour ${userData.email}`);
-          // Plan illimité - juste incrémenter les compteurs
-          updatedUserData = {
-            ...userData,
-            usage: {
-              ...userData.usage,
-              auditsThisMonth: userData.usage.auditsThisMonth + 1,
-              auditsTotal: userData.usage.auditsTotal + 1,
-              lastAuditDate: new Date().toISOString()
-            }
-          };
-          
-          // Sauvegarder dans la base de données
-          try {
-            await saveUser(updatedUserData);
-            console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
-          } catch (error) {
-            console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
-            // Ne pas bloquer l'audit même si la sauvegarde échoue
-          }
         }
       } else {
-        // Pour les utilisateurs bêta, on ne change pas les données d'usage
-        updatedUserData = userData;
         console.log(`👤 Audit pour utilisateur bêta ${userData.email} - Accès illimité ✅`);
       }
+      
+      // Passer les données utilisateur sans les modifier (l'incrémentation se fera après affichage)
+      updatedUserData = userData;
     }
 
     // Valider l'URL

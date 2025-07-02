@@ -940,6 +940,43 @@ export default function AuditResults({ result, language, onNewAudit }: AuditResu
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'images' | 'forms' | 'navigation' | 'structure' | 'colors' | 'multimedia'>('all');
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   
+  // Incrémenter le compteur d'audits après affichage des résultats
+  useEffect(() => {
+    const incrementAuditCounter = async () => {
+      try {
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+          const userData = JSON.parse(userDataString);
+          console.log('📈 Incrémentation du compteur d\'audits après affichage des résultats...');
+          
+          const response = await fetch('/api/user/increment-audit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userData })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.updatedUserData) {
+              // Mettre à jour les données utilisateur dans le localStorage
+              localStorage.setItem('userData', JSON.stringify(data.updatedUserData));
+              console.log('✅ Compteur d\'audits incrémenté avec succès');
+            }
+          } else {
+            console.error('❌ Erreur lors de l\'incrémentation:', await response.text());
+          }
+        }
+      } catch (error) {
+        console.error('❌ Erreur lors de l\'incrémentation des audits:', error);
+      }
+    };
+
+    // Incrémenter immédiatement après le montage du composant (affichage des résultats)
+    incrementAuditCounter();
+  }, []); // Tableau de dépendances vide = s'exécute une seule fois au montage
+  
   // Détecter le scroll pour afficher le bouton de retour en haut
   useEffect(() => {
     const handleScroll = () => {
