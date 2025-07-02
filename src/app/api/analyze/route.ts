@@ -187,11 +187,21 @@ export async function POST(request: NextRequest) {
           
           // Sauvegarder dans la base de données TOUJOURS
           try {
+            console.log(`🔄 Avant sauvegarde - auditsToday: ${updatedUserData.usage?.auditsToday}, auditsTotal: ${updatedUserData.usage?.auditsTotal}`);
             await saveUser(updatedUserData);
             console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
+            
+            // Vérification immédiate après sauvegarde
+            const verifiedUser = await getUserByEmail(userData.email);
+            if (verifiedUser) {
+              console.log(`✅ Vérification post-sauvegarde - auditsToday en base: ${verifiedUser.usage?.auditsToday}, auditsTotal: ${verifiedUser.usage?.auditsTotal}`);
+            } else {
+              console.log(`❌ Impossible de vérifier l'utilisateur après sauvegarde`);
+            }
           } catch (error) {
-            console.warn(`⚠️ Erreur sauvegarde base de données pour ${userData.email}:`, error);
-            // Ne pas bloquer l'audit même si la sauvegarde échoue
+            console.error(`❌ ERREUR CRITIQUE sauvegarde pour ${userData.email}:`, error);
+            console.error(`   Message d'erreur complet:`, error instanceof Error ? error.message : String(error));
+            // Ne pas bloquer l'audit mais logger l'erreur
           }
           
           console.log(`✅ Audit comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsToday}/${planLimits.auditsPerDay} audits aujourd'hui`);
