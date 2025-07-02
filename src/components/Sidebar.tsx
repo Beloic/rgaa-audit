@@ -9,7 +9,8 @@ const translations = {
     intelligentAnalysis: 'Analyse intelligente',
     rgaaReference: 'Référentiel RGAA',
     auditHistory: 'Gestion des audits',
-    disabilitySimulator: 'Simulateur d\'Handicap',
+    disabilitySimulator: "Simulateur d'Handicap",
+    quiz: 'Quiz',
     versionAlpha: 'VERSION ALPHA',
     bugReport: 'Il est probable que vous rencontriez des bugs, merci de bien vouloir les remonter :',
     reportBug: 'Signaler un bug'
@@ -20,6 +21,7 @@ const translations = {
     rgaaReference: 'RGAA Reference',
     auditHistory: 'History',
     disabilitySimulator: 'Disability Simulator',
+    quiz: 'Quiz',
     versionAlpha: 'ALPHA VERSION',
     bugReport: 'You may encounter bugs, please report them:',
     reportBug: 'Report a bug'
@@ -27,8 +29,8 @@ const translations = {
 };
 
 interface SidebarProps {
-  activeSection: 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator';
-  onSectionChange: (section: 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator') => void;
+  activeSection: 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator' | 'quiz';
+  onSectionChange: (section: 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator' | 'quiz') => void;
 }
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
@@ -70,6 +72,15 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         >
           <Accessibility className="w-5 h-5" aria-hidden="true" />
           <span className="font-medium">{t.disabilitySimulator}</span>
+        </button>
+        
+        <button
+          onClick={() => onSectionChange('quiz')}
+          className={getButtonClasses('quiz')}
+          aria-current={activeSection === 'quiz' ? 'page' : undefined}
+        >
+          <BookOpen className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">{t.quiz}</span>
         </button>
         
         {/*
