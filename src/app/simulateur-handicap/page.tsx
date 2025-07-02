@@ -42,9 +42,6 @@ export default function SimulateurHandicap() {
 
   const [isSimulating, setIsSimulating] = useState(false);
   const trembleIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const mouseTrembleRef = useRef<HTMLDivElement | null>(null);
-  const [showFakeCursor, setShowFakeCursor] = useState(false);
-  const [fakeCursorPos, setFakeCursorPos] = useState({ x: 0, y: 0 });
 
   // Appliquer les filtres CSS
   useEffect(() => {
@@ -104,24 +101,18 @@ export default function SimulateurHandicap() {
         clearInterval(trembleIntervalRef.current);
       }
       
-      // Créer l'effet de tremblement du body
+      // Créer l'effet de tremblement
       trembleIntervalRef.current = setInterval(() => {
         const trembleX = (Math.random() - 0.5) * intensity * 8;
         const trembleY = (Math.random() - 0.5) * intensity * 8;
         body.style.transform = `translate(${trembleX}px, ${trembleY}px)`;
       }, 50);
-      // Activer le faux curseur
-      setShowFakeCursor(true);
-      // Masquer le vrai curseur
-      body.style.cursor = 'none';
     } else {
       body.style.transform = '';
       if (trembleIntervalRef.current) {
         clearInterval(trembleIntervalRef.current);
         trembleIntervalRef.current = null;
       }
-      setShowFakeCursor(false);
-      body.style.cursor = '';
     }
     
     // Cécité
@@ -182,30 +173,6 @@ export default function SimulateurHandicap() {
 
     body.style.filter = filters.join(' ');
   }, [settings, isSimulating]);
-
-  // Mouvement du faux curseur tremblant
-  useEffect(() => {
-    if (!showFakeCursor) return;
-    let lastPos = { x: 0, y: 0 };
-    let animFrame: number;
-    const handleMouseMove = (e: MouseEvent) => {
-      lastPos = { x: e.clientX, y: e.clientY };
-    };
-    const animate = () => {
-      // Ajoute un tremblement autour de la vraie position
-      const intensity = settings.tremblements.intensity / 100;
-      const trembleX = (Math.random() - 0.5) * intensity * 30;
-      const trembleY = (Math.random() - 0.5) * intensity * 30;
-      setFakeCursorPos({ x: lastPos.x + trembleX, y: lastPos.y + trembleY });
-      animFrame = requestAnimationFrame(animate);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    animFrame = requestAnimationFrame(animate);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animFrame);
-    };
-  }, [showFakeCursor, settings.tremblements.intensity]);
 
   const toggleSimulation = () => {
     setIsSimulating(!isSimulating);
@@ -403,7 +370,7 @@ export default function SimulateurHandicap() {
                             severity: parseInt(e.target.value)
                           }
                         })}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider slider-bar"
                       />
                     </div>
                   </div>
@@ -569,7 +536,7 @@ export default function SimulateurHandicap() {
                             intensity: parseInt(e.target.value)
                           }
                         })}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider slider-bar"
                       />
                     </div>
                   </div>
@@ -659,29 +626,63 @@ export default function SimulateurHandicap() {
             </div>
           )}
         </div>
-
-        {/* Affichage du faux curseur tremblant */}
-        {showFakeCursor && (
-          <div
-            ref={mouseTrembleRef}
-            style={{
-              position: 'fixed',
-              left: fakeCursorPos.x,
-              top: fakeCursorPos.y,
-              width: 24,
-              height: 24,
-              pointerEvents: 'none',
-              zIndex: 9999,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="8" fill="#e53e3e" stroke="#fff" strokeWidth="2" />
-              <path d="M12 4 L12 20 M4 12 L20 12" stroke="#fff" strokeWidth="2" />
-            </svg>
-          </div>
-        )}
       </div>
     </div>
   );
-} 
+}
+
+// Ajout du style global pour les sliders
+<style jsx global>{`
+  input[type="range"].slider-bar {
+    background: linear-gradient(to right, #d1d5db 0%, #d1d5db 100%);
+    height: 0.5rem;
+    border-radius: 0.5rem;
+  }
+  input[type="range"].slider-bar::-webkit-slider-runnable-track {
+    background: #d1d5db;
+    height: 0.5rem;
+    border-radius: 0.5rem;
+  }
+  input[type="range"].slider-bar::-webkit-slider-thumb {
+    background: #2563eb;
+    border: 2px solid #fff;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -0.375rem;
+  }
+  input[type="range"].slider-bar:focus::-webkit-slider-thumb {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+  input[type="range"].slider-bar::-moz-range-thumb {
+    background: #2563eb;
+    border: 2px solid #fff;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  }
+  input[type="range"].slider-bar::-ms-thumb {
+    background: #2563eb;
+    border: 2px solid #fff;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  }
+  input[type="range"].slider-bar::-ms-fill-lower {
+    background: #d1d5db;
+    border-radius: 0.5rem;
+  }
+  input[type="range"].slider-bar::-ms-fill-upper {
+    background: #d1d5db;
+    border-radius: 0.5rem;
+  }
+  input[type="range"].slider-bar:focus {
+    outline: none;
+  }
+`}</style> 
