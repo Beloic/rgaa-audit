@@ -209,7 +209,7 @@ export default function SimulateurHandicap() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
@@ -218,7 +218,7 @@ export default function SimulateurHandicap() {
                 Simulateur d'Handicap
               </h1>
               <p className="text-gray-600">
-                Expérimentez différents types de handicaps visuels pour mieux comprendre les défis d'accessibilité
+                Expérimentez différents types de handicaps visuels et moteurs pour mieux comprendre les défis d'accessibilité
               </p>
             </div>
             <div className="flex gap-3">
@@ -265,273 +265,283 @@ export default function SimulateurHandicap() {
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Cécité */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <EyeOff className="w-6 h-6 text-gray-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900">Cécité</h3>
-                <p className="text-sm text-gray-500">Perte totale de la vision</p>
-              </div>
-            </div>
-            
-            <p className="text-gray-600 text-sm mb-4">
-              {handicapDescriptions.cecite}
-            </p>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.cecite}
-                onChange={(e) => setSettings({
-                  ...settings,
-                  cecite: e.target.checked,
-                  malvoyance: { ...settings.malvoyance, enabled: false }
-                })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700 font-medium">Simuler la cécité</span>
-            </label>
-          </div>
-
-          {/* Malvoyance */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Eye className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900">Malvoyance</h3>
-                <p className="text-sm text-gray-500">Déficience visuelle partielle</p>
-              </div>
-            </div>
-            
-            <p className="text-gray-600 text-sm mb-4">
-              {handicapDescriptions.malvoyance}
-            </p>
-
-            <div className="space-y-4">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={settings.malvoyance.enabled}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    malvoyance: { ...settings.malvoyance, enabled: e.target.checked },
-                    cecite: false
-                  })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="text-gray-700 font-medium">Simuler la malvoyance</span>
-              </label>
-
-              {settings.malvoyance.enabled && (
-                <div className="ml-7 space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Type de malvoyance
-                    </label>
-                    <select
-                      value={settings.malvoyance.type}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        malvoyance: {
-                          ...settings.malvoyance,
-                          type: e.target.value as 'blur' | 'tunnel' | 'spots'
-                        }
-                      })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="blur">Vision floue</option>
-                      <option value="tunnel">Vision tunnel</option>
-                      <option value="spots">Taches aveugles</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Sévérité: {settings.malvoyance.severity}%
-                    </label>
-                    <input
-                      type="range"
-                      min="10"
-                      max="90"
-                      value={settings.malvoyance.severity}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        malvoyance: {
-                          ...settings.malvoyance,
-                          severity: parseInt(e.target.value)
-                        }
-                      })}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                    />
-                  </div>
+        {/* Handicaps visuels */}
+        <div className="mb-10">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Handicaps visuels</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Cécité */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <EyeOff className="w-6 h-6 text-gray-600" />
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Navigation Clavier */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Keyboard className="w-6 h-6 text-orange-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900">Navigation Clavier</h3>
-                <p className="text-sm text-gray-500">Handicaps moteurs</p>
-              </div>
-            </div>
-            
-            <p className="text-gray-600 text-sm mb-4">
-              {handicapDescriptions.navigationClavier}
-            </p>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.navigationClavier}
-                onChange={(e) => setSettings({
-                  ...settings,
-                  navigationClavier: e.target.checked
-                })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700 font-medium">Désactiver la souris</span>
-            </label>
-            
-            {settings.navigationClavier && (
-              <div className="mt-4 p-3 bg-orange-50 rounded-lg">
-                <p className="text-sm text-orange-700">
-                  💡 <strong>Astuce :</strong> Utilisez Tab pour naviguer, Entrée pour cliquer, Espace pour cocher les cases.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Tremblements */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <Activity className="w-6 h-6 text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900">Tremblements</h3>
-                <p className="text-sm text-gray-500">Troubles moteurs</p>
-              </div>
-            </div>
-            
-            <p className="text-gray-600 text-sm mb-4">
-              {handicapDescriptions.tremblements}
-            </p>
-
-            <div className="space-y-4">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={settings.tremblements.enabled}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    tremblements: { ...settings.tremblements, enabled: e.target.checked }
-                  })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="text-gray-700 font-medium">Simuler les tremblements</span>
-              </label>
-
-              {settings.tremblements.enabled && (
-                <div className="ml-7 space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Intensité: {settings.tremblements.intensity}%
-                    </label>
-                    <input
-                      type="range"
-                      min="10"
-                      max="90"
-                      value={settings.tremblements.intensity}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        tremblements: {
-                          ...settings.tremblements,
-                          intensity: parseInt(e.target.value)
-                        }
-                      })}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                    />
-                  </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Cécité</h3>
+                  <p className="text-sm text-gray-500">Perte totale de la vision</p>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Daltonisme - Prend maintenant toute la largeur */}
-          <div className="bg-white rounded-lg shadow-sm p-6 md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Palette className="w-6 h-6 text-green-600" />
               </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900">Daltonisme</h3>
-                <p className="text-sm text-gray-500">Déficience de la perception des couleurs</p>
-              </div>
-            </div>
-            
-            <p className="text-gray-600 text-sm mb-4">
-              {handicapDescriptions.daltonisme}
-            </p>
+              
+              <p className="text-gray-600 text-sm mb-4">
+                {handicapDescriptions.cecite}
+              </p>
 
-            <div className="space-y-4">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={settings.daltonisme.enabled}
+                  checked={settings.cecite}
                   onChange={(e) => setSettings({
                     ...settings,
-                    daltonisme: { ...settings.daltonisme, enabled: e.target.checked }
+                    cecite: e.target.checked,
+                    malvoyance: { ...settings.malvoyance, enabled: false }
                   })}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <span className="text-gray-700 font-medium">Simuler le daltonisme</span>
+                <span className="text-gray-700 font-medium">Simuler la cécité</span>
               </label>
+            </div>
 
-              {settings.daltonisme.enabled && (
-                <div className="ml-7">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Type de daltonisme
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { value: 'deuteranopia', label: 'Deutéranopie (vert-rouge)' },
-                      { value: 'protanopia', label: 'Protanopie (rouge-vert)' },
-                      { value: 'tritanopia', label: 'Tritanopie (bleu-jaune)' },
-                      { value: 'monochromacy', label: 'Monochromatie (noir et blanc)' }
-                    ].map((option) => (
-                      <label key={option.value} className="flex items-center gap-2 cursor-pointer p-2 border rounded-lg hover:bg-gray-50">
-                        <input
-                          type="radio"
-                          name="daltonisme-type"
-                          value={option.value}
-                          checked={settings.daltonisme.type === option.value}
-                          onChange={(e) => setSettings({
-                            ...settings,
-                            daltonisme: {
-                              ...settings.daltonisme,
-                              type: e.target.value as any
-                            }
-                          })}
-                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700">{option.label}</span>
+            {/* Malvoyance */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Eye className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Malvoyance</h3>
+                  <p className="text-sm text-gray-500">Déficience visuelle partielle</p>
+                </div>
+              </div>
+              
+              <p className="text-gray-600 text-sm mb-4">
+                {handicapDescriptions.malvoyance}
+              </p>
+
+              <div className="space-y-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.malvoyance.enabled}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      malvoyance: { ...settings.malvoyance, enabled: e.target.checked },
+                      cecite: false
+                    })}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-gray-700 font-medium">Simuler la malvoyance</span>
+                </label>
+
+                {settings.malvoyance.enabled && (
+                  <div className="ml-7 space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Type de malvoyance
                       </label>
-                    ))}
+                      <select
+                        value={settings.malvoyance.type}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          malvoyance: {
+                            ...settings.malvoyance,
+                            type: e.target.value as 'blur' | 'tunnel' | 'spots'
+                          }
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="blur">Vision floue</option>
+                        <option value="tunnel">Vision tunnel</option>
+                        <option value="spots">Taches aveugles</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Sévérité: {settings.malvoyance.severity}%
+                      </label>
+                      <input
+                        type="range"
+                        min="10"
+                        max="90"
+                        value={settings.malvoyance.severity}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          malvoyance: {
+                            ...settings.malvoyance,
+                            severity: parseInt(e.target.value)
+                          }
+                        })}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      />
+                    </div>
                   </div>
+                )}
+              </div>
+            </div>
+
+            {/* Daltonisme */}
+            <div className="bg-white rounded-lg shadow-sm p-6 md:col-span-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Palette className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Daltonisme</h3>
+                  <p className="text-sm text-gray-500">Déficience de la perception des couleurs</p>
+                </div>
+              </div>
+              
+              <p className="text-gray-600 text-sm mb-4">
+                {handicapDescriptions.daltonisme}
+              </p>
+
+              <div className="space-y-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.daltonisme.enabled}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      daltonisme: { ...settings.daltonisme, enabled: e.target.checked }
+                    })}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-gray-700 font-medium">Simuler le daltonisme</span>
+                </label>
+
+                {settings.daltonisme.enabled && (
+                  <div className="ml-7">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Type de daltonisme
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { value: 'deuteranopia', label: 'Deutéranopie (vert-rouge)' },
+                        { value: 'protanopia', label: 'Protanopie (rouge-vert)' },
+                        { value: 'tritanopia', label: 'Tritanopie (bleu-jaune)' },
+                        { value: 'monochromacy', label: 'Monochromatie (noir et blanc)' }
+                      ].map((option) => (
+                        <label key={option.value} className="flex items-center gap-2 cursor-pointer p-2 border rounded-lg hover:bg-gray-50">
+                          <input
+                            type="radio"
+                            name="daltonisme-type"
+                            value={option.value}
+                            checked={settings.daltonisme.type === option.value}
+                            onChange={(e) => setSettings({
+                              ...settings,
+                              daltonisme: {
+                                ...settings.daltonisme,
+                                type: e.target.value as any
+                              }
+                            })}
+                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Handicaps moteurs */}
+        <div className="mb-10">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Handicaps moteurs</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Navigation Clavier */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <Keyboard className="w-6 h-6 text-orange-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Navigation Clavier</h3>
+                  <p className="text-sm text-gray-500">Handicaps moteurs</p>
+                </div>
+              </div>
+              
+              <p className="text-gray-600 text-sm mb-4">
+                {handicapDescriptions.navigationClavier}
+              </p>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={settings.navigationClavier}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    navigationClavier: e.target.checked
+                  })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-gray-700 font-medium">Désactiver la souris</span>
+              </label>
+              
+              {settings.navigationClavier && (
+                <div className="mt-4 p-3 bg-orange-50 rounded-lg">
+                  <p className="text-sm text-orange-700">
+                    💡 <strong>Astuce :</strong> Utilisez Tab pour naviguer, Entrée pour cliquer, Espace pour cocher les cases.
+                  </p>
                 </div>
               )}
+            </div>
+
+            {/* Tremblements */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <Activity className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Tremblements</h3>
+                  <p className="text-sm text-gray-500">Troubles moteurs</p>
+                </div>
+              </div>
+              
+              <p className="text-gray-600 text-sm mb-4">
+                {handicapDescriptions.tremblements}
+              </p>
+
+              <div className="space-y-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.tremblements.enabled}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      tremblements: { ...settings.tremblements, enabled: e.target.checked }
+                    })}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-gray-700 font-medium">Simuler les tremblements</span>
+                </label>
+
+                {settings.tremblements.enabled && (
+                  <div className="ml-7 space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Intensité: {settings.tremblements.intensity}%
+                      </label>
+                      <input
+                        type="range"
+                        min="10"
+                        max="90"
+                        value={settings.tremblements.intensity}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          tremblements: {
+                            ...settings.tremblements,
+                            intensity: parseInt(e.target.value)
+                          }
+                        })}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
