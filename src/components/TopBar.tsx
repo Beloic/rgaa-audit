@@ -92,6 +92,7 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
     try {
       await authLogout();
       setIsUserMenuOpen(false);
+      window.location.href = '/';
     } catch (error) {
       console.error('Erreur de déconnexion:', error);
     } finally {
