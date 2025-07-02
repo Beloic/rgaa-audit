@@ -2,7 +2,6 @@
 
 import { Monitor, FileCheck, BookOpen, Clock, BarChart3, Accessibility } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import Link from 'next/link';
 
 const translations = {
   fr: {
@@ -48,36 +47,50 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   return (
     <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 flex flex-col">
       <nav className="p-4 space-y-2 flex-1" aria-label="Navigation secondaire">
-        <Link href="/" legacyBehavior>
-          <a className={getButtonClasses('analyze')} aria-current={activeSection === 'analyze' ? 'page' : undefined}>
-            <Monitor className="w-5 h-5" aria-hidden="true" />
-            <span className="font-medium">{t.intelligentAnalysis}</span>
-          </a>
-        </Link>
-        <Link href="/audit-management" legacyBehavior>
-          <a className={getButtonClasses('history')} aria-current={activeSection === 'history' ? 'page' : undefined}>
-            <Clock className="w-5 h-5" aria-hidden="true" />
-            <span className="font-medium">{t.auditHistory}</span>
-          </a>
-        </Link>
-        <Link href="/simulateur-handicap" legacyBehavior>
-          <a className={getButtonClasses('disability-simulator') + ' text-[13px]'} aria-current={activeSection === 'disability-simulator' ? 'page' : undefined}>
-            <Accessibility className="w-5 h-5" aria-hidden="true" />
-            <span className="font-medium whitespace-nowrap">{t.disabilitySimulator}</span>
-          </a>
-        </Link>
-        <Link href="/statistics" legacyBehavior>
-          <a className={getButtonClasses('statistics')} aria-current={activeSection === 'statistics' ? 'page' : undefined}>
-            <BarChart3 className="w-5 h-5" aria-hidden="true" />
-            <span className="font-medium">{t.statistics}</span>
-          </a>
-        </Link>
-        <Link href="/quiz" legacyBehavior>
-          <a className={getButtonClasses('quiz')} aria-current={activeSection === 'quiz' ? 'page' : undefined}>
-            <BookOpen className="w-5 h-5" aria-hidden="true" />
-            <span className="font-medium">{t.quiz}</span>
-          </a>
-        </Link>
+        <button
+          onClick={() => onSectionChange('analyze')}
+          className={getButtonClasses('analyze')}
+          aria-current={activeSection === 'analyze' ? 'page' : undefined}
+        >
+          <Monitor className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">{t.intelligentAnalysis}</span>
+        </button>
+
+        <button
+          onClick={() => onSectionChange('history')}
+          className={getButtonClasses('history')}
+          aria-current={activeSection === 'history' ? 'page' : undefined}
+        >
+          <Clock className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">{t.auditHistory}</span>
+        </button>
+
+        <button
+          onClick={() => onSectionChange('disability-simulator')}
+          className={getButtonClasses('disability-simulator') + ' text-[13px]'}
+          aria-current={activeSection === 'disability-simulator' ? 'page' : undefined}
+        >
+          <Accessibility className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium whitespace-nowrap">{t.disabilitySimulator}</span>
+        </button>
+        
+        <button
+          onClick={() => onSectionChange('statistics')}
+          className={getButtonClasses('statistics')}
+          aria-current={activeSection === 'statistics' ? 'page' : undefined}
+        >
+          <BarChart3 className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">{t.statistics}</span>
+        </button>
+        
+        <button
+          onClick={() => onSectionChange('quiz')}
+          className={getButtonClasses('quiz')}
+          aria-current={activeSection === 'quiz' ? 'page' : undefined}
+        >
+          <BookOpen className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">{t.quiz}</span>
+        </button>
         
         {/*
         <button
