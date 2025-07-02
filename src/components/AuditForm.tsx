@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import type { AuditRequest, AnalysisProgress } from '@/types/audit';
 import { hasFreeAuditUsedRobust, setFreeAuditUsedRobust, setStorageItem } from '@/lib/storage-utils';
+import MobileBlocker from './MobileBlocker';
 
 interface AuditFormProps {
   onAuditStart: (request: AuditRequest, markFreeAuditAsUsed?: () => void) => void;
@@ -63,6 +64,11 @@ const translations = {
   }
 };
 
+function isMobileDevice() {
+  if (typeof window === 'undefined') return false;
+  return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent);
+}
+
 export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysisError }: AuditFormProps) {
   const { language } = useLanguage();
   const { user } = useAuth();
@@ -70,6 +76,7 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
   const [error, setError] = useState('');
   const [selectedEngine, setSelectedEngine] = useState<'wave' | 'axe' | 'rgaa' | 'all'>('rgaa');
   const [hasUsedFreeAudit, setHasUsedFreeAudit] = useState(false);
+  const [showMobileBlocker, setShowMobileBlocker] = useState(false);
 
   const t = translations[language];
 
@@ -101,6 +108,12 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Blocage mobile : si mobile, afficher le blocage
+    if (isMobileDevice()) {
+      setShowMobileBlocker(true);
+      return;
+    }
 
     // Vérifier si l'utilisateur non connecté a déjà utilisé son audit gratuit
     if (!user && hasUsedFreeAudit) {
@@ -169,6 +182,11 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
         </div>
       </div>
     );
+  }
+
+  // Affichage du blocage mobile si nécessaire
+  if (showMobileBlocker) {
+    return <MobileBlocker onClose={() => setShowMobileBlocker(false)} />;
   }
 
   return (
