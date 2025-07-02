@@ -42,17 +42,19 @@ export default function SimulateurHandicap() {
 
   const [isSimulating, setIsSimulating] = useState(false);
   const trembleIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   // Appliquer les filtres CSS
   useEffect(() => {
-    const body = document.body;
-    
+    const mainContent = mainContentRef.current;
+    if (!mainContent) return;
+
     if (!isSimulating) {
-      body.style.filter = '';
-      body.style.opacity = '';
-      body.style.pointerEvents = '';
-      body.className = body.className.replace(/vision-tunnel|vision-spots|keyboard-only/g, '').trim();
-      // Arrêter les tremblements
+      mainContent.style.filter = '';
+      mainContent.style.opacity = '';
+      mainContent.style.pointerEvents = '';
+      mainContent.style.transform = '';
+      mainContent.className = mainContent.className.replace(/vision-tunnel|vision-spots|keyboard-only/g, '').trim();
       if (trembleIntervalRef.current) {
         clearInterval(trembleIntervalRef.current);
         trembleIntervalRef.current = null;
@@ -64,8 +66,8 @@ export default function SimulateurHandicap() {
     
     // Navigation clavier seule
     if (settings.navigationClavier) {
-      body.style.pointerEvents = 'none';
-      body.classList.add('keyboard-only');
+      mainContent.style.pointerEvents = 'none';
+      mainContent.classList.add('keyboard-only');
       // Créer un indicateur de focus visible
       if (!document.querySelector('.focus-indicator-style')) {
         const style = document.createElement('style');
@@ -86,8 +88,8 @@ export default function SimulateurHandicap() {
         document.head.appendChild(style);
       }
     } else {
-      body.style.pointerEvents = '';
-      body.className = body.className.replace(/keyboard-only/g, '').trim();
+      mainContent.style.pointerEvents = '';
+      mainContent.className = mainContent.className.replace(/keyboard-only/g, '').trim();
       const focusStyle = document.querySelector('.focus-indicator-style');
       if (focusStyle) focusStyle.remove();
     }
@@ -105,10 +107,10 @@ export default function SimulateurHandicap() {
       trembleIntervalRef.current = setInterval(() => {
         const trembleX = (Math.random() - 0.5) * intensity * 8;
         const trembleY = (Math.random() - 0.5) * intensity * 8;
-        body.style.transform = `translate(${trembleX}px, ${trembleY}px)`;
+        mainContent.style.transform = `translate(${trembleX}px, ${trembleY}px)`;
       }, 50);
     } else {
-      body.style.transform = '';
+      mainContent.style.transform = '';
       if (trembleIntervalRef.current) {
         clearInterval(trembleIntervalRef.current);
         trembleIntervalRef.current = null;
@@ -117,8 +119,8 @@ export default function SimulateurHandicap() {
     
     // Cécité
     if (settings.cecite) {
-      body.style.opacity = '0.05'; // Quasi-noir au lieu de totalement noir
-      body.style.filter = 'contrast(0) brightness(0)';
+      mainContent.style.opacity = '0.05'; // Quasi-noir au lieu de totalement noir
+      mainContent.style.filter = 'contrast(0) brightness(0)';
       return;
     }
 
@@ -131,22 +133,22 @@ export default function SimulateurHandicap() {
           break;
         case 'tunnel':
           // Ajouter la classe CSS pour l'effet tunnel
-          body.className = body.className.replace(/vision-tunnel|vision-spots/g, '').trim();
-          body.classList.add('vision-tunnel');
+          mainContent.className = mainContent.className.replace(/vision-tunnel|vision-spots/g, '').trim();
+          mainContent.classList.add('vision-tunnel');
           filters.push(`contrast(${1 + severity * 0.5})`);
           filters.push(`brightness(${1 - severity * 0.3})`);
           break;
         case 'spots':
           // Ajouter la classe CSS pour les taches aveugles
-          body.className = body.className.replace(/vision-tunnel|vision-spots/g, '').trim();
-          body.classList.add('vision-spots');
+          mainContent.className = mainContent.className.replace(/vision-tunnel|vision-spots/g, '').trim();
+          mainContent.classList.add('vision-spots');
           filters.push(`contrast(${1 + severity})`);
           filters.push(`brightness(${1 - severity * 0.2})`);
           break;
       }
     } else {
       // Supprimer les classes si malvoyance non activée
-      body.className = body.className.replace(/vision-tunnel|vision-spots/g, '').trim();
+      mainContent.className = mainContent.className.replace(/vision-tunnel|vision-spots/g, '').trim();
     }
 
     // Daltonisme
@@ -171,7 +173,7 @@ export default function SimulateurHandicap() {
       }
     }
 
-    body.style.filter = filters.join(' ');
+    mainContent.style.filter = filters.join(' ');
   }, [settings, isSimulating]);
 
   const toggleSimulation = () => {
@@ -209,7 +211,7 @@ export default function SimulateurHandicap() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
+      <div ref={mainContentRef} className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
