@@ -22,6 +22,7 @@ interface ComparativeTableProps {
   result: ComparativeResult;
   language: 'fr' | 'en';
   onEngineClick?: (engine: 'wave' | 'axe' | 'rgaa', url: string) => void;
+  updatedUserData?: any; // Données utilisateur fraîches de l'API analyze
 }
 
 const translations = {
@@ -292,7 +293,7 @@ function ViolationRow({ violation, detectedBy, language }: {
   );
 }
 
-export default function ComparativeTable({ result, language, onEngineClick }: ComparativeTableProps) {
+export default function ComparativeTable({ result, language, onEngineClick, updatedUserData }: ComparativeTableProps) {
   const t = translations[language];
   const [activeTab, setActiveTab] = useState<'summary' | 'common'>('summary');
   const [selectedEngine, setSelectedEngine] = useState<'all' | 'wave' | 'axe' | 'rgaa'>('all');
@@ -301,29 +302,50 @@ export default function ComparativeTable({ result, language, onEngineClick }: Co
   useEffect(() => {
     const incrementAuditCounter = async () => {
       try {
-        const userDataString = localStorage.getItem('userData');
-        if (userDataString) {
-          const userData = JSON.parse(userDataString);
-          console.log('📈 Incrémentation du compteur d\'audits après affichage des résultats comparatifs...');
-          
-          const response = await fetch('/api/user/increment-audit', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userData })
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.updatedUserData) {
-              // Mettre à jour les données utilisateur dans le localStorage
-              localStorage.setItem('userData', JSON.stringify(data.updatedUserData));
-              console.log('✅ Compteur d\'audits incrémenté avec succès (analyse comparative)');
-            }
-          } else {
-            console.error('❌ Erreur lors de l\'incrémentation:', await response.text());
+        // Utiliser les données fraîches de l'API analyze si disponibles, sinon le localStorage
+        let userData;
+        
+        if (updatedUserData) {
+          console.log('📈 Utilisation des données utilisateur fraîches de l\'API analyze (comparative)...');
+          userData = updatedUserData;
+        } else {
+          console.log('📈 Utilisation des données utilisateur du localStorage (comparative)...');
+          const userDataString = localStorage.getItem('userData');
+          if (!userDataString) {
+            console.warn('⚠️ Aucune donnée utilisateur disponible pour l\'incrémentation (comparative)');
+            return;
           }
+          userData = JSON.parse(userDataString);
+        }
+        
+        console.log('📈 Incrémentation du compteur d\'audits après affichage des résultats comparatifs...');
+        console.log('📊 Données utilisateur avant incrémentation (comparative):', {
+          email: userData.email,
+          auditsToday: userData.usage?.auditsToday,
+          lastAuditDate: userData.usage?.lastAuditDate
+        });
+        
+        const response = await fetch('/api/user/increment-audit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userData })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.updatedUserData) {
+            // Mettre à jour les données utilisateur dans le localStorage
+            localStorage.setItem('userData', JSON.stringify(data.updatedUserData));
+            console.log('✅ Compteur d\'audits incrémenté avec succès (analyse comparative)');
+            console.log('📊 Nouvelles données (comparative):', {
+              auditsToday: data.updatedUserData.usage?.auditsToday,
+              auditsTotal: data.updatedUserData.usage?.auditsTotal
+            });
+          }
+        } else {
+          console.error('❌ Erreur lors de l\'incrémentation:', await response.text());
         }
       } catch (error) {
         console.error('❌ Erreur lors de l\'incrémentation des audits:', error);
@@ -332,7 +354,7 @@ export default function ComparativeTable({ result, language, onEngineClick }: Co
 
     // Incrémenter immédiatement après le montage du composant (affichage des résultats)
     incrementAuditCounter();
-  }, []); // Tableau de dépendances vide = s'exécute une seule fois au montage
+  }, [updatedUserData]); // Dépendre de updatedUserData
   
   const successfulEngines = result.engines.filter(e => e.success);
   

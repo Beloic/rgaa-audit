@@ -125,7 +125,6 @@ export async function POST(request: NextRequest) {
 
     // Sauvegarder dans la base de données
     try {
-      console.log(`🔄 Sauvegarde - auditsToday: ${updatedUserData.usage?.auditsToday}, auditsTotal: ${updatedUserData.usage?.auditsTotal}`);
       await saveUser(updatedUserData);
       console.log(`💾 Données utilisateur sauvegardées en base pour ${userData.email}`);
       
@@ -135,8 +134,6 @@ export async function POST(request: NextRequest) {
         console.log(`✅ Vérification post-sauvegarde - auditsToday en base: ${verifiedUser.usage?.auditsToday}, auditsTotal: ${verifiedUser.usage?.auditsTotal}`);
         // Retourner les données vérifiées de la base
         updatedUserData = verifiedUser;
-      } else {
-        console.log(`❌ Impossible de vérifier l'utilisateur après sauvegarde`);
       }
     } catch (error) {
       console.error(`❌ ERREUR CRITIQUE sauvegarde pour ${userData.email}:`, error);

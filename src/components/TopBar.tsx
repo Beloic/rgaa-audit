@@ -251,10 +251,15 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-gray-900 truncate">{user.name}</p>
                             <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                            <p className="text-xs text-blue-600 mt-1 flex items-center">
-                              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1"></span>
-                              Plan {getCurrentPlan().name}
-                            </p>
+                            <div className="flex items-center justify-between mt-1">
+                              <p className="text-xs text-blue-600 flex items-center">
+                                <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1"></span>
+                                Plan {getCurrentPlan().name}
+                              </p>
+                              <p className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                                {user.usage?.auditsToday || 0}/3 audits aujourd'hui
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -402,10 +407,15 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                       <div className="flex-1 min-w-0">
                         <p className="text-base font-semibold text-gray-900 truncate">{user.name}</p>
                         <p className="text-sm text-gray-600 truncate">{user.email}</p>
-                        <p className="text-sm text-blue-600 mt-1 flex items-center">
-                          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1"></span>
-                          Plan {getCurrentPlan().name}
-                        </p>
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-sm text-blue-600 flex items-center">
+                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1"></span>
+                            Plan {getCurrentPlan().name}
+                          </p>
+                          <p className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                            {user.usage?.auditsToday || 0}/3 audits
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>

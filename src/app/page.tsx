@@ -569,6 +569,7 @@ export default function HomePage() {
                     result={auditResult} 
                     language={language}
                     onNewAudit={handleNewAudit}
+                    updatedUserData={user} // Passer les données utilisateur fraîches
                   />
                 </section>
               )}
@@ -580,6 +581,7 @@ export default function HomePage() {
                     result={comparativeResult} 
                     language={language}
                     onEngineClick={handleEngineClick}
+                    updatedUserData={user} // Passer les données utilisateur fraîches
                   />
                 </section>
               )}
