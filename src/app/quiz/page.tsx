@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Shield } from 'lucide-react';
-import TopBar from '@/components/TopBar';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -355,9 +354,6 @@ export default function QuizPage() {
       >
         Aller au contenu principal
       </a>
-
-      {/* Topbar Navigation */}
-      <TopBar />
 
       {/* Main Content */}
       <main id="main-content" className="relative z-10">
