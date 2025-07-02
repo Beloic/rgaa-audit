@@ -15,6 +15,7 @@ import Footer from '@/components/Footer';
 import type { AuditRequest, AuditResult, ComparativeResult, AnalysisProgress } from '@/types/audit';
 import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import SimulateurHandicap from '@/app/simulateur-handicap/page';
+import QuizPage from '@/app/quiz/page';
 
 import { 
   Shield, 
@@ -134,15 +135,15 @@ export default function HomePage() {
     message: 'En attente...',
     progress: 0
   });
-  const [activeSection, setActiveSection] = useState<'home' | 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator'>('home');
+  const [activeSection, setActiveSection] = useState<'home' | 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator' | 'quiz'>('home');
 
   // Détecter les paramètres URL pour changer de section automatiquement
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const section = urlParams.get('section');
     
-    if (section && ['statistics', 'analyze', 'rgaa-reference', 'history', 'disability-simulator'].includes(section)) {
-      setActiveSection(section as 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator');
+    if (section && ['statistics', 'analyze', 'rgaa-reference', 'history', 'disability-simulator', 'quiz'].includes(section)) {
+      setActiveSection(section as 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator' | 'quiz');
     } else if (window.location.pathname === '/' && !section) {
       // Si on est sur la page d'accueil sans paramètre, rester sur home
       setActiveSection('home');
@@ -188,7 +189,7 @@ export default function HomePage() {
   };
 
   // Fonction pour gérer les changements de section de la sidebar
-  const handleSidebarSectionChange = (section: 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator') => {
+  const handleSidebarSectionChange = (section: 'statistics' | 'analyze' | 'rgaa-reference' | 'history' | 'disability-simulator' | 'quiz') => {
     setActiveSection(section);
     
     // Réinitialiser les résultats si on revient sur analyser et qu'il n'y a pas d'analyse en cours
@@ -201,7 +202,7 @@ export default function HomePage() {
   };
 
   // Fonction pour la TopBar (sans history)
-  const handleTopBarSectionChange = (section: 'home' | 'statistics' | 'analyze' | 'rgaa-reference') => {
+  const handleTopBarSectionChange = (section: 'home' | 'statistics' | 'analyze' | 'rgaa-reference' | 'quiz') => {
     setActiveSection(section);
     
     // Réinitialiser les résultats si on revient sur analyser et qu'il n'y a pas d'analyse en cours
@@ -387,7 +388,7 @@ export default function HomePage() {
 
         {/* Topbar Navigation */}
         <TopBar 
-          activeSection={activeSection === 'history' || activeSection === 'statistics' || activeSection === 'disability-simulator' ? 'home' : activeSection} 
+          activeSection={activeSection === 'history' || activeSection === 'statistics' || activeSection === 'disability-simulator' || activeSection === 'quiz' ? 'home' : activeSection} 
           onSectionChange={handleTopBarSectionChange}
           onAnalyzeClick={handleAnalyzeClick}
         />
@@ -600,6 +601,11 @@ export default function HomePage() {
           {/* Page Simulateur d'Handicap */}
           {activeSection === 'disability-simulator' && (
             <SimulateurHandicap />
+          )}
+
+          {/* Page Quiz */}
+          {activeSection === 'quiz' && (
+            <QuizPage />
           )}
 
         </main>
