@@ -45,17 +45,6 @@ export default function BlogPage() {
       featured: false
     },
     {
-      id: 'accessibilite-mobile-bonnes-pratiques',
-      title: t('article.mobile.title'),
-      excerpt: t('article.mobile.excerpt'),
-      date: '2024-11-20',
-      readTime: '10',
-      category: t('article.categories.mobile'),
-      image: '📱',
-      tags: [t('article.categories.mobile'), 'RGAA', 'UX'],
-      featured: false
-    },
-    {
       id: 'comment-tester-accessibilite-site-web',
       title: t('article.testing.title'),
       excerpt: t('article.testing.excerpt'),
