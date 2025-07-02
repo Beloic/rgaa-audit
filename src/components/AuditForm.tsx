@@ -5,6 +5,7 @@ import { Globe, Zap, Search, Cpu, Shield, BarChart3, UserPlus, Lock } from 'luci
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import type { AuditRequest, AnalysisProgress } from '@/types/audit';
+import { hasFreeAuditUsedRobust, setFreeAuditUsedRobust, setStorageItem } from '@/lib/storage-utils';
 
 interface AuditFormProps {
   onAuditStart: (request: AuditRequest, markFreeAuditAsUsed?: () => void) => void;
@@ -75,15 +76,24 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
   // Vérifier si l'utilisateur non connecté a déjà effectué un audit
   useEffect(() => {
     if (!user) {
-      const freeAuditUsed = localStorage.getItem('rgaa-free-audit-used');
-      setHasUsedFreeAudit(!!freeAuditUsed);
+      // Utiliser la fonction robuste avec fallback cookies
+      const freeAuditUsed = hasFreeAuditUsedRobust();
+      setHasUsedFreeAudit(freeAuditUsed);
+      
+      if (freeAuditUsed) {
+        console.log('ℹ️ Audit gratuit déjà utilisé (localStorage ou cookies)');
+      }
+    } else {
+      // Utilisateur connecté = audit illimité
+      setHasUsedFreeAudit(false);
     }
   }, [user]);
 
   // Fonction pour marquer l'audit gratuit comme utilisé (appelée depuis l'extérieur)
   const markFreeAuditAsUsed = () => {
     if (!user) {
-      localStorage.setItem('rgaa-free-audit-used', 'true');
+      // Utiliser la fonction robuste avec fallback cookies
+      setFreeAuditUsedRobust();
       setHasUsedFreeAudit(true);
     }
   };
@@ -110,7 +120,7 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
     }
     
     // Stocker l'URL dans sessionStorage pour la fonctionnalité de localisation
-    sessionStorage.setItem('lastAnalyzedUrl', url.trim());
+    setStorageItem('lastAnalyzedUrl', url.trim(), 'session');
     
     // Passer la fonction de marquage à onAuditStart pour qu'elle soit appelée après succès
     onAuditStart({ url: url.trim(), language, engine: selectedEngine }, markFreeAuditAsUsed);
