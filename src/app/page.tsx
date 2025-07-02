@@ -475,55 +475,16 @@ export default function HomePage() {
                   <h2 id="disabilities-types-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
                     À qui s'adresse l'accessibilité ?
                   </h2>
-                  <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-                    L'accessibilité numérique bénéficie à toutes les personnes, avec ou sans handicap
+                  <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-8">
+                    Quels sont les différents types d'handicap concernés par l'accessibilité numérique&nbsp;?
                   </p>
-                  
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                      <Eye className="w-12 h-12 text-red-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps visuels</h3>
-                      <p className="text-gray-600 text-sm mb-4">Cécité, malvoyance, daltonisme</p>
-                      <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Lecteurs d'écran</li>
-                        <li>• Contrastes élevés</li>
-                        <li>• Alternatives textuelles</li>
-                      </ul>
-                    </article>
-                    
-                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                      <Headphones className="w-12 h-12 text-blue-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps auditifs</h3>
-                      <p className="text-gray-600 text-sm mb-4">Surdité, malentendance</p>
-                      <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Sous-titres</li>
-                        <li>• Langue des signes</li>
-                        <li>• Transcriptions</li>
-                      </ul>
-                    </article>
-                    
-                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                      <MousePointer className="w-12 h-12 text-green-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps moteurs</h3>
-                      <p className="text-gray-600 text-sm mb-4">Paralysie, amputations, tremblements</p>
-                      <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Navigation au clavier</li>
-                        <li>• Zones de clic étendues</li>
-                        <li>• Commande vocale</li>
-                      </ul>
-                    </article>
-                    
-                    <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                      <Brain className="w-12 h-12 text-purple-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps cognitifs</h3>
-                      <p className="text-gray-600 text-sm mb-4">Dyslexie, TDAH, troubles de la mémoire</p>
-                      <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Contenu simplifié</li>
-                        <li>• Navigation claire</li>
-                        <li>• Temps de lecture adapté</li>
-                      </ul>
-                    </article>
-                  </div>
+                  <ul className="text-lg text-gray-700 text-center max-w-2xl mx-auto mb-12 space-y-2">
+                    <li><strong>• Handicaps visuels&nbsp;:</strong> cécité, malvoyance, daltonisme</li>
+                    <li><strong>• Handicaps auditifs&nbsp;:</strong> surdité, malentendance</li>
+                    <li><strong>• Handicaps moteurs&nbsp;:</strong> difficultés de mobilité, de préhension ou de coordination</li>
+                    <li><strong>• Handicaps cognitifs&nbsp;:</strong> troubles dys, difficultés de compréhension, troubles de l'attention</li>
+                    <li><strong>• Handicaps temporaires&nbsp;:</strong> bras cassé, fatigue, environnement bruyant, etc.</li>
+                  </ul>
                 </div>
               </section>
 
