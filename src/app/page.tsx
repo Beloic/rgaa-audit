@@ -125,7 +125,7 @@ function FAQSection() {
 
 export default function HomePage() {
   const { language, t } = useLanguage();
-  const { user, updateUser } = useAuth();
+  const { user, setUserDirectly } = useAuth();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
   const [comparativeResult, setComparativeResult] = useState<ComparativeResult | null>(null);
@@ -267,9 +267,11 @@ export default function HomePage() {
       const result = await response.json();
       
       // Mettre à jour les données utilisateur si elles ont été modifiées
-      if (result.updatedUserData && updateUser) {
-        updateUser(result.updatedUserData);
-        console.log('✅ Données utilisateur mises à jour après audit');
+      if (result.updatedUserData) {
+        // Les données ont déjà été sauvegardées en base par l'API /analyze
+        // On met juste à jour l'état local sans refaire un appel API
+        setUserDirectly(result.updatedUserData);
+        console.log('✅ Données utilisateur mises à jour localement après audit');
       }
       
       // Nettoyer l'intervalle de progression

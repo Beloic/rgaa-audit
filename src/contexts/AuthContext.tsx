@@ -129,6 +129,7 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (updates: Partial<User>) => void;
+  setUserDirectly: (user: User) => void;
   refreshUserData: () => Promise<void>;
   quitBeta: () => Promise<void>;
   hasBetaAccess: () => boolean;
@@ -509,6 +510,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // Fonction pour mettre à jour directement l'utilisateur (quand déjà sauvegardé en base)
+  const setUserDirectly = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem('rgaa-user', JSON.stringify(updatedUser));
+  };
+
   const quitBeta = async () => {
     if (user) {
       const updates = {
@@ -588,6 +595,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     register,
     logout,
     updateUser,
+    setUserDirectly,
     refreshUserData,
     quitBeta,
     hasBetaAccess,
