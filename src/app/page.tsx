@@ -214,7 +214,7 @@ export default function HomePage() {
     }
   };
 
-  const handleAuditStart = async (request: AuditRequest) => {
+  const handleAuditStart = async (request: AuditRequest, markFreeAuditAsUsed?: () => void) => {
     setIsAnalyzing(true);
     setError(null);
     setAuditResult(null);
@@ -290,6 +290,11 @@ export default function HomePage() {
         setAuditResult(result as AuditResult);
         // Sauvegarder dans l'historique
         saveAuditToHistory(result as AuditResult, request.engine || 'rgaa', user?.email);
+      }
+      
+      // Marquer l'audit gratuit comme utilisé SEULEMENT après le succès de l'analyse
+      if (markFreeAuditAsUsed) {
+        markFreeAuditAsUsed();
       }
       
       setIsAnalyzing(false);

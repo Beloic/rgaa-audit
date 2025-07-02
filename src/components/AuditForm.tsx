@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import type { AuditRequest, AnalysisProgress } from '@/types/audit';
 
 interface AuditFormProps {
-  onAuditStart: (request: AuditRequest) => void;
+  onAuditStart: (request: AuditRequest, markFreeAuditAsUsed?: () => void) => void;
   progress: AnalysisProgress;
   isAnalyzing: boolean;
   analysisError?: string | null;
@@ -80,6 +80,14 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
     }
   }, [user]);
 
+  // Fonction pour marquer l'audit gratuit comme utilisé (appelée depuis l'extérieur)
+  const markFreeAuditAsUsed = () => {
+    if (!user) {
+      localStorage.setItem('rgaa-free-audit-used', 'true');
+      setHasUsedFreeAudit(true);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -104,13 +112,8 @@ export default function AuditForm({ onAuditStart, progress, isAnalyzing, analysi
     // Stocker l'URL dans sessionStorage pour la fonctionnalité de localisation
     sessionStorage.setItem('lastAnalyzedUrl', url.trim());
     
-    // Marquer que l'utilisateur non connecté a utilisé son audit gratuit
-    if (!user) {
-      localStorage.setItem('rgaa-free-audit-used', 'true');
-      setHasUsedFreeAudit(true);
-    }
-    
-    onAuditStart({ url: url.trim(), language, engine: selectedEngine });
+    // Passer la fonction de marquage à onAuditStart pour qu'elle soit appelée après succès
+    onAuditStart({ url: url.trim(), language, engine: selectedEngine }, markFreeAuditAsUsed);
   };
 
   // Si l'utilisateur non connecté a déjà utilisé son audit gratuit, afficher le message d'inscription
