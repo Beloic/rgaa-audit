@@ -950,6 +950,17 @@ export default function AuditResults({ result, language, onNewAudit, updatedUser
       return;
     }
 
+    // Vérifier que cette instance correspond à une analyse fraîche et réussie
+    // Ne pas incrémenter si c'est un ancien résultat affiché après une erreur
+    const resultTimestamp = result.timestamp ? new Date(result.timestamp).getTime() : 0;
+    const currentTime = Date.now();
+    const isRecentResult = (currentTime - resultTimestamp) < 60000; // Moins d'1 minute = analyse récente
+
+    if (!isRecentResult) {
+      console.log('🚫 Résultat trop ancien, pas d\'incrémentation (probablement affiché après une erreur)');
+      return;
+    }
+
     const incrementAuditCounter = async () => {
       try {
         // Utiliser les données fraîches de l'API analyze si disponibles, sinon le localStorage
