@@ -940,84 +940,9 @@ export default function AuditResults({ result, language, onNewAudit, updatedUser
   // État pour le filtre par catégorie uniquement
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'images' | 'forms' | 'navigation' | 'structure' | 'colors' | 'multimedia'>('all');
   const [showScrollToTop, setShowScrollToTop] = useState(false);
-  const [hasIncrementedAudit, setHasIncrementedAudit] = useState(false);
   
-  // Incrémenter le compteur d'audits après affichage des résultats (une seule fois)
-  useEffect(() => {
-    // Empêcher les appels multiples avec un flag
-    if (hasIncrementedAudit) {
-      console.log('🚫 Incrémentation déjà effectuée pour cette analyse, ignoré');
-      return;
-    }
-
-    // Vérifier que cette instance correspond à une analyse fraîche et réussie
-    // Ne pas incrémenter si c'est un ancien résultat affiché après une erreur
-    const resultTimestamp = result.timestamp ? new Date(result.timestamp).getTime() : 0;
-    const currentTime = Date.now();
-    const isRecentResult = (currentTime - resultTimestamp) < 60000; // Moins d'1 minute = analyse récente
-
-    if (!isRecentResult) {
-      console.log('🚫 Résultat trop ancien, pas d\'incrémentation (probablement affiché après une erreur)');
-      return;
-    }
-
-    const incrementAuditCounter = async () => {
-      try {
-        // Utiliser les données fraîches de l'API analyze si disponibles, sinon le localStorage
-        let userData;
-        
-        if (updatedUserData) {
-          console.log('📈 Utilisation des données utilisateur fraîches de l\'API analyze...');
-          userData = updatedUserData;
-        } else {
-          console.log('📈 Utilisation des données utilisateur du localStorage...');
-          const userDataString = localStorage.getItem('userData');
-          if (!userDataString) {
-            console.warn('⚠️ Aucune donnée utilisateur disponible pour l\'incrémentation');
-            return;
-          }
-          userData = JSON.parse(userDataString);
-        }
-        
-        console.log('📈 Incrémentation du compteur d\'audits après affichage des résultats...');
-        console.log('📊 Données utilisateur avant incrémentation:', {
-          email: userData.email,
-          auditsToday: userData.usage?.auditsToday,
-          lastAuditDate: userData.usage?.lastAuditDate
-        });
-        
-        const response = await fetch('/api/user/increment-audit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userData })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success && data.updatedUserData) {
-            // Mettre à jour les données utilisateur dans le localStorage
-            localStorage.setItem('userData', JSON.stringify(data.updatedUserData));
-            console.log('✅ Compteur d\'audits incrémenté avec succès');
-            console.log('📊 Nouvelles données:', {
-              auditsToday: data.updatedUserData.usage?.auditsToday,
-              auditsTotal: data.updatedUserData.usage?.auditsTotal
-            });
-            // Marquer comme incrémenté pour éviter les doublons
-            setHasIncrementedAudit(true);
-          }
-        } else {
-          console.error('❌ Erreur lors de l\'incrémentation:', await response.text());
-        }
-      } catch (error) {
-        console.error('❌ Erreur lors de l\'incrémentation des audits:', error);
-      }
-    };
-
-    // Incrémenter immédiatement après le montage du composant (affichage des résultats)
-    incrementAuditCounter();
-  }, [updatedUserData]); // Pas besoin d'inclure hasIncrementedAudit pour éviter les boucles
+  // L'incrémentation se fait maintenant automatiquement dans l'API /analyze après analyse réussie
+  // Plus besoin d'incrémenter depuis le composant frontend
   
   // Détecter le scroll pour afficher le bouton de retour en haut
   useEffect(() => {

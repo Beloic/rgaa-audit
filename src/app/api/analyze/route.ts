@@ -206,6 +206,29 @@ export async function POST(request: NextRequest) {
     if (engine === 'all') {
       const comparativeResult = await runComparativeAnalysis(url);
       
+      // Incrémenter le compteur d'audits après analyse réussie
+      if (userData?.email) {
+        try {
+          console.log('📈 Incrémentation automatique après analyse comparative réussie...');
+          const incrementResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/increment-audit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userData.email })
+          });
+          
+          if (incrementResponse.ok) {
+            const incrementData = await incrementResponse.json();
+            // Mettre à jour les données utilisateur avec celles incrémentées
+            updatedUserData = incrementData.userData;
+            console.log('✅ Compteur incrémenté automatiquement après analyse comparative');
+          } else {
+            console.error('❌ Erreur lors de l\'incrémentation automatique:', await incrementResponse.text());
+          }
+        } catch (error) {
+          console.error('❌ Erreur lors de l\'incrémentation automatique:', error);
+        }
+      }
+      
       return NextResponse.json({ 
         ...comparativeResult, 
         updatedUserData 
@@ -249,6 +272,29 @@ export async function POST(request: NextRequest) {
       // URL du rapport WAVE web pour consultation visuelle
       waveReportUrl: engine === 'wave' ? `https://wave.webaim.org/report#/${encodeURIComponent(url)}` : undefined
     };
+
+    // Incrémenter le compteur d'audits après analyse réussie
+    if (userData?.email) {
+      try {
+        console.log('📈 Incrémentation automatique après analyse simple réussie...');
+        const incrementResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/increment-audit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userData.email })
+        });
+        
+        if (incrementResponse.ok) {
+          const incrementData = await incrementResponse.json();
+          // Mettre à jour les données utilisateur avec celles incrémentées
+          updatedUserData = incrementData.userData;
+          console.log('✅ Compteur incrémenté automatiquement après analyse simple');
+        } else {
+          console.error('❌ Erreur lors de l\'incrémentation automatique:', await incrementResponse.text());
+        }
+      } catch (error) {
+        console.error('❌ Erreur lors de l\'incrémentation automatique:', error);
+      }
+    }
 
     return NextResponse.json({ 
       ...result, 
