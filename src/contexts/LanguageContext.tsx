@@ -98,7 +98,7 @@ const translations = {
 
     // Liens d'actions
     'action.startFreeAudit': 'Commencer un audit gratuit',
-    'action.viewOtherGuides': 'Voir d\'autres guides',
+          'action.viewOtherGuides': 'Voir d\'autres guides',
     'action.prepareNow': 'Préparez-vous dès maintenant',
 
     // Messages contextuels
@@ -182,6 +182,124 @@ const translations = {
     // Messages d'interface
     'ui.waiting': 'En attente...',
     'ui.errorOccurred': 'Une erreur est survenue',
+
+    // Features page d'accueil
+    'features.semiAutomated.title': 'Analyse semi-automatique',
+    'features.semiAutomated.description': 'Analyse rapide avec WAVE, Axe Core et le moteur RGAA exclusif. Aucune intelligence artificielle n\'est utilisée.',
+    'features.legalCompliance.title': 'Conformité légale',
+    'features.legalCompliance.description': 'Respect des standards RGAA 4.1 et WCAG 2.1 pour votre mise en conformité réglementaire',
+    'features.socialImpact.title': 'Impact social',
+    'features.socialImpact.description': 'Rendez votre site accessible à tous, y compris aux 12 millions de personnes en situation de handicap en France',
+    'features.automationLimits.title': 'Limites de l\'automatisation',
+    'features.automationLimits.description': 'Cet outil détecte environ 30% des problèmes d\'accessibilité. Un guide d\'analyse manuelle est disponible pour une conformité complète',
+
+    // Section types de handicaps
+    'disabilities.title': 'Les différents types de handicap concernés par l\'accessibilité numérique',
+    'disabilities.description': 'L\'accessibilité numérique vise à lever les barrières pour les personnes en situation de handicap visuel, auditif, moteur ou cognitif. Voici les grandes familles de handicap prises en compte par le RGAA :',
+    'disabilities.visual.title': 'Handicaps visuels',
+    'disabilities.visual.description': 'Cécité, malvoyance, daltonisme',
+    'disabilities.visual.screenReaders': '• Lecteurs d\'écran',
+    'disabilities.visual.highContrast': '• Contrastes élevés',
+    'disabilities.visual.altTexts': '• Alternatives textuelles',
+    'disabilities.auditory.title': 'Handicaps auditifs',
+    'disabilities.auditory.description': 'Surdité, malentendance',
+    'disabilities.auditory.subtitles': '• Sous-titres',
+    'disabilities.auditory.signLanguage': '• Langue des signes',
+    'disabilities.auditory.transcriptions': '• Transcriptions',
+    'disabilities.motor.title': 'Handicaps moteurs',
+    'disabilities.motor.description': 'Paralysie, amputations, tremblements',
+    'disabilities.motor.keyboardNav': '• Navigation au clavier',
+    'disabilities.motor.largeTargets': '• Zones de clic étendues',
+    'disabilities.motor.voiceControl': '• Commande vocale',
+    'disabilities.cognitive.title': 'Handicaps cognitifs',
+    'disabilities.cognitive.description': 'Dyslexie, TDAH, troubles de la mémoire',
+    'disabilities.cognitive.simpleContent': '• Contenu simplifié',
+    'disabilities.cognitive.clearNav': '• Navigation claire',
+    'disabilities.cognitive.adaptedTiming': '• Temps de lecture adapté',
+
+    // Simulateur de handicap
+    'simulator.title': 'Simulateur d\'Handicap',
+    'simulator.description': 'Expérimentez différents types de handicaps visuels et moteurs pour mieux comprendre les défis d\'accessibilité',
+    'simulator.reset': 'Réinitialiser',
+    'simulator.startSimulation': 'Démarrer la simulation',
+    'simulator.stopSimulation': 'Arrêter la simulation',
+    'simulator.activeSimulation': 'Simulation active - Vous expérimentez actuellement les handicaps sélectionnés',
+    'simulator.visualDisabilities': 'Handicaps visuels',
+    'simulator.motorDisabilities': 'Handicaps moteurs',
+    'simulator.blindness.title': 'Cécité',
+    'simulator.blindness.subtitle': 'Perte totale de la vision',
+    'simulator.blindness.description': 'La cécité est la perte totale ou quasi-totale de la vision. Les personnes aveugles dépendent des lecteurs d\'écran et de la navigation au clavier.',
+    'simulator.blindness.simulate': 'Simuler la cécité',
+    'simulator.lowVision.title': 'Malvoyance',
+    'simulator.lowVision.subtitle': 'Déficience visuelle partielle',
+    'simulator.lowVision.description': 'La malvoyance inclut diverses déficiences visuelles comme la vision floue, la vision tunnel, ou les taches aveugles.',
+    'simulator.lowVision.simulate': 'Simuler la malvoyance',
+    'simulator.lowVision.type': 'Type de malvoyance',
+    'simulator.lowVision.blur': 'Vision floue',
+    'simulator.lowVision.tunnel': 'Vision tunnel',
+    'simulator.lowVision.spots': 'Taches aveugles',
+    'simulator.lowVision.severity': 'Sévérité',
+    'simulator.colorBlindness.title': 'Daltonisme',
+    'simulator.colorBlindness.subtitle': 'Déficience de la perception des couleurs',
+    'simulator.colorBlindness.description': 'Le daltonisme affecte la perception des couleurs, notamment la distinction entre certaines couleurs comme le rouge et le vert.',
+    'simulator.colorBlindness.simulate': 'Simuler le daltonisme',
+    'simulator.colorBlindness.type': 'Type de daltonisme',
+    'simulator.keyboardNav.title': 'Navigation Clavier',
+    'simulator.keyboardNav.subtitle': 'Handicaps moteurs',
+    'simulator.keyboardNav.description': 'Simulation de l\'utilisation d\'un ordinateur sans souris, uniquement avec le clavier. Essentiel pour les personnes ayant des handicaps moteurs.',
+    'simulator.keyboardNav.simulate': 'Désactiver la souris',
+    'simulator.keyboardNav.tip': '💡 Astuce : Utilisez Tab pour naviguer, Entrée pour cliquer, Espace pour cocher les cases.',
+    'simulator.tremors.title': 'Tremblements',
+    'simulator.tremors.subtitle': 'Troubles moteurs',
+    'simulator.tremors.description': 'Les tremblements moteurs rendent difficile le contrôle précis de la souris et des gestes. Fréquent avec Parkinson, sclérose en plaques, etc.',
+    'simulator.tremors.simulate': 'Simuler les tremblements',
+    'simulator.tremors.intensity': 'Intensité',
+
+    // Types de daltonisme
+    'simulator.colorBlindness.deuteranopia': 'Deutéranopie (vert-rouge)',
+    'simulator.colorBlindness.protanopia': 'Protanopie (rouge-vert)',
+    'simulator.colorBlindness.tritanopia': 'Tritanopie (bleu-jaune)',
+    'simulator.colorBlindness.monochromacy': 'Monochromatie (noir et blanc)',
+
+    // Zone de test
+    'simulator.testZone.title': 'Zone de test',
+    'simulator.testZone.description': 'Utilisez cette zone pour tester l\'impact des handicaps simulés sur différents éléments visuels et interactifs.',
+    'simulator.testZone.colorTest': 'Test de couleurs',
+    'simulator.testZone.colorLabels': 'Rouge, Vert, Bleu, Jaune',
+    'simulator.testZone.contrastTest': 'Test de contraste',
+    'simulator.testZone.goodContrast': 'Bon contraste',
+    'simulator.testZone.badContrast': 'Mauvais contraste',
+    'simulator.testZone.interactionTest': 'Test d\'interaction',
+    'simulator.testZone.clickButton': 'Cliquer ici',
+    'simulator.testZone.textInput': 'Saisir du texte',
+    'simulator.testZone.readingTest': 'Test de lecture',
+    'simulator.testZone.sampleText': 'Ce texte sert à tester la lisibilité avec différents handicaps visuels. Observez comment les simulations affectent votre capacité à lire ce contenu.',
+
+    // Zone de test - sections manquantes
+    'simulator.testZone.navigationTest': 'Navigation test',
+    'simulator.testZone.button1': 'Button 1',
+    'simulator.testZone.button2': 'Button 2',
+    'simulator.testZone.inputField': 'Input field',
+    'simulator.testZone.precisionTest': 'Precision test',
+    'simulator.testZone.checkbox': 'Checkbox',
+    'simulator.testZone.smallButtons': 'Small buttons hard to click',
+    'simulator.testZone.activeInstructions': 'Instructions for active tests:',
+    'simulator.testZone.keyboardInstructions': '• Keyboard navigation: Use Tab/Shift+Tab to navigate, Enter/Space to interact',
+    'simulator.testZone.tremorsInstructions': '• Tremors: Try to click precisely on small buttons',
+
+    // Autres labels génériques
+    'common.srOnly.mainFeatures': 'Fonctionnalités principales',
+    'common.srOnly.auditFormHome': 'Formulaire d\'audit d\'accessibilité',
+    'common.srOnly.auditForm': 'Formulaire d\'audit d\'accessibilité',
+
+    // Sélecteur de langue
+    'language.french': 'Français',
+    'language.english': 'English',
+
+    // Labels génériques
+    'common.french': 'french',
+    'common.legal': 'French/European legal standard',
+    'common.auditWithAI': 'Complete audit with AI, free and in French',
   },
   en: {
     // Navigation
@@ -194,7 +312,7 @@ const translations = {
     'home.title': 'Test your website\'s RGAA accessibility',
     'home.subtitle': 'WAVE & RGAA Analysis Engine',
     'home.description': 'Instantly analyze your website\'s accessibility with our free tool based on WAVE and French RGAA criteria.',
-    'home.mainTitle': 'Accessibility Audit',
+    'home.mainTitle': 'Accessibility Audit ',
     'home.mainDescription': 'This alpha version uses the most powerful engines to help professionals perform their audits. This tool is not intended to replace human expertise.',
     
     // Formulaire
@@ -351,6 +469,124 @@ const translations = {
     // Messages d'interface
     'ui.waiting': 'Waiting...',
     'ui.errorOccurred': 'An error occurred',
+
+    // Features page d'accueil
+    'features.semiAutomated.title': 'Semi-automated analysis',
+    'features.semiAutomated.description': 'Quick analysis with WAVE, Axe Core and exclusive RGAA engine. No artificial intelligence is used.',
+    'features.legalCompliance.title': 'Legal compliance',
+    'features.legalCompliance.description': 'Respect of RGAA 4.1 and WCAG 2.1 standards for regulatory compliance',
+    'features.socialImpact.title': 'Social impact',
+    'features.socialImpact.description': 'Make your site accessible to everyone, including the 12 million people in France with disabilities',
+    'features.automationLimits.title': 'Automation limits',
+    'features.automationLimits.description': 'This tool detects about 30% of accessibility issues. A manual analysis guide is available for complete compliance',
+
+    // Section types de handicaps
+    'disabilities.title': 'The different types of disability related to digital accessibility',
+    'disabilities.description': 'Digital accessibility aims to remove barriers for people with visual, auditory, motor or cognitive disabilities. Here are the main disability categories taken into account by RGAA:',
+    'disabilities.visual.title': 'Visual disabilities',
+    'disabilities.visual.description': 'Blindness, low vision, color blindness',
+    'disabilities.visual.screenReaders': '• Screen readers',
+    'disabilities.visual.highContrast': '• High contrasts',
+    'disabilities.visual.altTexts': '• Alternative texts',
+    'disabilities.auditory.title': 'Auditory disabilities',
+    'disabilities.auditory.description': 'Deafness, hearing loss',
+    'disabilities.auditory.subtitles': '• Subtitles',
+    'disabilities.auditory.signLanguage': '• Sign language',
+    'disabilities.auditory.transcriptions': '• Transcriptions',
+    'disabilities.motor.title': 'Motor disabilities',
+    'disabilities.motor.description': 'Paralysis, amputations, tremors',
+    'disabilities.motor.keyboardNav': '• Keyboard navigation',
+    'disabilities.motor.largeTargets': '• Extended click zones',
+    'disabilities.motor.voiceControl': '• Voice control',
+    'disabilities.cognitive.title': 'Cognitive disabilities',
+    'disabilities.cognitive.description': 'Dyslexia, ADHD, memory problems',
+    'disabilities.cognitive.simpleContent': '• Simplified content',
+    'disabilities.cognitive.clearNav': '• Clear navigation',
+    'disabilities.cognitive.adaptedTiming': '• Adapted reading time',
+
+    // Simulateur de handicap
+    'simulator.title': 'Handicap Simulator',
+    'simulator.description': 'Experience different types of visual and motor disabilities to better understand accessibility challenges',
+    'simulator.reset': 'Reset',
+    'simulator.startSimulation': 'Start simulation',
+    'simulator.stopSimulation': 'Stop simulation',
+    'simulator.activeSimulation': 'Simulation active - You are currently experiencing the selected disabilities',
+    'simulator.visualDisabilities': 'Visual disabilities',
+    'simulator.motorDisabilities': 'Motor disabilities',
+    'simulator.blindness.title': 'Blindness',
+    'simulator.blindness.subtitle': 'Total loss of vision',
+    'simulator.blindness.description': 'Blindness is the total or near-total loss of vision. Blind people depend on screen readers and keyboard navigation.',
+    'simulator.blindness.simulate': 'Simulate blindness',
+    'simulator.lowVision.title': 'Low vision',
+    'simulator.lowVision.subtitle': 'Partial visual impairment',
+    'simulator.lowVision.description': 'Low vision includes various visual impairments such as blurred vision, tunnel vision, or blind spots.',
+    'simulator.lowVision.simulate': 'Simulate low vision',
+    'simulator.lowVision.type': 'Type of low vision',
+    'simulator.lowVision.blur': 'Blurred vision',
+    'simulator.lowVision.tunnel': 'Tunnel vision',
+    'simulator.lowVision.spots': 'Blind spots',
+    'simulator.lowVision.severity': 'Severity',
+    'simulator.colorBlindness.title': 'Color blindness',
+    'simulator.colorBlindness.subtitle': 'Deficiency in color perception',
+    'simulator.colorBlindness.description': 'Color blindness affects color perception, especially the distinction between certain colors like red and green.',
+    'simulator.colorBlindness.simulate': 'Simulate color blindness',
+    'simulator.colorBlindness.type': 'Type of color blindness',
+    'simulator.keyboardNav.title': 'Keyboard navigation',
+    'simulator.keyboardNav.subtitle': 'Motor disabilities',
+    'simulator.keyboardNav.description': 'Simulation of using a computer without a mouse, only with the keyboard. Essential for people with motor disabilities.',
+    'simulator.keyboardNav.simulate': 'Disable mouse',
+    'simulator.keyboardNav.tip': '💡 Tip: Use Tab to navigate, Enter to click, Space to check boxes.',
+    'simulator.tremors.title': 'Tremors',
+    'simulator.tremors.subtitle': 'Motor problems',
+    'simulator.tremors.description': 'Tremors make it difficult to precisely control the mouse and gestures. Common with Parkinson, plaque sclerosis, etc.',
+    'simulator.tremors.simulate': 'Simulate tremors',
+    'simulator.tremors.intensity': 'Intensity',
+
+    // Types de daltonisme
+    'simulator.colorBlindness.deuteranopia': 'Deutéranopie (vert-rouge)',
+    'simulator.colorBlindness.protanopia': 'Protanopie (rouge-vert)',
+    'simulator.colorBlindness.tritanopia': 'Tritanopie (bleu-jaune)',
+    'simulator.colorBlindness.monochromacy': 'Monochromatie (noir et blanc)',
+
+    // Zone de test
+    'simulator.testZone.title': 'Test zone',
+    'simulator.testZone.description': 'Use this zone to test the impact of simulated disabilities on different visual and interactive elements.',
+    'simulator.testZone.colorTest': 'Color test',
+    'simulator.testZone.colorLabels': 'Red, Green, Blue, Yellow',
+    'simulator.testZone.contrastTest': 'Contrast test',
+    'simulator.testZone.goodContrast': 'Good contrast',
+    'simulator.testZone.badContrast': 'Bad contrast',
+    'simulator.testZone.interactionTest': 'Interaction test',
+    'simulator.testZone.clickButton': 'Click here',
+    'simulator.testZone.textInput': 'Enter text',
+    'simulator.testZone.readingTest': 'Reading test',
+    'simulator.testZone.sampleText': 'This text is used to test readability with different visual disabilities. Observe how simulations affect your ability to read this content.',
+
+    // Zone de test - sections manquantes
+    'simulator.testZone.navigationTest': 'Test de navigation',
+    'simulator.testZone.button1': 'Bouton 1',
+    'simulator.testZone.button2': 'Bouton 2',
+    'simulator.testZone.inputField': 'Champ de saisie',
+    'simulator.testZone.precisionTest': 'Test de précision',
+    'simulator.testZone.checkbox': 'Case à cocher',
+    'simulator.testZone.smallButtons': 'Petits boutons difficiles à cliquer',
+    'simulator.testZone.activeInstructions': 'Instructions pour les tests actifs :',
+    'simulator.testZone.keyboardInstructions': '• Keyboard navigation: Use Tab/Shift+Tab for navigation, Enter/Space to interact',
+          'simulator.testZone.tremorsInstructions': '• Tremors: Try to click precisely on small buttons',
+
+    // Autres labels génériques
+    'common.srOnly.mainFeatures': 'Main features',
+    'common.srOnly.auditFormHome': 'Accessibility audit form',
+    'common.srOnly.auditForm': 'Accessibility audit form',
+
+    // Sélecteur de langue
+    'language.french': 'Français',
+    'language.english': 'English',
+
+    // Labels génériques
+    'common.french': 'français',
+    'common.legal': 'Standard légal français/européen',
+    'common.auditWithAI': 'Audit complet avec IA, gratuit et en français',
   }
 };
 

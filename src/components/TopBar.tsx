@@ -16,7 +16,7 @@ interface TopBarProps {
 
 export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick }: TopBarProps) {
   const pathname = usePathname();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { user, isAuthenticated, logout: authLogout, getRemainingAudits, getCurrentPlan } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
@@ -209,8 +209,8 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                   className="appearance-none border border-gray-300 rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer min-w-0"
                   aria-label="Sélection de la langue"
                 >
-                  <option value="fr">🇫🇷 Français</option>
-                  <option value="en">🇬🇧 English</option>
+                  <option value="fr">🇫🇷 {t('language.french')}</option>
+                  <option value="en">🇬🇧 {t('language.english')}</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   <span className="text-gray-400 text-sm">▼</span>

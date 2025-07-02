@@ -437,7 +437,7 @@ export default function HomePage() {
 
               {/* Formulaire d'audit sur la page d'accueil */}
               <section id="audit-form-home" className={`px-6 max-w-4xl mx-auto ${isAnalyzing ? "mb-8" : "mb-20"}`} aria-labelledby="audit-form-home-heading">
-                <h2 id="audit-form-home-heading" className="sr-only">Formulaire d'audit d'accessibilité</h2>
+                <h2 id="audit-form-home-heading" className="sr-only">{t('common.srOnly.auditFormHome')}</h2>
                 <AuditForm
                   onAuditStart={handleAuditStart}
                   progress={progress}
@@ -448,84 +448,84 @@ export default function HomePage() {
 
               {/* Features - sur la page d'accueil */}
               <section aria-labelledby="features-heading" className="px-6 pb-20 max-w-6xl mx-auto">
-                <h2 id="features-heading" className="sr-only">Fonctionnalités principales</h2>
+                <h2 id="features-heading" className="sr-only">{t('common.srOnly.mainFeatures')}</h2>
                 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                   <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
                     <Zap className="w-12 h-12 text-blue-600 mb-4" aria-hidden="true" />
-                    <h3 className="font-semibold text-gray-900 mb-2 text-center">Analyse semi-automatique</h3>
-                    <p className="text-gray-600 text-center">Analyse rapide avec WAVE, Axe Core et le moteur RGAA exclusif. Aucune intelligence artificielle n'est utilisée.</p>
+                    <h3 className="font-semibold text-gray-900 mb-2 text-center">{t('features.semiAutomated.title')}</h3>
+                    <p className="text-gray-600 text-center">{t('features.semiAutomated.description')}</p>
                   </article>
                   <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
                     <Shield className="w-12 h-12 text-purple-600 mb-4" aria-hidden="true" />
-                    <h3 className="font-semibold text-gray-900 mb-2 text-center">Conformité légale</h3>
-                    <p className="text-gray-600 text-center">Respect des standards RGAA 4.1 et WCAG 2.1 pour votre mise en conformité réglementaire</p>
+                    <h3 className="font-semibold text-gray-900 mb-2 text-center">{t('features.legalCompliance.title')}</h3>
+                    <p className="text-gray-600 text-center">{t('features.legalCompliance.description')}</p>
                   </article>
                   <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
                     <Users className="w-12 h-12 text-green-600 mb-4" aria-hidden="true" />
-                    <h3 className="font-semibold text-gray-900 mb-2 text-center">Impact social</h3>
-                    <p className="text-gray-600 text-center">Rendez votre site accessible à tous, y compris aux 12 millions de personnes en situation de handicap en France</p>
+                    <h3 className="font-semibold text-gray-900 mb-2 text-center">{t('features.socialImpact.title')}</h3>
+                    <p className="text-gray-600 text-center">{t('features.socialImpact.description')}</p>
                   </article>
                   <article className="flex flex-col items-center p-6 bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-blue-500">
                     <AlertTriangle className="w-12 h-12 text-orange-600 mb-4" aria-hidden="true" />
-                    <h3 className="font-semibold text-gray-900 mb-2 text-center">Limites de l'automatisation</h3>
-                    <p className="text-gray-600 text-center">Cet outil détecte environ 30% des problèmes d'accessibilité. Un guide d'analyse manuelle est disponible pour une conformité complète</p>
+                    <h3 className="font-semibold text-gray-900 mb-2 text-center">{t('features.automationLimits.title')}</h3>
+                    <p className="text-gray-600 text-center">{t('features.automationLimits.description')}</p>
                   </article>
                 </div>
               </section>
 
-                            {/* Types de handicaps - Section éducative */}
+              {/* Types de handicaps - Section éducative */}
               <section aria-labelledby="disabilities-types-heading" className="px-6 py-20 bg-gray-50">
                 <div className="max-w-6xl mx-auto">
                   <h2 id="disabilities-types-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
-                    Les différents types de handicap concernés par l'accessibilité numérique
+                    {t('disabilities.title')}
                   </h2>
                   <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-                    L'accessibilité numérique vise à lever les barrières pour les personnes en situation de handicap visuel, auditif, moteur ou cognitif. Voici les grandes familles de handicap prises en compte par le RGAA :
+                    {t('disabilities.description')}
                   </p>
                   
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                       <Eye className="w-12 h-12 text-red-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps visuels</h3>
-                      <p className="text-gray-600 text-sm mb-4">Cécité, malvoyance, daltonisme</p>
+                      <h3 className="font-semibold text-gray-900 mb-3">{t('disabilities.visual.title')}</h3>
+                      <p className="text-gray-600 text-sm mb-4">{t('disabilities.visual.description')}</p>
                       <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Lecteurs d'écran</li>
-                        <li>• Contrastes élevés</li>
-                        <li>• Alternatives textuelles</li>
+                        <li>{t('disabilities.visual.screenReaders')}</li>
+                        <li>{t('disabilities.visual.highContrast')}</li>
+                        <li>{t('disabilities.visual.altTexts')}</li>
                       </ul>
                     </article>
                     
                     <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                       <Headphones className="w-12 h-12 text-blue-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps auditifs</h3>
-                      <p className="text-gray-600 text-sm mb-4">Surdité, malentendance</p>
+                      <h3 className="font-semibold text-gray-900 mb-3">{t('disabilities.auditory.title')}</h3>
+                      <p className="text-gray-600 text-sm mb-4">{t('disabilities.auditory.description')}</p>
                       <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Sous-titres</li>
-                        <li>• Langue des signes</li>
-                        <li>• Transcriptions</li>
+                        <li>{t('disabilities.auditory.subtitles')}</li>
+                        <li>{t('disabilities.auditory.signLanguage')}</li>
+                        <li>{t('disabilities.auditory.transcriptions')}</li>
                       </ul>
                     </article>
                     
                     <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                       <MousePointer className="w-12 h-12 text-green-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps moteurs</h3>
-                      <p className="text-gray-600 text-sm mb-4">Paralysie, amputations, tremblements</p>
+                      <h3 className="font-semibold text-gray-900 mb-3">{t('disabilities.motor.title')}</h3>
+                      <p className="text-gray-600 text-sm mb-4">{t('disabilities.motor.description')}</p>
                       <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Navigation au clavier</li>
-                        <li>• Zones de clic étendues</li>
-                        <li>• Commande vocale</li>
+                        <li>{t('disabilities.motor.keyboardNav')}</li>
+                        <li>{t('disabilities.motor.largeTargets')}</li>
+                        <li>{t('disabilities.motor.voiceControl')}</li>
                       </ul>
                     </article>
                     
                     <article className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                       <Brain className="w-12 h-12 text-purple-600 mb-4" aria-hidden="true" />
-                      <h3 className="font-semibold text-gray-900 mb-3">Handicaps cognitifs</h3>
-                      <p className="text-gray-600 text-sm mb-4">Dyslexie, TDAH, troubles de la mémoire</p>
+                      <h3 className="font-semibold text-gray-900 mb-3">{t('disabilities.cognitive.title')}</h3>
+                      <p className="text-gray-600 text-sm mb-4">{t('disabilities.cognitive.description')}</p>
                       <ul className="text-sm text-gray-500 space-y-1">
-                        <li>• Contenu simplifié</li>
-                        <li>• Navigation claire</li>
-                        <li>• Temps de lecture adapté</li>
+                        <li>{t('disabilities.cognitive.simpleContent')}</li>
+                        <li>{t('disabilities.cognitive.clearNav')}</li>
+                        <li>{t('disabilities.cognitive.adaptedTiming')}</li>
                       </ul>
                     </article>
                   </div>
@@ -553,7 +553,7 @@ export default function HomePage() {
               {!auditResult && !comparativeResult && (
                 <section id="audit-form" className="px-6 min-h-[calc(100vh-4rem)] flex items-center justify-center" aria-labelledby="audit-form-heading">
                   <div className="w-full max-w-4xl mx-auto">
-                    <h2 id="audit-form-heading" className="sr-only">Formulaire d'audit d'accessibilité</h2>
+                    <h2 id="audit-form-heading" className="sr-only">{t('common.srOnly.auditForm')}</h2>
                     <AuditForm
                       onAuditStart={handleAuditStart}
                       progress={progress}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Eye, EyeOff, Palette, Settings, RotateCcw, Info, Keyboard, Activity } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SimulationSettings {
   cecite: boolean;
@@ -22,6 +23,7 @@ interface SimulationSettings {
 }
 
 export default function SimulateurHandicap() {
+  const { t } = useLanguage();
   const [settings, setSettings] = useState<SimulationSettings>({
     cecite: false,
     malvoyance: {
@@ -200,11 +202,11 @@ export default function SimulateurHandicap() {
   };
 
   const handicapDescriptions = {
-    cecite: "La cécité est la perte totale ou quasi-totale de la vision. Les personnes aveugles dépendent des lecteurs d'écran et de la navigation au clavier.",
-    malvoyance: "La malvoyance inclut diverses déficiences visuelles comme la vision floue, la vision tunnel, ou les taches aveugles.",
-    daltonisme: "Le daltonisme affecte la perception des couleurs, notamment la distinction entre certaines couleurs comme le rouge et le vert.",
-    navigationClavier: "Simulation de l'utilisation d'un ordinateur sans souris, uniquement avec le clavier. Essentiel pour les personnes ayant des handicaps moteurs.",
-    tremblements: "Les tremblements moteurs rendent difficile le contrôle précis de la souris et des gestes. Fréquent avec Parkinson, sclérose en plaques, etc."
+    cecite: t('simulator.blindness.description'),
+    malvoyance: t('simulator.lowVision.description'),
+    daltonisme: t('simulator.colorBlindness.description'),
+    navigationClavier: t('simulator.keyboardNav.description'),
+    tremblements: t('simulator.tremors.description')
   };
 
   return (
@@ -215,10 +217,10 @@ export default function SimulateurHandicap() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex-1">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                Simulateur d'Handicap
+                {t('simulator.title')}
               </h1>
               <p className="text-gray-600 text-sm sm:text-base">
-                Expérimentez différents types de handicaps visuels et moteurs pour mieux comprendre les défis d'accessibilité
+                {t('simulator.description')}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 lg:flex-shrink-0">
@@ -227,7 +229,7 @@ export default function SimulateurHandicap() {
                 className="flex items-center justify-center gap-2 px-4 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors touch-manipulation min-h-[48px]"
               >
                 <RotateCcw className="w-4 h-4" />
-                <span className="font-medium">Réinitialiser</span>
+                <span className="font-medium">{t('simulator.reset')}</span>
               </button>
               <button
                 onClick={toggleSimulation}
@@ -242,12 +244,12 @@ export default function SimulateurHandicap() {
                 {isSimulating ? (
                   <>
                     <EyeOff className="w-4 h-4" />
-                    <span>Arrêter la simulation</span>
+                    <span>{t('simulator.stopSimulation')}</span>
                   </>
                 ) : (
                   <>
                     <Eye className="w-4 h-4" />
-                    <span>Démarrer la simulation</span>
+                    <span>{t('simulator.startSimulation')}</span>
                   </>
                 )}
               </button>
@@ -261,7 +263,7 @@ export default function SimulateurHandicap() {
             <div className="flex items-center">
               <Info className="w-5 h-5 text-orange-400 mr-2" />
               <p className="text-orange-700 font-medium">
-                Simulation active - Vous expérimentez actuellement les handicaps sélectionnés
+                {t('simulator.activeSimulation')}
               </p>
             </div>
           </div>
@@ -269,7 +271,7 @@ export default function SimulateurHandicap() {
 
         {/* Handicaps visuels */}
         <div className="mb-10">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Handicaps visuels</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">{t('simulator.visualDisabilities')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Cécité */}
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -278,8 +280,8 @@ export default function SimulateurHandicap() {
                   <EyeOff className="w-6 h-6 text-gray-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Cécité</h3>
-                  <p className="text-sm text-gray-500">Perte totale de la vision</p>
+                  <h3 className="text-xl font-semibold text-gray-900">{t('simulator.blindness.title')}</h3>
+                  <p className="text-sm text-gray-500">{t('simulator.blindness.subtitle')}</p>
                 </div>
               </div>
               
@@ -287,19 +289,19 @@ export default function SimulateurHandicap() {
                 {handicapDescriptions.cecite}
               </p>
 
-                              <label className="flex items-center gap-3 cursor-pointer touch-manipulation py-1">
-                  <input
-                    type="checkbox"
-                    checked={settings.cecite}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      cecite: e.target.checked,
-                      malvoyance: { ...settings.malvoyance, enabled: false }
-                    })}
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                  />
-                  <span className="text-gray-700 font-medium">Simuler la cécité</span>
-                </label>
+              <label className="flex items-center gap-3 cursor-pointer touch-manipulation py-1">
+                <input
+                  type="checkbox"
+                  checked={settings.cecite}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    cecite: e.target.checked,
+                    malvoyance: { ...settings.malvoyance, enabled: false }
+                  })}
+                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+                <span className="text-gray-700 font-medium">{t('simulator.blindness.simulate')}</span>
+              </label>
             </div>
 
             {/* Malvoyance */}
@@ -309,8 +311,8 @@ export default function SimulateurHandicap() {
                   <Eye className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Malvoyance</h3>
-                  <p className="text-sm text-gray-500">Déficience visuelle partielle</p>
+                  <h3 className="text-xl font-semibold text-gray-900">{t('simulator.lowVision.title')}</h3>
+                  <p className="text-sm text-gray-500">{t('simulator.lowVision.subtitle')}</p>
                 </div>
               </div>
               
@@ -330,14 +332,14 @@ export default function SimulateurHandicap() {
                     })}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="text-gray-700 font-medium">Simuler la malvoyance</span>
+                  <span className="text-gray-700 font-medium">{t('simulator.lowVision.simulate')}</span>
                 </label>
 
                 {settings.malvoyance.enabled && (
                   <div className="ml-7 space-y-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Type de malvoyance
+                        {t('simulator.lowVision.type')}
                       </label>
                       <select
                         value={settings.malvoyance.type}
@@ -350,15 +352,15 @@ export default function SimulateurHandicap() {
                         })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       >
-                        <option value="blur">Vision floue</option>
-                        <option value="tunnel">Vision tunnel</option>
-                        <option value="spots">Taches aveugles</option>
+                        <option value="blur">{t('simulator.lowVision.blur')}</option>
+                        <option value="tunnel">{t('simulator.lowVision.tunnel')}</option>
+                        <option value="spots">{t('simulator.lowVision.spots')}</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Sévérité: {settings.malvoyance.severity}%
+                        {t('simulator.lowVision.severity')}: {settings.malvoyance.severity}%
                       </label>
                       <input
                         type="range"
@@ -387,8 +389,8 @@ export default function SimulateurHandicap() {
                   <Palette className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Daltonisme</h3>
-                  <p className="text-sm text-gray-500">Déficience de la perception des couleurs</p>
+                  <h3 className="text-xl font-semibold text-gray-900">{t('simulator.colorBlindness.title')}</h3>
+                  <p className="text-sm text-gray-500">{t('simulator.colorBlindness.subtitle')}</p>
                 </div>
               </div>
               
@@ -407,20 +409,20 @@ export default function SimulateurHandicap() {
                     })}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="text-gray-700 font-medium">Simuler le daltonisme</span>
+                  <span className="text-gray-700 font-medium">{t('simulator.colorBlindness.simulate')}</span>
                 </label>
 
                 {settings.daltonisme.enabled && (
                   <div className="ml-7">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Type de daltonisme
+                      {t('simulator.colorBlindness.type')}
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { value: 'deuteranopia', label: 'Deutéranopie (vert-rouge)' },
-                        { value: 'protanopia', label: 'Protanopie (rouge-vert)' },
-                        { value: 'tritanopia', label: 'Tritanopie (bleu-jaune)' },
-                        { value: 'monochromacy', label: 'Monochromatie (noir et blanc)' }
+                        { value: 'deuteranopia', label: t('simulator.colorBlindness.deuteranopia') },
+                        { value: 'protanopia', label: t('simulator.colorBlindness.protanopia') },
+                        { value: 'tritanopia', label: t('simulator.colorBlindness.tritanopia') },
+                        { value: 'monochromacy', label: t('simulator.colorBlindness.monochromacy') }
                       ].map((option) => (
                         <label key={option.value} className="flex items-center gap-2 cursor-pointer p-2 border rounded-lg hover:bg-gray-50">
                           <input
@@ -450,7 +452,7 @@ export default function SimulateurHandicap() {
 
         {/* Handicaps moteurs */}
         <div className="mb-10">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Handicaps moteurs</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">{t('simulator.motorDisabilities')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Navigation Clavier */}
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -459,8 +461,8 @@ export default function SimulateurHandicap() {
                   <Keyboard className="w-6 h-6 text-orange-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Navigation Clavier</h3>
-                  <p className="text-sm text-gray-500">Handicaps moteurs</p>
+                  <h3 className="text-xl font-semibold text-gray-900">{t('simulator.keyboardNav.title')}</h3>
+                  <p className="text-sm text-gray-500">{t('simulator.keyboardNav.subtitle')}</p>
                 </div>
               </div>
               
@@ -478,14 +480,12 @@ export default function SimulateurHandicap() {
                   })}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <span className="text-gray-700 font-medium">Désactiver la souris</span>
+                <span className="text-gray-700 font-medium">{t('simulator.keyboardNav.simulate')}</span>
               </label>
               
               {settings.navigationClavier && (
                 <div className="mt-4 p-3 bg-orange-50 rounded-lg">
-                  <p className="text-sm text-orange-700">
-                    💡 <strong>Astuce :</strong> Utilisez Tab pour naviguer, Entrée pour cliquer, Espace pour cocher les cases.
-                  </p>
+                  <p className="text-sm text-orange-700" dangerouslySetInnerHTML={{ __html: t('simulator.keyboardNav.tip') }} />
                 </div>
               )}
             </div>
@@ -497,8 +497,8 @@ export default function SimulateurHandicap() {
                   <Activity className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Tremblements</h3>
-                  <p className="text-sm text-gray-500">Troubles moteurs</p>
+                  <h3 className="text-xl font-semibold text-gray-900">{t('simulator.tremors.title')}</h3>
+                  <p className="text-sm text-gray-500">{t('simulator.tremors.subtitle')}</p>
                 </div>
               </div>
               
@@ -517,14 +517,14 @@ export default function SimulateurHandicap() {
                     })}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="text-gray-700 font-medium">Simuler les tremblements</span>
+                  <span className="text-gray-700 font-medium">{t('simulator.tremors.simulate')}</span>
                 </label>
 
                 {settings.tremblements.enabled && (
                   <div className="ml-7 space-y-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Intensité: {settings.tremblements.intensity}%
+                        {t('simulator.tremors.intensity')}: {settings.tremblements.intensity}%
                       </label>
                       <input
                         type="range"
@@ -550,46 +550,46 @@ export default function SimulateurHandicap() {
 
         {/* Exemples de test */}
         <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mt-6">
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Zone de test</h3>
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">{t('simulator.testZone.title')}</h3>
           <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            Utilisez cette zone pour tester l'impact des handicaps simulés sur différents éléments visuels et interactifs.
+            {t('simulator.testZone.description')}
           </p>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Test de couleurs */}
             <div className="space-y-3">
-              <h4 className="font-medium text-gray-900">Test de couleurs</h4>
+              <h4 className="font-medium text-gray-900">{t('simulator.testZone.colorTest')}</h4>
               <div className="flex gap-2">
                 <div className="w-8 h-8 bg-red-500 rounded"></div>
                 <div className="w-8 h-8 bg-green-500 rounded"></div>
                 <div className="w-8 h-8 bg-blue-500 rounded"></div>
                 <div className="w-8 h-8 bg-yellow-500 rounded"></div>
               </div>
-              <p className="text-sm text-gray-600">Rouge, Vert, Bleu, Jaune</p>
+              <p className="text-sm text-gray-600">{t('simulator.testZone.colorLabels')}</p>
             </div>
 
             {/* Test de contraste */}
             <div className="space-y-3">
-              <h4 className="font-medium text-gray-900">Test de contraste</h4>
+              <h4 className="font-medium text-gray-900">{t('simulator.testZone.contrastTest')}</h4>
               <div className="space-y-2">
-                <div className="bg-black text-white p-2 text-sm rounded">Bon contraste</div>
-                <div className="bg-gray-300 text-gray-400 p-2 text-sm rounded">Mauvais contraste</div>
+                <div className="bg-black text-white p-2 text-sm rounded">{t('simulator.testZone.goodContrast')}</div>
+                <div className="bg-gray-300 text-gray-400 p-2 text-sm rounded">{t('simulator.testZone.badContrast')}</div>
               </div>
             </div>
 
             {/* Test de navigation */}
             <div className="space-y-3">
-              <h4 className="font-medium text-gray-900">Test de navigation</h4>
+              <h4 className="font-medium text-gray-900">{t('simulator.testZone.navigationTest')}</h4>
               <div className="space-y-2">
                 <button className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  Bouton 1
+                  {t('simulator.testZone.button1')}
                 </button>
                 <button className="w-full px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                  Bouton 2
+                  {t('simulator.testZone.button2')}
                 </button>
                 <input 
                   type="text" 
-                  placeholder="Champ de saisie"
+                  placeholder={t('simulator.testZone.inputField')}
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -597,18 +597,18 @@ export default function SimulateurHandicap() {
 
             {/* Test de précision */}
             <div className="space-y-3">
-              <h4 className="font-medium text-gray-900">Test de précision</h4>
+              <h4 className="font-medium text-gray-900">{t('simulator.testZone.precisionTest')}</h4>
               <div className="space-y-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                  <span className="text-sm">Case à cocher</span>
+                  <span className="text-sm">{t('simulator.testZone.checkbox')}</span>
                 </label>
                 <div className="flex gap-1">
                   <button className="w-6 h-6 bg-red-500 text-white text-xs rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">1</button>
                   <button className="w-6 h-6 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">2</button>
                   <button className="w-6 h-6 bg-green-500 text-white text-xs rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">3</button>
                 </div>
-                <p className="text-xs text-gray-500">Petits boutons difficiles à cliquer</p>
+                <p className="text-xs text-gray-500">{t('simulator.testZone.smallButtons')}</p>
               </div>
             </div>
           </div>
@@ -616,13 +616,13 @@ export default function SimulateurHandicap() {
           {/* Instructions spécifiques */}
           {(settings.navigationClavier || settings.tremblements.enabled) && (
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-medium text-blue-900 mb-2">Instructions pour les tests actifs :</h4>
+              <h4 className="font-medium text-blue-900 mb-2">{t('simulator.testZone.activeInstructions')}</h4>
               <ul className="text-sm text-blue-800 space-y-1">
                 {settings.navigationClavier && (
-                  <li>• <strong>Navigation clavier :</strong> Utilisez Tab/Shift+Tab pour naviguer, Entrée/Espace pour interagir</li>
+                  <li dangerouslySetInnerHTML={{ __html: t('simulator.testZone.keyboardInstructions') }} />
                 )}
                 {settings.tremblements.enabled && (
-                  <li>• <strong>Tremblements :</strong> Essayez de cliquer précisément sur les petits boutons</li>
+                  <li dangerouslySetInnerHTML={{ __html: t('simulator.testZone.tremorsInstructions') }} />
                 )}
               </ul>
             </div>
