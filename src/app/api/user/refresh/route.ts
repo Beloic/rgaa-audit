@@ -54,18 +54,19 @@ export async function POST(request: NextRequest) {
         trialEndsAt: userData.subscription_trial_ends_at
       },
       usage: {
-        auditsToday: userData.usage_audits_today || 0,
-        auditsThisMonth: userData.usage_audits_this_month || 0,
-        auditsTotal: userData.usage_audits_total || 0,
-        teamMembers: userData.usage_team_members || 1,
-        storageUsed: userData.usage_storage_used || 0
+        auditsToday: userData.audits_today || 0,
+        auditsThisMonth: userData.audits_this_month || 0,
+        auditsTotal: userData.audits_total || 0,
+        lastAuditDate: userData.last_audit_date,
+        teamMembers: userData.team_members || 1,
+        storageUsed: userData.storage_used || 0
       },
       settings: {
-        defaultLanguage: userData.settings_default_language || 'fr',
-        emailNotifications: userData.settings_email_notifications ?? true,
-        weeklyReports: userData.settings_weekly_reports ?? false,
-        theme: userData.settings_theme || 'system',
-        timezone: userData.settings_timezone || 'Europe/Paris'
+        defaultLanguage: userData.default_language || 'fr',
+        emailNotifications: userData.email_notifications ?? true,
+        weeklyReports: userData.weekly_reports ?? false,
+        theme: userData.theme || 'system',
+        timezone: userData.timezone || 'Europe/Paris'
       }
     };
 
