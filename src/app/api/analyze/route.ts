@@ -4,6 +4,7 @@ import { getUserByEmail, saveUser } from '@/lib/supabase-auth';
 // Configuration pour Vercel Pro - durée maximale pour les analyses complexes
 export const maxDuration = 300; // 5 minutes
 import type { AuditResult, RGAAViolation, EngineResult, ComparativeResult } from '@/types/audit';
+import { incrementUserAuditCount } from '@/lib/audit-utils';
 
 // Types pour les plans de tarification
 interface PlanLimits {
@@ -210,20 +211,8 @@ export async function POST(request: NextRequest) {
       if (userData?.email) {
         try {
           console.log('📈 Incrémentation automatique après analyse comparative réussie...');
-          const incrementResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/increment-audit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: userData.email })
-          });
-          
-          if (incrementResponse.ok) {
-            const incrementData = await incrementResponse.json();
-            // Mettre à jour les données utilisateur avec celles incrémentées
-            updatedUserData = incrementData.userData;
-            console.log('✅ Compteur incrémenté automatiquement après analyse comparative');
-          } else {
-            console.error('❌ Erreur lors de l\'incrémentation automatique:', await incrementResponse.text());
-          }
+          updatedUserData = await incrementUserAuditCount(userData);
+          console.log('✅ Compteur incrémenté automatiquement après analyse comparative');
         } catch (error) {
           console.error('❌ Erreur lors de l\'incrémentation automatique:', error);
         }
@@ -277,20 +266,8 @@ export async function POST(request: NextRequest) {
     if (userData?.email) {
       try {
         console.log('📈 Incrémentation automatique après analyse simple réussie...');
-        const incrementResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/increment-audit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: userData.email })
-        });
-        
-        if (incrementResponse.ok) {
-          const incrementData = await incrementResponse.json();
-          // Mettre à jour les données utilisateur avec celles incrémentées
-          updatedUserData = incrementData.userData;
-          console.log('✅ Compteur incrémenté automatiquement après analyse simple');
-        } else {
-          console.error('❌ Erreur lors de l\'incrémentation automatique:', await incrementResponse.text());
-        }
+        updatedUserData = await incrementUserAuditCount(userData);
+        console.log('✅ Compteur incrémenté automatiquement après analyse simple');
       } catch (error) {
         console.error('❌ Erreur lors de l\'incrémentation automatique:', error);
       }
