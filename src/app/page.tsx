@@ -473,10 +473,10 @@ export default function HomePage() {
               <section aria-labelledby="disabilities-types-heading" className="px-6 py-20 bg-gray-50">
                 <div className="max-w-6xl mx-auto">
                   <h2 id="disabilities-types-heading" className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
-                    À qui s'adresse l'accessibilité ?
+                    Les différents types de handicap concernés par l'accessibilité numérique
                   </h2>
                   <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-                    L'accessibilité numérique bénéficie à toutes les personnes, avec ou sans handicap
+                    L'accessibilité numérique vise à lever les barrières pour les personnes en situation de handicap visuel, auditif, moteur ou cognitif. Voici les grandes familles de handicap prises en compte par le RGAA :
                   </p>
                   
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
