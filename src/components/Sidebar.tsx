@@ -37,7 +37,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   const { language } = useLanguage();
   const t = translations[language];
   const getButtonClasses = (section: string) => {
-    const baseClasses = "w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 border";
+    const baseClasses = "w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 border text-[15px]";
     if (activeSection === section) {
       return `${baseClasses} bg-blue-50 text-blue-700 border-blue-200`;
     }
@@ -67,11 +67,20 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
 
         <button
           onClick={() => onSectionChange('disability-simulator')}
-          className={getButtonClasses('disability-simulator')}
+          className={getButtonClasses('disability-simulator') + ' text-[13px]'}
           aria-current={activeSection === 'disability-simulator' ? 'page' : undefined}
         >
           <Accessibility className="w-5 h-5" aria-hidden="true" />
-          <span className="font-medium">{t.disabilitySimulator}</span>
+          <span className="font-medium whitespace-nowrap">{t.disabilitySimulator}</span>
+        </button>
+        
+        <button
+          onClick={() => onSectionChange('statistics')}
+          className={getButtonClasses('statistics')}
+          aria-current={activeSection === 'statistics' ? 'page' : undefined}
+        >
+          <BarChart3 className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">{t.statistics}</span>
         </button>
         
         <button
@@ -93,15 +102,6 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           <span className="font-medium">{t.rgaaReference}</span>
         </button>
         */}
-
-        <button
-          onClick={() => onSectionChange('statistics')}
-          className={getButtonClasses('statistics')}
-          aria-current={activeSection === 'statistics' ? 'page' : undefined}
-        >
-          <BarChart3 className="w-5 h-5" aria-hidden="true" />
-          <span className="font-medium">{t.statistics}</span>
-        </button>
       </nav>
       
       {/* Section Alpha en bas */}
