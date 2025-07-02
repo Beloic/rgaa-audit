@@ -42,19 +42,17 @@ export default function SimulateurHandicap() {
 
   const [isSimulating, setIsSimulating] = useState(false);
   const trembleIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const mainContentRef = useRef<HTMLDivElement>(null);
 
   // Appliquer les filtres CSS
   useEffect(() => {
-    const mainContent = mainContentRef.current;
-    if (!mainContent) return;
-
+    const body = document.body;
+    
     if (!isSimulating) {
-      mainContent.style.filter = '';
-      mainContent.style.opacity = '';
-      mainContent.style.pointerEvents = '';
-      mainContent.style.transform = '';
-      mainContent.className = mainContent.className.replace(/vision-tunnel|vision-spots|keyboard-only/g, '').trim();
+      body.style.filter = '';
+      body.style.opacity = '';
+      body.style.pointerEvents = '';
+      body.className = body.className.replace(/vision-tunnel|vision-spots|keyboard-only/g, '').trim();
+      // Arrêter les tremblements
       if (trembleIntervalRef.current) {
         clearInterval(trembleIntervalRef.current);
         trembleIntervalRef.current = null;
@@ -66,8 +64,8 @@ export default function SimulateurHandicap() {
     
     // Navigation clavier seule
     if (settings.navigationClavier) {
-      mainContent.style.pointerEvents = 'none';
-      mainContent.classList.add('keyboard-only');
+      body.style.pointerEvents = 'none';
+      body.classList.add('keyboard-only');
       // Créer un indicateur de focus visible
       if (!document.querySelector('.focus-indicator-style')) {
         const style = document.createElement('style');
@@ -88,8 +86,8 @@ export default function SimulateurHandicap() {
         document.head.appendChild(style);
       }
     } else {
-      mainContent.style.pointerEvents = '';
-      mainContent.className = mainContent.className.replace(/keyboard-only/g, '').trim();
+      body.style.pointerEvents = '';
+      body.className = body.className.replace(/keyboard-only/g, '').trim();
       const focusStyle = document.querySelector('.focus-indicator-style');
       if (focusStyle) focusStyle.remove();
     }
@@ -107,10 +105,10 @@ export default function SimulateurHandicap() {
       trembleIntervalRef.current = setInterval(() => {
         const trembleX = (Math.random() - 0.5) * intensity * 8;
         const trembleY = (Math.random() - 0.5) * intensity * 8;
-        mainContent.style.transform = `translate(${trembleX}px, ${trembleY}px)`;
+        body.style.transform = `translate(${trembleX}px, ${trembleY}px)`;
       }, 50);
     } else {
-      mainContent.style.transform = '';
+      body.style.transform = '';
       if (trembleIntervalRef.current) {
         clearInterval(trembleIntervalRef.current);
         trembleIntervalRef.current = null;
@@ -119,8 +117,8 @@ export default function SimulateurHandicap() {
     
     // Cécité
     if (settings.cecite) {
-      mainContent.style.opacity = '0.05'; // Quasi-noir au lieu de totalement noir
-      mainContent.style.filter = 'contrast(0) brightness(0)';
+      body.style.opacity = '0.05'; // Quasi-noir au lieu de totalement noir
+      body.style.filter = 'contrast(0) brightness(0)';
       return;
     }
 
@@ -133,22 +131,22 @@ export default function SimulateurHandicap() {
           break;
         case 'tunnel':
           // Ajouter la classe CSS pour l'effet tunnel
-          mainContent.className = mainContent.className.replace(/vision-tunnel|vision-spots/g, '').trim();
-          mainContent.classList.add('vision-tunnel');
+          body.className = body.className.replace(/vision-tunnel|vision-spots/g, '').trim();
+          body.classList.add('vision-tunnel');
           filters.push(`contrast(${1 + severity * 0.5})`);
           filters.push(`brightness(${1 - severity * 0.3})`);
           break;
         case 'spots':
           // Ajouter la classe CSS pour les taches aveugles
-          mainContent.className = mainContent.className.replace(/vision-tunnel|vision-spots/g, '').trim();
-          mainContent.classList.add('vision-spots');
+          body.className = body.className.replace(/vision-tunnel|vision-spots/g, '').trim();
+          body.classList.add('vision-spots');
           filters.push(`contrast(${1 + severity})`);
           filters.push(`brightness(${1 - severity * 0.2})`);
           break;
       }
     } else {
       // Supprimer les classes si malvoyance non activée
-      mainContent.className = mainContent.className.replace(/vision-tunnel|vision-spots/g, '').trim();
+      body.className = body.className.replace(/vision-tunnel|vision-spots/g, '').trim();
     }
 
     // Daltonisme
@@ -173,7 +171,7 @@ export default function SimulateurHandicap() {
       }
     }
 
-    mainContent.style.filter = filters.join(' ');
+    body.style.filter = filters.join(' ');
   }, [settings, isSimulating]);
 
   const toggleSimulation = () => {
@@ -210,44 +208,46 @@ export default function SimulateurHandicap() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div ref={mainContentRef} className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 pb-24 lg:pb-6">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                 Simulateur d'Handicap
               </h1>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm sm:text-base">
                 Expérimentez différents types de handicaps visuels et moteurs pour mieux comprendre les défis d'accessibilité
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 lg:flex-shrink-0">
               <button
                 onClick={resetSettings}
-                className="flex items-center gap-2 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors touch-manipulation min-h-[48px]"
               >
                 <RotateCcw className="w-4 h-4" />
-                Réinitialiser
+                <span className="font-medium">Réinitialiser</span>
               </button>
               <button
                 onClick={toggleSimulation}
-                className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors touch-manipulation min-h-[48px] ${
                   isSimulating
-                    ? 'bg-red-600 text-white hover:bg-red-700'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-red-600 text-white hover:bg-red-700 focus:bg-red-700'
+                    : 'bg-blue-600 text-white hover:bg-blue-700 focus:bg-blue-700'
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  isSimulating ? 'focus:ring-red-500' : 'focus:ring-blue-500'
                 }`}
               >
                 {isSimulating ? (
                   <>
                     <EyeOff className="w-4 h-4" />
-                    Arrêter la simulation
+                    <span>Arrêter la simulation</span>
                   </>
                 ) : (
                   <>
                     <Eye className="w-4 h-4" />
-                    Démarrer la simulation
+                    <span>Démarrer la simulation</span>
                   </>
                 )}
               </button>
@@ -269,8 +269,8 @@ export default function SimulateurHandicap() {
 
         {/* Handicaps visuels */}
         <div className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Handicaps visuels</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Handicaps visuels</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Cécité */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
@@ -287,19 +287,19 @@ export default function SimulateurHandicap() {
                 {handicapDescriptions.cecite}
               </p>
 
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={settings.cecite}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    cecite: e.target.checked,
-                    malvoyance: { ...settings.malvoyance, enabled: false }
-                  })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="text-gray-700 font-medium">Simuler la cécité</span>
-              </label>
+                              <label className="flex items-center gap-3 cursor-pointer touch-manipulation py-1">
+                  <input
+                    type="checkbox"
+                    checked={settings.cecite}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      cecite: e.target.checked,
+                      malvoyance: { ...settings.malvoyance, enabled: false }
+                    })}
+                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <span className="text-gray-700 font-medium">Simuler la cécité</span>
+                </label>
             </div>
 
             {/* Malvoyance */}
@@ -450,8 +450,8 @@ export default function SimulateurHandicap() {
 
         {/* Handicaps moteurs */}
         <div className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Handicaps moteurs</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Handicaps moteurs</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Navigation Clavier */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
@@ -549,13 +549,13 @@ export default function SimulateurHandicap() {
         </div>
 
         {/* Exemples de test */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">Zone de test</h3>
-          <p className="text-gray-600 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mt-6">
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Zone de test</h3>
+          <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Utilisez cette zone pour tester l'impact des handicaps simulés sur différents éléments visuels et interactifs.
           </p>
           
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Test de couleurs */}
             <div className="space-y-3">
               <h4 className="font-medium text-gray-900">Test de couleurs</h4>
@@ -629,62 +629,112 @@ export default function SimulateurHandicap() {
           )}
         </div>
       </div>
-      {/* Style global sliders + curseur normal pendant tremblements */}
+      {/* Styles globaux pour l'accessibilité mobile et les interactions */}
       <style jsx global>{`
+        /* Sliders améliorés pour mobile */
         input[type="range"].slider-bar {
           background: linear-gradient(to right, #d1d5db 0%, #d1d5db 100%);
-          height: 0.5rem;
-          border-radius: 0.5rem;
+          height: 0.75rem;
+          border-radius: 0.75rem;
+          min-height: 44px; /* Touch target minimum */
+          padding: 10px 0;
         }
         input[type="range"].slider-bar::-webkit-slider-runnable-track {
           background: #d1d5db;
-          height: 0.5rem;
-          border-radius: 0.5rem;
+          height: 0.75rem;
+          border-radius: 0.75rem;
         }
         input[type="range"].slider-bar::-webkit-slider-thumb {
           background: #2563eb;
-          border: 2px solid #fff;
-          width: 1.25rem;
-          height: 1.25rem;
+          border: 3px solid #fff;
+          width: 1.75rem;
+          height: 1.75rem;
           border-radius: 9999px;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
           -webkit-appearance: none;
           appearance: none;
-          margin-top: -0.375rem;
+          margin-top: -0.5rem;
+          cursor: pointer;
         }
         input[type="range"].slider-bar:focus::-webkit-slider-thumb {
-          outline: 2px solid #2563eb;
-          outline-offset: 2px;
+          outline: 3px solid #2563eb;
+          outline-offset: 3px;
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.5);
         }
         input[type="range"].slider-bar::-moz-range-thumb {
           background: #2563eb;
-          border: 2px solid #fff;
-          width: 1.25rem;
-          height: 1.25rem;
+          border: 3px solid #fff;
+          width: 1.75rem;
+          height: 1.75rem;
           border-radius: 9999px;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+          cursor: pointer;
         }
         input[type="range"].slider-bar::-ms-thumb {
           background: #2563eb;
-          border: 2px solid #fff;
-          width: 1.25rem;
-          height: 1.25rem;
+          border: 3px solid #fff;
+          width: 1.75rem;
+          height: 1.75rem;
           border-radius: 9999px;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+          cursor: pointer;
         }
         input[type="range"].slider-bar::-ms-fill-lower {
           background: #d1d5db;
-          border-radius: 0.5rem;
+          border-radius: 0.75rem;
         }
         input[type="range"].slider-bar::-ms-fill-upper {
           background: #d1d5db;
-          border-radius: 0.5rem;
+          border-radius: 0.75rem;
         }
         input[type="range"].slider-bar:focus {
           outline: none;
         }
+        
+        /* Checkboxes améliorées pour mobile */
+        input[type="checkbox"] {
+          min-width: 20px;
+          min-height: 20px;
+          cursor: pointer;
+        }
+        
+        /* Boutons radio améliorés pour mobile */
+        input[type="radio"] {
+          min-width: 18px;
+          min-height: 18px;
+          cursor: pointer;
+        }
+        
+        /* Zones de touch étendues pour les labels */
+        label.touch-manipulation {
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Focus visible amélioré */
+        button:focus,
+        input:focus,
+        select:focus {
+          outline: 2px solid #2563eb;
+          outline-offset: 2px;
+        }
+        
+        /* Curseur normal pendant tremblements */
         body[style*="transform"] {
           cursor: default !important;
+        }
+        body[style*="transform"] * {
+          cursor: default !important;
+        }
+        
+        /* Support du safe area pour mobile */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+          .safe-area-inset-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+          }
         }
       `}</style>
     </div>

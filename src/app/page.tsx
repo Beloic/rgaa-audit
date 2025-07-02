@@ -409,7 +409,7 @@ export default function HomePage() {
         )}
 
         {/* Main Content */}
-        <main id="main-content" className={`${activeSection !== 'home' ? 'ml-64' : ''} relative z-10`}>
+        <main id="main-content" className={`${activeSection !== 'home' ? 'lg:ml-64' : ''} relative z-10 ${activeSection !== 'home' ? 'pb-24 lg:pb-0' : ''}`}>
           
           {/* Page d'accueil */}
           {activeSection === 'home' && (
