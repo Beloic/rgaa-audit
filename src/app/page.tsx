@@ -287,10 +287,12 @@ export default function HomePage() {
       if (request.engine === 'all') {
         setComparativeResult(result as ComparativeResult);
         // Sauvegarder dans l'historique
+        console.log('💾 Sauvegarde historique - analyse comparative:', { url: result.url, userEmail: user?.email });
         saveAuditToHistory(result as ComparativeResult, 'all', user?.email);
       } else {
         setAuditResult(result as AuditResult);
         // Sauvegarder dans l'historique
+        console.log('💾 Sauvegarde historique - analyse simple:', { url: result.url, engine: request.engine, userEmail: user?.email });
         saveAuditToHistory(result as AuditResult, request.engine || 'rgaa', user?.email);
       }
       
