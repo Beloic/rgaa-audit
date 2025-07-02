@@ -57,7 +57,7 @@ export async function saveAuditToDatabase(
 
     // Insérer en base
     const { data, error } = await supabase
-      .from('audit_history')
+      .from('audit_accessibility_history')
       .insert({
         user_email: userEmail,
         url: result.url || 'URL inconnue',
@@ -94,7 +94,7 @@ export async function getUserAuditHistory(userEmail: string, limit: number = 50)
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data, error } = await supabase
-      .from('audit_history')
+      .from('audit_accessibility_history')
       .select('*')
       .eq('user_email', userEmail)
       .order('timestamp', { ascending: false })
@@ -124,7 +124,7 @@ export async function deleteAuditFromHistory(auditId: string, userEmail: string)
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { error } = await supabase
-      .from('audit_history')
+      .from('audit_accessibility_history')
       .delete()
       .eq('id', auditId)
       .eq('user_email', userEmail); // Sécurité : s'assurer que l'utilisateur ne peut supprimer que ses propres audits
@@ -153,7 +153,7 @@ export async function clearUserAuditHistory(userEmail: string): Promise<boolean>
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { error } = await supabase
-      .from('audit_history')
+      .from('audit_accessibility_history')
       .delete()
       .eq('user_email', userEmail);
 
@@ -179,7 +179,7 @@ export async function countUserAudits(userEmail: string): Promise<number> {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { count, error } = await supabase
-      .from('audit_history')
+      .from('audit_accessibility_history')
       .select('*', { count: 'exact', head: true })
       .eq('user_email', userEmail);
 

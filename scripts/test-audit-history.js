@@ -1,5 +1,5 @@
 // Script pour tester la fonctionnalité d'historique des audits côté serveur
-// À exécuter après avoir créé la table audit_history dans Supabase
+// À exécuter après avoir créé la table audit_accessibility_history dans Supabase
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -9,26 +9,26 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 async function testAuditHistory() {
   try {
-    console.log('🧪 Test de l\'historique des audits côté serveur...');
+    console.log('🧪 Test de l\'historique des audits côté serveur (audit_accessibility_history)...');
     
     const supabase = createClient(supabaseUrl, supabaseKey);
     
     // Email de test
     const testEmail = 'lauregagnonn@gmail.com';
     
-    // 1. Vérifier la table audit_history
-    console.log('\n📋 1. Vérification de la table audit_history...');
+    // 1. Vérifier la table audit_accessibility_history
+    console.log('\n📋 1. Vérification de la table audit_accessibility_history...');
     const { data: tableCheck, error: tableError } = await supabase
-      .from('audit_history')
+      .from('audit_accessibility_history')
       .select('count', { count: 'exact', head: true });
     
     if (tableError) {
-      console.error('❌ Table audit_history non trouvée:', tableError.message);
+      console.error('❌ Table audit_accessibility_history non trouvée:', tableError.message);
       console.log('📋 Créez d\'abord la table avec le script setup-audit-history.sql dans Supabase SQL Editor');
       return;
     }
     
-    console.log(`✅ Table audit_history trouvée`);
+    console.log(`✅ Table audit_accessibility_history trouvée`);
     
     // 2. Insérer un audit de test
     console.log('\n💾 2. Insertion d\'un audit de test...');
@@ -56,7 +56,7 @@ async function testAuditHistory() {
     };
     
     const { data: insertData, error: insertError } = await supabase
-      .from('audit_history')
+      .from('audit_accessibility_history')
       .insert(testAudit)
       .select()
       .single();
@@ -71,7 +71,7 @@ async function testAuditHistory() {
     // 3. Récupérer l'historique
     console.log('\n📚 3. Récupération de l\'historique...');
     const { data: historyData, error: historyError } = await supabase
-      .from('audit_history')
+      .from('audit_accessibility_history')
       .select('*')
       .eq('user_email', testEmail)
       .order('timestamp', { ascending: false });
@@ -113,7 +113,7 @@ async function testAuditHistory() {
     await new Promise(resolve => setTimeout(resolve, 5000));
     
     const { error: deleteError } = await supabase
-      .from('audit_history')
+      .from('audit_accessibility_history')
       .delete()
       .eq('user_email', testEmail);
     

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`📚 API: Récupération historique pour ${userEmail}...`);
+    console.log(`📚 API: Récupération historique audit_accessibility_history pour ${userEmail}...`);
 
     const audits = await getUserAuditHistory(userEmail, limit);
 
