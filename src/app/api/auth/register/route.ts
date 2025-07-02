@@ -60,6 +60,31 @@ export async function POST(request: NextRequest) {
       emailVerificationToken: verificationToken
     });
 
+    // Envoyer une notification admin à chaque inscription
+    if (mailjetClient) {
+      await mailjetClient
+        .post('send', { version: 'v3.1' })
+        .request({
+          Messages: [
+            {
+              From: {
+                Email: process.env.MAILJET_FROM_EMAIL || 'hello@loicbernard.com',
+                Name: 'RGAA Audit'
+              },
+              To: [
+                {
+                  Email: 'hello@loicbernard.com',
+                  Name: 'Admin RGAA Audit'
+                }
+              ],
+              Subject: 'Nouvelle inscription sur RGAA Audit',
+              TextPart: `Nouvel utilisateur inscrit :\nEmail : ${email}\nNom : ${name}`,
+              HTMLPart: `<h3>Nouvel utilisateur inscrit</h3><ul><li><b>Email :</b> ${email}</li><li><b>Nom :</b> ${name}</li></ul>`
+            }
+          ]
+        });
+    }
+
     // Envoyer automatiquement l'email de vérification directement
     try {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://rgaa-audit.vercel.app';
