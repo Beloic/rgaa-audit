@@ -33,7 +33,9 @@ CREATE TABLE users (
   
   -- Usage tracking
   audits_this_month INTEGER DEFAULT 0,
+  audits_today INTEGER DEFAULT 0,
   audits_total INTEGER DEFAULT 0,
+  last_audit_date TIMESTAMP WITH TIME ZONE,
   team_members INTEGER DEFAULT 1,
   storage_used INTEGER DEFAULT 0,
   

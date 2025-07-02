@@ -107,9 +107,19 @@ export async function POST(request: NextRequest) {
     if (userData) {
       const isBetaUser = userData.betaAccess?.granted && !userData.betaAccess?.hasQuit;
       
+      console.log(`🔍 DEBUG Audit pour ${userData.email}:`, {
+        isBetaUser,
+        betaAccess: userData.betaAccess,
+        plan: userData.subscription?.plan,
+        auditsToday: userData.usage?.auditsToday,
+        lastAuditDate: userData.usage?.lastAuditDate,
+        emailVerified: userData.emailVerified
+      });
+      
       if (!isBetaUser) {
         // Vérifier la vérification d'email
         if (!userData.emailVerified) {
+          console.log(`❌ Email non vérifié pour ${userData.email}`);
           return NextResponse.json(
             { 
               error: 'Veuillez vérifier votre adresse email avant de pouvoir effectuer des analyses. Consultez votre boîte mail pour le lien de confirmation.',
@@ -128,17 +138,28 @@ export async function POST(request: NextRequest) {
         
         // Récupérer les limites du plan
         const planLimits = getPlanLimits(userData.subscription?.plan || 'free');
+        console.log(`📊 Limites du plan ${userData.subscription?.plan || 'free'}:`, planLimits);
         
         // Vérifier la limite quotidienne
         if (planLimits.auditsPerDay !== 'unlimited') {
           const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
           const lastAuditDate = userData.usage.lastAuditDate ? new Date(userData.usage.lastAuditDate).toISOString().split('T')[0] : null;
           
+          console.log(`📅 Vérification date:`, { today, lastAuditDate });
+          
           // Si c'est un nouveau jour, réinitialiser le compteur quotidien
           const auditsToday = lastAuditDate === today ? (userData.usage.auditsToday || 0) + 1 : 1;
           
+          console.log(`📈 Calcul audits aujourd'hui:`, {
+            isNewDay: lastAuditDate !== today,
+            currentAuditsToday: userData.usage.auditsToday || 0,
+            newAuditsToday: auditsToday,
+            limit: planLimits.auditsPerDay
+          });
+          
           // Vérifier si la limite quotidienne est dépassée
           if (auditsToday > planLimits.auditsPerDay) {
+            console.log(`🚫 LIMITE ATTEINTE pour ${userData.email}: ${auditsToday}/${planLimits.auditsPerDay}`);
             return NextResponse.json(
               { error: `Limite d'audits quotidienne atteinte (${planLimits.auditsPerDay}/jour). Passez à un plan supérieur pour continuer.` },
               { 
@@ -174,6 +195,7 @@ export async function POST(request: NextRequest) {
           
           console.log(`✅ Audit comptabilisé pour ${userData.email}: ${updatedUserData.usage.auditsToday}/${planLimits.auditsPerDay} audits aujourd'hui`);
         } else {
+          console.log(`♾️ Plan illimité pour ${userData.email}`);
           // Plan illimité - juste incrémenter les compteurs
           updatedUserData = {
             ...userData,
