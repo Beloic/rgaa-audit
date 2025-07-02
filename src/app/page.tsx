@@ -13,7 +13,6 @@ import RGAAReference from '@/components/RGAAReference';
 import AuditHistory, { saveAuditToHistory } from '@/components/AuditHistory';
 import Footer from '@/components/Footer';
 import type { AuditRequest, AuditResult, ComparativeResult, AnalysisProgress } from '@/types/audit';
-import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 import SimulateurHandicap from '@/app/simulateur-handicap/page';
 import QuizPage from '@/app/quiz/page';
 
@@ -397,13 +396,6 @@ export default function HomePage() {
           onSectionChange={handleTopBarSectionChange}
           onAnalyzeClick={handleAnalyzeClick}
         />
-
-        {/* Banner de vérification d'email */}
-        <div className={`${activeSection !== 'home' ? 'ml-64' : ''} relative z-10`}>
-          <div className="px-6 pt-4">
-            <EmailVerificationBanner />
-          </div>
-        </div>
 
         {/* Sidebar - seulement sur les pages autres que home */}
         {activeSection !== 'home' && (
