@@ -256,9 +256,11 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                                 <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1"></span>
                                 Plan {getCurrentPlan().name}
                               </p>
-                              <p className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                                {user.usage?.auditsToday || 0}/3 audits aujourd'hui
-                              </p>
+                              {getCurrentPlan().limits.auditsPerDay !== 'unlimited' && (
+                                <p className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                                  {user.usage?.auditsToday || 0}/{getCurrentPlan().limits.auditsPerDay} audits aujourd'hui
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -412,9 +414,11 @@ export default function TopBar({ activeSection, onSectionChange, onAnalyzeClick 
                             <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1"></span>
                             Plan {getCurrentPlan().name}
                           </p>
-                          <p className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                            {user.usage?.auditsToday || 0}/3 audits
-                          </p>
+                          {getCurrentPlan().limits.auditsPerDay !== 'unlimited' && (
+                            <p className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                              {user.usage?.auditsToday || 0}/{getCurrentPlan().limits.auditsPerDay} audits
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
