@@ -510,7 +510,7 @@ export default function AuditManagementPage() {
 
   // Charger les données d'audit et de gestion
   useEffect(() => {
-    const loadAuditData = () => {
+    const loadAuditData = async () => {
       try {
         if (!user) {
           setError('Utilisateur non connecté');
@@ -518,58 +518,86 @@ export default function AuditManagementPage() {
           return;
         }
 
-        // Charger l'historique des audits
-        const historyKey = `rgaa-audit-history-${user.email}`;
-        const stored = localStorage.getItem(historyKey);
+        console.log('🔍 Chargement audit depuis API pour gestion:', user?.email, 'auditId:', auditId);
         
-        if (stored) {
-          const audits: any[] = JSON.parse(stored);
-          const audit = audits.find(a => a.id === auditId);
+        let audit = null;
+
+        // D'abord essayer de charger depuis l'API Supabase (comme AuditHistory)
+        try {
+          const response = await fetch(`/api/audit-history?userEmail=${encodeURIComponent(user?.email || '')}`);
           
-          if (audit) {
-            setAuditData(audit.result);
+          if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Historique API chargé pour gestion:', data.total, 'audits');
             
-            // Charger ou créer les données de gestion
-            const managementKey = `audit-management-${auditId}-${user.email}`;
-            const storedManagement = localStorage.getItem(managementKey);
-            
-            if (storedManagement) {
-              setManagement(JSON.parse(storedManagement));
-            } else {
-              // Créer de nouvelles données de gestion
-              const newManagement: AuditManagement = {
-                auditId,
-                notes: [],
-                kanbanCards: audit.result.violations?.map((violation: RGAAViolation, index: number) => ({
-                  id: `card-${index}`,
-                  violation: { ...violation, source: 'automatic' as const },
-                  status: 'todo' as const,
-                  priority: violation.impact === 'critical' ? 'critical' : 
-                           violation.impact === 'serious' ? 'high' : 
-                           violation.impact === 'moderate' ? 'medium' : 'low',
-                  notes: '',
-                  updatedAt: new Date().toISOString(),
-                  customTitle: `Critère ${violation.criterion}`,
-                  customDescription: violation.description
-                })) || [],
-                settings: {
-                  assignees: [],
-                  tags: []
-                },
-                lastUpdated: new Date().toISOString()
-              };
-              
-              setManagement(newManagement);
-              localStorage.setItem(managementKey, JSON.stringify(newManagement));
+            if (data.success && data.audits) {
+              audit = data.audits.find((a: any) => a.id === auditId);
+              console.log('🔍 Audit trouvé dans API:', !!audit);
             }
           } else {
-            setError('Audit non trouvé');
+            console.error('❌ Erreur API historique pour gestion:', response.status, response.statusText);
+          }
+        } catch (apiError) {
+          console.error('❌ Erreur lors du chargement API pour gestion:', apiError);
+        }
+
+        // Fallback vers localStorage si pas trouvé dans l'API
+        if (!audit) {
+          console.log('📂 Fallback vers localStorage pour gestion...');
+          const historyKey = `rgaa-audit-history-${user.email}`;
+          const stored = localStorage.getItem(historyKey);
+          
+          if (stored) {
+            const audits: any[] = JSON.parse(stored);
+            audit = audits.find(a => a.id === auditId);
+            console.log('🔍 Audit trouvé dans localStorage:', !!audit);
+          }
+        }
+
+        if (audit) {
+          setAuditData(audit.result);
+          
+          // Charger ou créer les données de gestion
+          const managementKey = `audit-management-${auditId}-${user.email}`;
+          const storedManagement = localStorage.getItem(managementKey);
+          
+          if (storedManagement) {
+            setManagement(JSON.parse(storedManagement));
+          } else {
+            // Créer de nouvelles données de gestion
+            const newManagement: AuditManagement = {
+              auditId,
+              notes: [],
+              kanbanCards: audit.result.violations?.map((violation: RGAAViolation, index: number) => ({
+                id: `card-${index}`,
+                violation: { ...violation, source: 'automatic' as const },
+                status: 'todo' as const,
+                priority: violation.impact === 'critical' ? 'critical' : 
+                         violation.impact === 'serious' ? 'high' : 
+                         violation.impact === 'moderate' ? 'medium' : 'low',
+                notes: '',
+                updatedAt: new Date().toISOString(),
+                customTitle: `Critère ${violation.criterion}`,
+                customDescription: violation.description,
+                colorTag: violation.impact === 'critical' ? 'red' : 
+                         violation.impact === 'serious' ? 'red' : 
+                         violation.impact === 'moderate' ? 'yellow' : 'gray'
+              })) || [],
+              settings: {
+                assignees: [],
+                tags: []
+              },
+              lastUpdated: new Date().toISOString()
+            };
+            
+            setManagement(newManagement);
+            localStorage.setItem(managementKey, JSON.stringify(newManagement));
           }
         } else {
-          setError('Aucun historique d\'audit trouvé');
+          setError('Audit non trouvé dans l\'historique');
         }
       } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
+        console.error('Erreur lors du chargement des données de gestion:', error);
         setError('Erreur lors du chargement des données');
       } finally {
         setIsLoading(false);
