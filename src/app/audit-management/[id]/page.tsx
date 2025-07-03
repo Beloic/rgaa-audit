@@ -607,16 +607,132 @@ export default function AuditManagementPage() {
     loadAuditData();
   }, [auditId, user]);
 
-  // Sauvegarder les données de gestion
+  // Fonction pour nettoyer le localStorage quand il est plein
+  const cleanupLocalStorage = () => {
+    try {
+      console.log('🧹 Nettoyage du localStorage - espace plein détecté');
+      
+      // Récupérer toutes les clés d'audit-management
+      const keysToCheck: { key: string; timestamp: number }[] = [];
+      
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith('audit-management-')) {
+          try {
+            const data = localStorage.getItem(key);
+            if (data) {
+              const parsedData = JSON.parse(data);
+              const timestamp = new Date(parsedData.lastUpdated || '2000-01-01').getTime();
+              keysToCheck.push({ key, timestamp });
+            }
+          } catch (e) {
+            // Si on ne peut pas parser, on ajoute avec un timestamp ancien pour le supprimer
+            keysToCheck.push({ key, timestamp: 0 });
+          }
+        }
+      }
+      
+      // Trier par ancienneté (plus ancien en premier)
+      keysToCheck.sort((a, b) => a.timestamp - b.timestamp);
+      
+      // Supprimer les 50% plus anciens ou au minimum 3 éléments
+      const toDelete = Math.max(3, Math.floor(keysToCheck.length * 0.5));
+      let deleted = 0;
+      
+      for (let i = 0; i < toDelete && i < keysToCheck.length; i++) {
+        try {
+          localStorage.removeItem(keysToCheck[i].key);
+          deleted++;
+          console.log(`🗑️ Supprimé: ${keysToCheck[i].key}`);
+        } catch (e) {
+          console.error('Erreur lors de la suppression:', e);
+        }
+      }
+      
+      console.log(`✅ Nettoyage terminé: ${deleted} éléments supprimés`);
+      return deleted > 0;
+      
+    } catch (error) {
+      console.error('Erreur lors du nettoyage:', error);
+      return false;
+    }
+  };
+
+  // Sauvegarder les données de gestion avec gestion intelligente du quota
   const saveManagement = (updatedManagement: AuditManagement) => {
     try {
       if (!user) return;
       
       const managementKey = `audit-management-${auditId}-${user.email}`;
-      localStorage.setItem(managementKey, JSON.stringify(updatedManagement));
+      const dataToSave = JSON.stringify(updatedManagement);
+      
+      // Tenter la sauvegarde normale
+      localStorage.setItem(managementKey, dataToSave);
       setManagement(updatedManagement);
+      
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
+      
+      // Si c'est une erreur de quota
+      if (error instanceof DOMException && (
+        error.name === 'QuotaExceededError' || 
+        error.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+        error.code === 22
+      )) {
+        console.log('📦 LocalStorage plein - tentative de nettoyage...');
+        
+        // Tenter le nettoyage
+        const cleanupSuccessful = cleanupLocalStorage();
+        
+        if (cleanupSuccessful && user) {
+          try {
+            // Réessayer après nettoyage
+            const retryManagementKey = `audit-management-${auditId}-${user.email}`;
+            const retryDataToSave = JSON.stringify(updatedManagement);
+            localStorage.setItem(retryManagementKey, retryDataToSave);
+            setManagement(updatedManagement);
+            
+            // Afficher un message à l'utilisateur
+            console.log('✅ Sauvegarde réussie après nettoyage');
+            
+          } catch (retryError) {
+            console.error('❌ Échec de sauvegarde même après nettoyage:', retryError);
+            
+            // Dernière tentative : sauvegarder une version allégée
+            try {
+              const lightManagement = {
+                ...updatedManagement,
+                kanbanCards: updatedManagement.kanbanCards.map(card => ({
+                  ...card,
+                  // Retirer les screenshots pour économiser l'espace
+                  screenshot: undefined
+                }))
+              };
+              
+              const lightData = JSON.stringify(lightManagement);
+              const lightManagementKey = `audit-management-${auditId}-${user.email}`;
+              localStorage.setItem(lightManagementKey, lightData);
+              setManagement(lightManagement);
+              
+              console.log('💡 Sauvegarde allégée réussie (sans screenshots)');
+              
+            } catch (finalError) {
+              console.error('❌ Impossible de sauvegarder même en version allégée:', finalError);
+              // Continuer sans sauvegarder - au moins l'interface reste fonctionnelle
+              setManagement(updatedManagement);
+            }
+          }
+        } else {
+          console.error('❌ Nettoyage impossible - sauvegarde abandonnée');
+          // Continuer sans sauvegarder - au moins l'interface reste fonctionnelle  
+          setManagement(updatedManagement);
+        }
+        
+      } else {
+        // Autre type d'erreur
+        console.error('❌ Erreur de sauvegarde non liée au quota:', error);
+        setManagement(updatedManagement);
+      }
     }
   };
 
