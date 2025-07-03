@@ -85,28 +85,65 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [clearAllConfirm, setClearAllConfirm] = useState(false);
 
-  // Charger l'historique depuis localStorage (spécifique à l'utilisateur)
+  // Charger l'historique depuis l'API Supabase (base de données)
   useEffect(() => {
-    const loadHistory = () => {
+    const loadHistory = async () => {
       try {
         if (!user) {
           setAudits([]);
           return;
         }
         
-        const historyKey = `rgaa-audit-history-${user.email}`;
-        const stored = localStorage.getItem(historyKey);
-        if (stored) {
-          const parsed: HistoricalAudit[] = JSON.parse(stored);
-          // Trier par date décroissante (plus récent en premier)
-          parsed.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-          setAudits(parsed);
+        console.log('🔍 Chargement historique depuis API pour:', user?.email);
+        
+        // Appeler l'API pour récupérer l'historique depuis Supabase
+        const response = await fetch(`/api/audit-history?userEmail=${encodeURIComponent(user?.email || '')}`);
+        
+        if (!response.ok) {
+          console.error('❌ Erreur API historique:', response.status, response.statusText);
+          // Fallback vers localStorage si l'API échoue
+          const historyKey = `rgaa-audit-history-${user?.email || ''}`;
+          const stored = localStorage.getItem(historyKey);
+          if (stored) {
+            const parsed: HistoricalAudit[] = JSON.parse(stored);
+            parsed.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+            setAudits(parsed);
+            console.log('📂 Fallback vers localStorage:', parsed.length, 'audits');
+          } else {
+            setAudits([]);
+          }
+          return;
+        }
+        
+        const data = await response.json();
+        console.log('✅ Historique API chargé:', data.total, 'audits');
+        
+        if (data.success && data.audits) {
+          // Les audits sont déjà triés par timestamp DESC dans l'API
+          setAudits(data.audits);
         } else {
           setAudits([]);
         }
+        
       } catch (error) {
-        console.error('Erreur lors du chargement de l\'historique:', error);
-        setAudits([]);
+        console.error('❌ Erreur lors du chargement de l\'historique depuis l\'API:', error);
+        
+        // Fallback vers localStorage en cas d'erreur
+        try {
+          const historyKey = `rgaa-audit-history-${user?.email || ''}`;
+          const stored = localStorage.getItem(historyKey);
+          if (stored) {
+            const parsed: HistoricalAudit[] = JSON.parse(stored);
+            parsed.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+            setAudits(parsed);
+            console.log('📂 Fallback vers localStorage après erreur API:', parsed.length, 'audits');
+          } else {
+            setAudits([]);
+          }
+        } catch (fallbackError) {
+          console.error('❌ Erreur fallback localStorage:', fallbackError);
+          setAudits([]);
+        }
       }
     };
 

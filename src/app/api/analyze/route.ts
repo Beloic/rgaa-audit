@@ -220,6 +220,12 @@ export async function POST(request: NextRequest) {
       }
 
       // Sauvegarder l'audit comparatif dans l'historique côté serveur
+      console.log('🔍 DEBUG sauvegarde automatique COMPARATIVE - userData:', { 
+        hasUserData: !!userData, 
+        hasEmail: !!userData?.email, 
+        email: userData?.email 
+      });
+      
       if (userData?.email) {
         try {
           console.log('💾 Sauvegarde automatique de l\'audit comparatif en base...');
@@ -229,6 +235,8 @@ export async function POST(request: NextRequest) {
           console.error('❌ Erreur lors de la sauvegarde automatique comparative en base:', error);
           // Ne pas faire échouer l'analyse si la sauvegarde échoue
         }
+      } else {
+        console.log('❌ Sauvegarde automatique COMPARATIVE ignorée - pas de userData.email');
       }
       
       return NextResponse.json({ 
@@ -287,6 +295,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Sauvegarder l'audit dans l'historique côté serveur
+    console.log('🔍 DEBUG sauvegarde automatique - userData:', { 
+      hasUserData: !!userData, 
+      hasEmail: !!userData?.email, 
+      email: userData?.email 
+    });
+    
     if (userData?.email) {
       try {
         console.log('💾 Sauvegarde automatique de l\'audit en base...');
@@ -296,6 +310,8 @@ export async function POST(request: NextRequest) {
         console.error('❌ Erreur lors de la sauvegarde automatique en base:', error);
         // Ne pas faire échouer l'analyse si la sauvegarde échoue
       }
+    } else {
+      console.log('❌ Sauvegarde automatique ignorée - pas de userData.email');
     }
 
     return NextResponse.json({ 
