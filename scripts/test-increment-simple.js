@@ -97,7 +97,7 @@ async function testIncrementAPI() {
         }
 
         // Test de la limite quotidienne
-        console.log('\n🚦 Test de la limite quotidienne (3 audits max)...');
+        console.log('\n🚦 Test de la limite quotidienne (2 audits max)...');
         
         // Simuler 2 audits supplémentaires pour atteindre la limite
         for (let i = 1; i <= 2; i++) {
@@ -133,7 +133,7 @@ async function testIncrementAPI() {
           ...testUserData,
           usage: {
             ...testUserData.usage,
-            auditsToday: 3, // Déjà 3 audits aujourd'hui
+            auditsToday: 2, // Déjà 2 audits aujourd'hui
             auditsTotal: testUserData.usage.auditsTotal + 3,
             auditsThisMonth: testUserData.usage.auditsThisMonth + 3
           }
@@ -146,9 +146,9 @@ async function testIncrementAPI() {
         });
         
         if (limitExceededResponse.ok) {
-          console.log('   ❌ PROBLÈME: 4e audit autorisé (ne devrait pas)');
+          console.log('   ❌ PROBLÈME: 3e audit autorisé (ne devrait pas)');
         } else {
-          console.log('   ✅ 4e audit refusé correctement');
+          console.log('   ✅ 3e audit refusé correctement');
           const errorText = await limitExceededResponse.text();
           console.log(`   Raison: ${errorText}`);
         }

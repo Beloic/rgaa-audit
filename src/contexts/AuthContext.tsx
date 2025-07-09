@@ -152,7 +152,7 @@ const PRICING_PLANS: PricingPlan[] = [
     interval: 'month',
     description: 'Parfait pour découvrir l\'audit d\'accessibilité',
     features: [
-      '3 audits par jour',
+      '2 audits par jour',
       'Rapports de base',
       'Support communautaire',
       'Historique 30 jours',
@@ -160,7 +160,7 @@ const PRICING_PLANS: PricingPlan[] = [
       'Gestion des audits'
     ],
     limits: {
-      auditsPerDay: 3,
+      auditsPerDay: 2,
       auditsPerMonth: 'unlimited',
       teamMembers: 1,
       storage: 1,

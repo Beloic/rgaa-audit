@@ -147,13 +147,13 @@ async function testDirectAuditLimitation() {
     if (finalAuditsToday === 0) {
       console.log('   ❌ PROBLÈME CRITIQUE: Aucun audit comptabilisé');
       console.log('   → La synchronisation ne fonctionne pas du tout');
-    } else if (finalAuditsToday < 3) {
+    } else if (finalAuditsToday < 2) {
       console.log('   ⚠️ PROBLÈME PARTIEL: Comptage fonctionne mais pas testé jusqu\'à la limite');
       console.log('   → Relancer le script pour aller jusqu\'au bout');
-    } else if (finalAuditsToday === 3) {
-      console.log('   ✅ PARFAIT: 3 audits comptabilisés, limitation devrait s\'activer');
+    } else if (finalAuditsToday === 2) {
+      console.log('   ✅ PARFAIT: 2 audits comptabilisés, limitation devrait s\'activer');
     } else {
-      console.log('   ❌ PROBLÈME: Plus de 3 audits autorisés');
+      console.log('   ❌ PROBLÈME: Plus de 2 audits autorisés');
       console.log('   → La limitation ne s\'applique pas');
     }
 

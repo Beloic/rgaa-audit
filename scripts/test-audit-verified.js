@@ -155,7 +155,7 @@ async function testWithVerifiedEmail() {
         console.log('✅ PARTIEL: audits_today s\'incrémente');
         console.log('   → Besoin de tester jusqu\'à la limite');
       } else if (auditsToday >= 3) {
-        console.log('⚠️ PROBLÈME: Plus de 3 audits autorisés');
+        console.log('⚠️ PROBLÈME: Plus de 2 audits autorisés');
         console.log('   → La limitation ne s\'applique pas correctement');
       }
     }
