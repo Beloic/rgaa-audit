@@ -71,7 +71,7 @@ export default function ArticlePage() {
             
             <p className="text-xl text-gray-600 leading-relaxed">
               Le RGAA (Référentiel Général d'Amélioration de l'Accessibilité) va connaître plusieurs évolutions importantes en 2025. Basé 
-              sur des normes internationales, ce référentiel verra son rayon d'application élargi le <strong>28 juin 2025</strong>. Découvrez les 5 points qui vont évoluer cet été.
+              sur des normes internationales, ce référentiel verra son rayon d'application élargi le <strong>28 juin 2025</strong>. Découvrez les 4 points qui vont évoluer cet été.
             </p>
           </header>
 
@@ -85,7 +85,7 @@ export default function ArticlePage() {
             </div>
 
             <p className="text-gray-700 text-lg leading-relaxed mb-8">
-              Élaboré dans le cadre de la loi sur l'égalité des droits et des chances de 2005, le RGAA, ou Référentiel Général d'Amélioration de l'Accessibilité, déployé en 2009 et mis à jour régulièrement depuis, impose aux services publics, de l'État et des collectivités, de rendre leurs plateformes numériques accessibles à toutes et tous. Il s'appuie sur des normes internationales, comme les WCAG (Web Content Accessibility Guidelines), et verra son rayon d'application élargi le <strong>28 juin 2025</strong>. Découvrez les 5 points qui vont évoluer cet été.
+              Élaboré dans le cadre de la loi sur l'égalité des droits et des chances de 2005, le RGAA, ou Référentiel Général d'Amélioration de l'Accessibilité, déployé en 2009 et mis à jour régulièrement depuis, impose aux services publics, de l'État et des collectivités, de rendre leurs plateformes numériques accessibles à toutes et tous. Il s'appuie sur des normes internationales, comme les WCAG (Web Content Accessibility Guidelines), et verra son rayon d'application élargi le <strong>28 juin 2025</strong>. Découvrez les 4 points qui vont évoluer cet été.
             </p>
 
             {/* Point 1 */}
@@ -278,40 +278,7 @@ export default function ArticlePage() {
               </div>
             </section>
 
-            {/* Point 5 */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="bg-blue-100 text-blue-800 text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">5</span>
-                La mise en place d'outils d'accompagnement
-              </h2>
-              
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <p className="text-gray-700 leading-relaxed mb-6">
-                  Pour faciliter la mise en conformité, l'État mettra à disposition des outils pratiques :
-                </p>
-                
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
-                  <div className="flex items-start">
-                    <div className="bg-blue-500 text-white w-12 h-12 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                      <FileText className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Plateforme Ara</h4>
-                      <p className="text-gray-700 leading-relaxed mb-3">
-                        Un outil en ligne permettant de réaliser des audits d'accessibilité numérique. Elle fournira aux entreprises et administrations des rapports détaillés sur les points à améliorer pour répondre aux critères du RGAA.
-                      </p>
-                      <p className="text-blue-600 text-sm font-medium">
-                        ✓ Audits automatisés ✓ Rapports détaillés ✓ Recommandations personnalisées
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <p className="text-gray-700 leading-relaxed mt-6">
-                  Ces outils visent à simplifier le processus de mise en conformité et à aider les organismes à identifier rapidement les lacunes de leurs services numériques. En outre, ces ressources contribueront à sensibiliser les développeurs et designers à l'importance de l'accessibilité dès les phases initiales des projets.
-                </p>
-              </div>
-            </section>
+
 
             {/* Conclusion */}
             <section className="mb-12">
