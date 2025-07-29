@@ -416,18 +416,18 @@ export default function AuditHistory({ onResumeAudit }: AuditHistoryProps) {
                   {/* Statut de conformité */}
                   <div className="flex flex-col items-center justify-center p-0 h-full">
                     <div className={`rounded-xl shadow w-full py-6 flex flex-col items-center justify-center mb-2 border h-full ${
-                      audit.score >= 100 
+                      audit.score >= 90 
                         ? 'bg-green-50 border-green-100' 
                         : audit.score >= 50 
                         ? 'bg-orange-50 border-orange-100'
                         : 'bg-red-50 border-red-100'
                     }`}>
                       <span className={`text-sm font-bold mb-1 ${
-                        audit.score >= 100 ? 'text-green-700' :
+                        audit.score >= 90 ? 'text-green-700' :
                         audit.score >= 50 ? 'text-orange-700' :
                         'text-red-700'
                       }`} style={{fontFamily: 'inherit'}}>
-                        {audit.score >= 100 ? 'Conforme' :
+                        {audit.score >= 90 ? 'Bon niveau' :
                          audit.score >= 50 ? 'Partiellement conforme' :
                          'Non conforme'}
                       </span>

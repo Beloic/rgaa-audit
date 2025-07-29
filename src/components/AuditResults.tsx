@@ -788,11 +788,12 @@ function AccessibilityLevelCard({ result, language }: { result: AuditResult; lan
     console.log('  - Score obtenu:', result.score);
     
     // Classification selon les seuils RGAA officiels
-    if (result.score >= 100) {
-      console.log('  ✅ Niveau: TOTALEMENT CONFORME (100% des critères respectés)');
-      return 'AA'; // Niveau le plus élevé pour totalement conforme
+    // Note: Une analyse automatique ne peut pas garantir une conformité totale
+    if (result.score >= 90) {
+      console.log('  ✅ Niveau: BON NIVEAU (90%+ des critères respectés)');
+      return 'GOOD'; // Bon niveau mais pas totalement conforme
     } else if (result.score >= 50) {
-      console.log('  ⚠️ Niveau: PARTIELLEMENT CONFORME (50-99% des critères respectés)');
+      console.log('  ⚠️ Niveau: PARTIELLEMENT CONFORME (50-89% des critères respectés)');
       return 'A'; // Niveau intermédiaire pour partiellement conforme
     } else {
       console.log('  ❌ Niveau: NON CONFORME (<50% des critères respectés)');
@@ -803,15 +804,15 @@ function AccessibilityLevelCard({ result, language }: { result: AuditResult; lan
   const level = getAccessibilityLevel();
 
   const levelConfig = {
-    'AA': {
-      label: language === 'fr' ? 'Totalement conforme' : 'Fully compliant',
+    'GOOD': {
+      label: language === 'fr' ? 'Bon niveau' : 'Good level',
       description: language === 'fr' 
-        ? 'Le site respecte l\'ensemble des critères RGAA applicables' 
-        : 'The site meets all applicable RGAA criteria',
+        ? 'Le site présente un bon niveau d\'accessibilité selon l\'analyse automatique. Une vérification manuelle reste recommandée pour une conformité totale.' 
+        : 'The site shows good accessibility level based on automated analysis. Manual verification is still recommended for full compliance.',
       color: 'bg-green-500',
       textColor: 'text-white',
       borderColor: 'border-green-600',
-              bgGradient: 'bg-green-50',
+      bgGradient: 'bg-green-50',
       icon: '✅'
     },
     'A': {
@@ -822,7 +823,7 @@ function AccessibilityLevelCard({ result, language }: { result: AuditResult; lan
       color: 'bg-orange-500',
       textColor: 'text-white',
       borderColor: 'border-orange-600',
-              bgGradient: 'bg-orange-50',
+      bgGradient: 'bg-orange-50',
       icon: '⚠️'
     },
     'NONE': {
@@ -833,7 +834,7 @@ function AccessibilityLevelCard({ result, language }: { result: AuditResult; lan
       color: 'bg-red-500',
       textColor: 'text-white',
       borderColor: 'border-red-600',
-              bgGradient: 'bg-red-50',
+      bgGradient: 'bg-red-50',
       icon: '❌'
     }
   };
@@ -1230,7 +1231,7 @@ export default function AuditResults({ result, language, onNewAudit, updatedUser
         </div>
         {/* Widget conformité */}
         <div className="flex flex-col items-center justify-center w-full h-full min-h-[160px] bg-orange-50 border border-orange-100 rounded-2xl shadow-lg p-8 text-center h-full">
-          <span className="text-lg font-bold text-orange-800 mb-3">{result.score >= 100 ? 'Conforme' : result.score >= 50 ? 'Partiellement conforme' : 'Non conforme'}</span>
+          <span className="text-lg font-bold text-orange-800 mb-3">{result.score >= 90 ? 'Bon niveau' : result.score >= 50 ? 'Partiellement conforme' : 'Non conforme'}</span>
           <div className="text-gray-500 text-sm">Statut de conformité</div>
         </div>
       </div>
