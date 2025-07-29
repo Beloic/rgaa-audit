@@ -807,8 +807,8 @@ function AccessibilityLevelCard({ result, language }: { result: AuditResult; lan
     'GOOD': {
       label: language === 'fr' ? 'Bon niveau' : 'Good level',
       description: language === 'fr' 
-        ? 'Le site présente un bon niveau d\'accessibilité selon l\'analyse automatique. Une vérification manuelle reste recommandée pour une conformité totale.' 
-        : 'The site shows good accessibility level based on automated analysis. Manual verification is still recommended for full compliance.',
+        ? 'Le site présente un bon niveau d\'accessibilité selon l\'analyse automatique. Une vérification manuelle par un ou une experte est nécessaire pour une conformité totale.' 
+        : 'The site shows good accessibility level based on automated analysis. Manual verification by an expert is necessary for full compliance.',
       color: 'bg-green-500',
       textColor: 'text-white',
       borderColor: 'border-green-600',
