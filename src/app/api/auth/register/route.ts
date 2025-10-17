@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       user: userWithoutPassword,
-      message: 'Compte créé avec succès ! Vous pouvez maintenant utiliser la plateforme.'
+      message: 'Inscription réussie ! Redirection dans quelques secondes...'
     });
 
   } catch (error) {
