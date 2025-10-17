@@ -6,17 +6,24 @@ import type { User } from '@/types/user';
 // Import MailJet pour envoi direct
 const mailjet = require('node-mailjet');
 
-// Initialiser MailJet si les clés sont configurées
-const mailjetClient = process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY
-  ? mailjet.apiConnect(
-      process.env.MAILJET_API_KEY,
-      process.env.MAILJET_SECRET_KEY
-    )
-  : null;
-
 export async function POST(request: NextRequest) {
   try {
     const { email, password, name } = await request.json();
+
+    // Initialiser MailJet si les clés sont configurées
+    const mailjetClient = process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY
+      ? mailjet.apiConnect(
+          process.env.MAILJET_API_KEY,
+          process.env.MAILJET_SECRET_KEY
+        )
+      : null;
+
+    console.log('🔍 Debug MailJet:', {
+      apiKey: process.env.MAILJET_API_KEY ? '✅ Définie' : '❌ Manquante',
+      secretKey: process.env.MAILJET_SECRET_KEY ? '✅ Définie' : '❌ Manquante',
+      fromEmail: process.env.MAILJET_FROM_EMAIL || '❌ Manquante',
+      clientInitialized: mailjetClient ? '✅ Oui' : '❌ Non'
+    });
 
     // Validation des données
     if (!email || !password || !name) {
