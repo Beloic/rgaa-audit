@@ -61,31 +61,37 @@ export async function POST(request: NextRequest) {
     });
 
     // Envoyer une notification admin à chaque inscription
-    if (mailjetClient) {
-      await mailjetClient
-        .post('send', { version: 'v3.1' })
-        .request({
-          Messages: [
-            {
-              From: {
-                Email: process.env.MAILJET_FROM_EMAIL || 'hello@loicbernard.com',
-                Name: 'RGAA Audit'
-              },
-              To: [
-                {
-                  Email: 'hello@loicbernard.com',
-                  Name: 'Admin RGAA Audit'
-                }
-              ],
-              Subject: 'Nouvelle inscription sur RGAA Audit',
-              TextPart: `Nouvel utilisateur inscrit :\nEmail : ${email}\nNom : ${name}`,
-              HTMLPart: `<h3>Nouvel utilisateur inscrit</h3><ul><li><b>Email :</b> ${email}</li><li><b>Nom :</b> ${name}</li></ul>`
-            }
-          ]
-        });
+    try {
+      if (mailjetClient) {
+        await mailjetClient
+          .post('send', { version: 'v3.1' })
+          .request({
+            Messages: [
+              {
+                From: {
+                  Email: process.env.MAILJET_FROM_EMAIL || 'hello@loicbernard.com',
+                  Name: 'RGAA Audit'
+                },
+                To: [
+                  {
+                    Email: 'hello@loicbernard.com',
+                    Name: 'Admin RGAA Audit'
+                  }
+                ],
+                Subject: 'Nouvelle inscription sur RGAA Audit',
+                TextPart: `Nouvel utilisateur inscrit :\nEmail : ${email}\nNom : ${name}`,
+                HTMLPart: `<h3>Nouvel utilisateur inscrit</h3><ul><li><b>Email :</b> ${email}</li><li><b>Nom :</b> ${name}</li></ul>`
+              }
+            ]
+          });
+      }
+    } catch (adminEmailError) {
+      console.log('⚠️ Erreur lors de l\'envoi de la notification admin:', adminEmailError);
+      // Ne pas faire échouer l'inscription pour cette erreur
     }
 
     // Envoyer automatiquement l'email de vérification directement
+    let emailSent = false;
     try {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://rgaa-audit.vercel.app';
       const verificationUrl = `${appUrl}/auth/verify-email?token=${verificationToken}`;
@@ -203,6 +209,7 @@ L'équipe RGAA Audit
 
         console.log('✅ Email de vérification envoyé via MailJet à:', email);
         console.log('   - Message ID:', result.body.Messages[0].To[0].MessageID);
+        emailSent = true;
       } else {
         // Mode simulation
         console.log(`
@@ -225,9 +232,11 @@ L'équipe RGAA Audit
         L'équipe RGAA Audit
         ===============================================
         `);
+        emailSent = true; // En mode simulation, considérer comme envoyé
       }
     } catch (emailError) {
       console.log('⚠️ Erreur lors de l\'envoi de l\'email de vérification:', emailError);
+      emailSent = false;
     }
 
     // Retourner l'utilisateur (sans le mot de passe)
@@ -236,7 +245,9 @@ L'équipe RGAA Audit
     return NextResponse.json({
       success: true,
       user: userWithoutPassword,
-      message: 'Compte créé avec succès. Un email de vérification a été envoyé.'
+      message: emailSent 
+        ? 'Compte créé avec succès. Un email de vérification a été envoyé.'
+        : 'Compte créé avec succès. L\'email de vérification n\'a pas pu être envoyé, mais vous pouvez vous connecter.'
     });
 
   } catch (error) {
