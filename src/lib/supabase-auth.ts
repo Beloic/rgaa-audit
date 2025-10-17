@@ -121,7 +121,6 @@ export const createUser = async (userData: {
   email: string;
   name: string;
   password: string;
-  emailVerificationToken?: string;
 }): Promise<UserType> => {
   try {
     const hashedPassword = await hashPassword(userData.password);
@@ -133,10 +132,10 @@ export const createUser = async (userData: {
       email: userData.email,
       name: userData.name,
       password: hashedPassword,
-      email_verification_token: userData.emailVerificationToken,
-      email_verification_sent_at: userData.emailVerificationToken ? new Date().toISOString() : null,
+      email_verification_token: null,
+      email_verification_sent_at: null,
       subscription_trial_ends_at: trialEndsAt.toISOString(),
-      email_verified: false,
+      email_verified: true, // Marquer comme vérifié par défaut
       beta_access_granted: false,
       beta_access_has_quit: false,
       subscription_plan: 'free',
